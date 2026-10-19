@@ -23,10 +23,33 @@ from nesting_engine import NestingEngine
 from dxf_engine import generate_panel_dxf, generate_sheet_nesting_dxf, generate_csv_cut_report
 
 PORT = int(os.environ.get('PORT', 8080))
-STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public")
+if not os.path.exists(STATIC_DIR):
+    STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
-# Simple in-memory session token store (token -> {user_id, email, role, full_name})
+# In-memory session token store (mirrored with SQLite sessions table for serverless)
 SESSIONS = {}
+
+def save_session(token: str, user_data: dict):
+    SESSIONS[token] = user_data
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS sessions (
+            token TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            data_json TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        );
+        """)
+        c.execute("INSERT OR REPLACE INTO sessions (token, user_id, data_json) VALUES (?, ?, ?)",
+                  (token, user_data['id'], json.dumps(user_data, ensure_ascii=False)))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print("save_session error:", e)
 
 def generate_reference_code(category: str = "kitchen") -> str:
     prefix = "TR"
@@ -80,13 +103,58 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
         auth_header = self.headers.get('Authorization', '')
         if auth_header.startswith('Bearer '):
             token = auth_header.split(' ', 1)[1].strip()
-            return SESSIONS.get(token)
+            if token in SESSIONS:
+                return SESSIONS[token]
+            try:
+                conn = get_db()
+                c = conn.cursor()
+                c.execute("SELECT data_json FROM sessions WHERE token = ?", (token,))
+                row = c.fetchone()
+                conn.close()
+                if row:
+                    user_data = json.loads(row['data_json'])
+                    SESSIONS[token] = user_data
+                    return user_data
+            except Exception as e:
+                print("get_auth_user error:", e)
         return None
 
-    def do_GET(self):
+    def get_parsed_path(self):
+        matched = (
+            self.headers.get('x-matched-path') or 
+            self.headers.get('x-forwarded-uri') or 
+            self.headers.get('x-original-url') or 
+            self.headers.get('x-rewrite-url')
+        )
+        if matched:
+            parsed = urllib.parse.urlparse(matched)
+            return parsed.path, urllib.parse.parse_qs(parsed.query)
+
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
+
+        if path.startswith('/api/index') or path == '/api':
+            if '_route' in query:
+                r = query['_route'][0].lstrip('/')
+                return f"/api/{r}", query
+            if 'path' in query:
+                r = query['path'][0].lstrip('/')
+                return f"/api/{r}", query
+
+        return path, query
+
+    def do_GET(self):
+        path, query = self.get_parsed_path()
+
+        # Health & Status Route
+        if path == '/api/health':
+            return self.send_json({
+                "status": "ok",
+                "app": "ModulerCraft Pro",
+                "version": "2.0.0",
+                "platform": "vercel" if os.environ.get("VERCEL") else "local"
+            }, 200)
 
         # API Routes
         if path == '/api/auth/me':
@@ -290,8 +358,7 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
         return self.serve_static(path)
 
     def do_POST(self):
-        parsed = urllib.parse.urlparse(self.path)
-        path = parsed.path
+        path, query = self.get_parsed_path()
         body = self.read_json_body()
 
         # Auth Register
@@ -338,7 +405,7 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
                 "phone": phone, "role": role, "tokens_balance": initial_tokens,
                 "company_name": company_name
             }
-            SESSIONS[token] = user_data
+            save_session(token, user_data)
             return self.send_json({"success": True, "token": token, "user": user_data})
 
         # Auth Login
@@ -359,7 +426,7 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             del user_data['password_hash']
 
             token = "mc_tok_" + "".join(random.choices(string.ascii_letters + string.digits, k=32))
-            SESSIONS[token] = user_data
+            save_session(token, user_data)
             return self.send_json({"success": True, "token": token, "user": user_data})
 
         # Token Purchase (for Professional users / architects)

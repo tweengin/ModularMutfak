@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ModulerCraft Pro - Özel Mobilya Tasarım & CNC Entegrasyon Sistemi</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="brand" onclick="navigateTo('landing')">
+      <div class="brand-logo">MC</div>
+      <div class="brand-text">
+        <h1>ModulerCraft Pro</h1>
+        <span>Özel Mobilya & CNC Entegrasyonu</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <button class="nav-btn active" id="nav-landing" onclick="navigateTo('landing')">
+        🏠 Ana Sayfa
+      </button>
+      <button class="nav-btn" id="nav-categories" onclick="navigateTo('categories')">
+        📁 Modeller & Tasarım
+      </button>
+      <button class="nav-btn" id="nav-studio" onclick="navigateTo('studio')">
+        📐 3D Tasarım Stüdyosu
+      </button>
+      <button class="nav-btn" onclick="openRefLookupModal()">
+        🔍 Referans Sorgula
+      </button>
+      <div id="auth-nav-container"></div>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-container">
+
+    <!-- 0. LANDING PAGE VIEW (VITRIN WEB SITESI) -->
+    <section id="view-landing" class="view-section active">
+      <div class="landing-section">
+        
+        <!-- Hero Section -->
+        <div class="landing-hero">
+          <div class="landing-hero-badge">
+            <span>✦</span> YENİ NESİL ÖZEL MOBİLYA TASARIM & CNC FABRİKA ENTEGRASYONU
+          </div>
+          <h1>Hayalinizdeki Mobilyayı 3D Tasarlayın, Milimetrik Fabrika İmalatına Dönüştürün</h1>
+          <p>
+            Mutfak, portmanto, yatak odası ve genç odanızı tarayıcınızda 360° interaktif olarak tasarlayın. 
+            Kapı açılış tarama yayını hesaplayan akıllı motorumuzla montaj hatalarını sıfırlayın; 
+            Pegasus Cad-Cam ve Honda Benk CNC makinelerimizle sıfır hata üretime dönüştürün.
+          </p>
+
+          <div class="hero-cta-buttons">
+            <button class="btn btn-primary btn-lg" onclick="startDesignCustomer('kitchen')">
+              🎨 Ücretsiz Üye Ol & Hemen Tasarla 🚀
+            </button>
+            <button class="btn btn-outline btn-lg" onclick="openAuthModal('login')">
+              🔑 Üye Girişi Yap
+            </button>
+            <button class="btn btn-admin btn-lg" onclick="openAdminLoginModal()">
+              👑 Yönetici Girişi (Eşinizin Paneli)
+            </button>
+          </div>
+
+          <div class="hero-stats-bar">
+            <div class="hero-stat-item">
+              <span class="stat-check">✔</span>
+              <span>100% Gerçek 3D Derinlik (600mm / 350mm)</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="stat-check">✔</span>
+              <span>360° Sınırsız Döner Podyum & Kılavuz Gölge</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="stat-check">✔</span>
+              <span>Pegasus & Honda Benk CNC Nesting</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="stat-check">✔</span>
+              <span>E1 Normu AGT MDFlam & Blum/Samet Raylar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- How It Works (Nasıl Çalışır?) -->
+        <div id="how-it-works">
+          <div class="section-heading">
+            <h2>Nasıl Çalışır?</h2>
+            <p>Evinizin ölçülerinden fabrikadaki CNC makinelerine uzanan 4 adımlı kusursuz süreç</p>
+          </div>
+
+          <div class="workflow-grid">
+            <div class="workflow-card">
+              <div class="workflow-step-num">01</div>
+              <h3>Odanızı & Ölçüleri Belirleyin</h3>
+              <p>Odanızın net en, boy ve tavan yüksekliğini girin. Kapınızın açılış yönünü seçin; akıllı motorumuz kapı açılış yayını tarayarak dolapların kapıya çarpmasını otomatik önlesin.</p>
+            </div>
+
+            <div class="workflow-card">
+              <div class="workflow-step-num">02</div>
+              <h3>3D Modülleri Tuvale Yerleştirin</h3>
+              <p>Çekmeceli alt dolaplar, eviye, ankastre fırın, aspiratör ve boy kileri sürükle-bırak ile duvara dizin. İster Arka Duvara ister Sol Duvara dizin, 3D sahnede modülleri tutup kaydırın.</p>
+            </div>
+
+            <div class="workflow-card">
+              <div class="workflow-step-num">03</div>
+              <h3>Kaydedin & Referans Kodu Alın</h3>
+              <p>Tasarımınızı tek tıkla kaydedin. Size özel oluşturulan TR-xxxx referans kodu ile atölye yöneticimize iletin. Fiyat teklifinizi ve showroom keşif randevunuzu talep edin.</p>
+            </div>
+
+            <div class="workflow-card">
+              <div class="workflow-step-num">04</div>
+              <h3>CNC ile Sıfır Hata Üretim</h3>
+              <p>Yöneticimiz dinamik fiyat matrisi üzerinden projenizi onayladığında, sistem otomatik 2D Nesting yapar ve Pegasus / Honda Benk CNC makinelerinde milimetrik üretime başlar.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Main Categories Showcase -->
+        <div>
+          <div class="section-heading">
+            <h2>Üretim Kategorilerimiz</h2>
+            <p>1. Sınıf malzemelerle üretilen 4 ana yaşam alanı mobilya koleksiyonu</p>
+          </div>
+
+          <div class="landing-categories-grid">
+            <!-- Kitchen -->
+            <div class="landing-cat-card">
+              <div class="landing-cat-visual">🍳</div>
+              <div class="landing-cat-body">
+                <div class="landing-cat-tag">En Çok Tercih Edilen</div>
+                <h3>Özel Mutfak Sistemleri</h3>
+                <p>Doğrusal tek duvar veya L-Mutfak köşe modülleri, 3 çekmeceli tandem frenli raylar, eviye altı, ankastre setler ve Çimstone/granit tezgah çözümleri.</p>
+                <button class="btn btn-primary" onclick="startDesignCustomer('kitchen')">Mutfak Tasarla →</button>
+              </div>
+            </div>
+
+            <!-- Portmanto -->
+            <div class="landing-cat-card">
+              <div class="landing-cat-visual">🧥</div>
+              <div class="landing-cat-body">
+                <div class="landing-cat-tag">Giriş & Antre</div>
+                <h3>Portmanto & Vestiyer</h3>
+                <p>Minderli oturmalı ayakkabılık bench'i, tam boy aynalı gizli dolap, ceket/kaban askılık bölmeleri ve üst valiz depolama dolapları.</p>
+                <button class="btn btn-primary" onclick="startDesignCustomer('portmanto')">Portmanto Tasarla →</button>
+              </div>
+            </div>
+
+            <!-- Bedroom -->
+            <div class="landing-cat-card">
+              <div class="landing-cat-visual">🛏️</div>
+              <div class="landing-cat-body">
+                <div class="landing-cat-tag">Yatak Odası</div>
+                <h3>Gardırop & Yatak Odası</h3>
+                <p>Geniş iç hacimli 3 kapaklı gardırop, pantolonluk ve ayarlı raf bölmeleri, 4 çekmeceli şifonyer, aynalı makyaj konsolu ve ikili komodin takımı.</p>
+                <button class="btn btn-primary" onclick="startDesignCustomer('bedroom')">Yatak Odası Tasarla →</button>
+              </div>
+            </div>
+
+            <!-- Children's Room -->
+            <div class="landing-cat-card">
+              <div class="landing-cat-visual">🧸</div>
+              <div class="landing-cat-body">
+                <div class="landing-cat-tag">Çocuk & Genç</div>
+                <h3>Çocuk & Genç Odası</h3>
+                <p>Ergonomik çalışma masası, güvenli yumuşak radiuslu köşeler, modüler kitaplık rafları, emniyetli çekmeceler ve oyuncak depolama üniteleri.</p>
+                <button class="btn btn-primary" onclick="startDesignCustomer('children')">Çocuk Odası Tasarla →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technical Advantages (Neden ModulerCraft Pro?) -->
+        <div>
+          <div class="section-heading">
+            <h2>Neden ModulerCraft Pro?</h2>
+            <p>Geleneksel mobilyacılık ile endüstriyel CAD/CAM teknolojisinin buluştuğu nokta</p>
+          </div>
+
+          <div class="features-grid">
+            <div class="feature-box">
+              <div class="feature-icon-bubble">📐</div>
+              <div>
+                <h4>Sıfır Derinlik Algısı Yanılgısı</h4>
+                <p>Düşük derinlik algısına sahip kullanıcılar için 3D Showroom, 2D Mimari Plan ve 2D Ön Görünüş tam senkronize çalışır; boyut yanılsamasını engeller.</p>
+              </div>
+            </div>
+
+            <div class="feature-box">
+              <div class="feature-icon-bubble">🚪</div>
+              <div>
+                <h4>Dinamik Kapı Açılış Koruması</h4>
+                <p>Kapı açılış tarama yayını milimetrik hesaplayarak mobilyanın kapıya çarpma riskini kırmızı uyarı ile önceden haber verir.</p>
+              </div>
+            </div>
+
+            <div class="feature-box">
+              <div class="feature-icon-bubble">🧱</div>
+              <div>
+                <h4>Duvar Sınırı & L-Köşe Desteği</h4>
+                <p>Dolapların duvardan dışarı taşmasını fiziksel olarak sınırlar. Arka duvar dolduğunda sol duvara geçişi otomatik önerir.</p>
+              </div>
+            </div>
+
+            <div class="feature-box">
+              <div class="feature-icon-bubble">⚡</div>
+              <div>
+                <h4>İç Mimarlar İçin Jeton Sistemi</h4>
+                <p>Müteahhit ve iç mimarlar için çoklu proje yükleme, jetonlu bakiye sistemi ve öncelikli fabrika CNC kesim hattı entegrasyonu.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin / Manager Highlight Banner -->
+        <div class="landing-admin-banner">
+          <div class="admin-banner-text">
+            <h3>👑 Atölye Yönetici Paneli (Eşinizin Paneli)</h3>
+            <p>
+              Müşteriler teknik detay ve maliyet görmez. Yöneticimiz dinamik hammadde matrisi, kâr marjı ve işçilikle net teklifi belirler; 
+              onaylanan projeyi tek tıkla 2D Nesting ile Pegasus Cad-Cam & Honda Benk CNC makinelerine gönderir.
+            </p>
+          </div>
+          <div>
+            <button class="btn btn-admin btn-lg" onclick="openAdminLoginModal()" style="white-space:nowrap;">
+              🔐 Yönetici Paneline Giriş Yap →
+            </button>
+          </div>
+        </div>
+
+        <!-- Landing Footer -->
+        <footer class="landing-footer">
+          <div class="footer-top">
+            <div class="brand" onclick="navigateTo('landing')">
+              <div class="brand-logo">MC</div>
+              <div class="brand-text">
+                <h1 style="font-size:1.1rem;">ModulerCraft Pro</h1>
+                <span>Özel Mobilya & CNC Entegrasyonu</span>
+              </div>
+            </div>
+            <div class="footer-sponsors">
+              <span>Resmi Malzeme & Teknoloji Ortakları:</span>
+              <span class="footer-sponsor-pill">AGT Panel & Zemin</span>
+              <span class="footer-sponsor-pill">Çimstone Kuvars</span>
+              <span class="footer-sponsor-pill">Blum / Samet Hırdavat</span>
+              <span class="footer-sponsor-pill">Honda Benk CNC</span>
+              <span class="footer-sponsor-pill">Pegasus Cad-Cam</span>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <span>© 2026 ModulerCraft Pro. Tüm Hakları Saklıdır.</span>
+            <div style="display:flex; gap:1.25rem;">
+              <a href="javascript:void(0)" onclick="navigateTo('categories')" style="color:#94a3b8; text-decoration:none;">Modeller</a>
+              <a href="javascript:void(0)" onclick="openRefLookupModal()" style="color:#94a3b8; text-decoration:none;">Referans Sorgula</a>
+              <a href="javascript:void(0)" onclick="openAdminLoginModal()" style="color:#f87171; text-decoration:none; font-weight:700;">Yönetici Girişi</a>
+            </div>
+          </div>
+        </footer>
+
+      </div>
+    </section>
+
+    <!-- 1. CATEGORY SELECTION VIEW -->
+    <section id="view-categories" class="view-section">
+      <div class="hero-header">
+        <h2>Ne Tasarlamak İstiyorsunuz?</h2>
+        <p>Evinizin ölçülerine özel milimetrik mobilyanızı tasarlayın, kapı açılış mesafelerini otomatik hesaplayıp doğrudan fabrikamıza gönderin.</p>
+      </div>
+
+      <div class="categories-grid">
+        <!-- Kitchen -->
+        <div class="category-card" onclick="selectCategory('kitchen')">
+          <div class="cat-icon">🍳</div>
+          <h3>Mutfak (Kitchen)</h3>
+          <div class="cat-subtitle">Alt/Üst Dolaplar, Kiler & Tezgah</div>
+          <p>3 Çekmeceli modüller, eviye altı, ankastre fırın/ocak/bulaşık makinesi entegrasyonu, aspiratör üstü ve kiler boy dolapları.</p>
+          <button class="btn btn-primary btn-sm">Mutfak Tasarla →</button>
+        </div>
+
+        <!-- Portmanto -->
+        <div class="category-card" onclick="selectCategory('portmanto')">
+          <div class="cat-icon">🧥</div>
+          <h3>Portmanto & Antre</h3>
+          <div class="cat-subtitle">Giriş Holü, Boy Aynası & Ayakkabılık</div>
+          <p>Minderli oturma bench'i, çekmeceli ayakkabılık bölmeleri, boy aynalı gizli dolaplar ve ceket askılık alanları.</p>
+          <button class="btn btn-primary btn-sm">Portmanto Tasarla →</button>
+        </div>
+
+        <!-- Bedroom -->
+        <div class="category-card" onclick="selectCategory('bedroom')">
+          <div class="cat-icon">🛏️</div>
+          <h3>Yatak Odası (Bedroom)</h3>
+          <div class="cat-subtitle">Gardırop, Şifonyer, Komodin & Makyaj</div>
+          <p>Geniş iç hacimli sürgülü veya menteşeli gardıroplar, 4 çekmeceli şifonyer, aynalı makyaj masası ve ikili komodin takımı.</p>
+          <button class="btn btn-primary btn-sm">Yatak Odası Tasarla →</button>
+        </div>
+
+        <!-- Children's Room -->
+        <div class="category-card" onclick="selectCategory('children')">
+          <div class="cat-icon">🧸</div>
+          <h3>Çocuk & Genç Odası</h3>
+          <div class="cat-subtitle">Çalışma Masası, Gardırop & Kitaplık</div>
+          <p>Güvenli radiuslu köşeler, ergonomik kablo geçişli çalışma masası, modüler kitaplık, şifonyer ve oyuncak depolama dolapları.</p>
+          <button class="btn btn-primary btn-sm">Çocuk Odası Tasarla →</button>
+        </div>
+      </div>
+
+      <!-- Sponsor Highlight -->
+      <div class="sponsor-banner">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span class="sponsor-badge">RESMİ SPONSORLAR</span>
+          <span style="font-size:0.9rem; color:#e2e8f0;">Tüm tasarımlarımızda <strong>AGT MDFlam & Parke Sistemleri</strong>, <strong>Samet / Blum Frenli Donanımlar</strong> ve <strong>Çimstone Tezgahlar</strong> kullanılmaktadır.</span>
+        </div>
+        <span style="font-size:0.8rem; color:#94a3b8;">1. Sınıf E1 Standartlı İmalat</span>
+      </div>
+    </section>
+
+    <!-- 2. ROOM LAYOUT WIZARD VIEW -->
+    <section id="view-wizard" class="view-section">
+      <div class="wizard-card">
+        <div class="wizard-steps-bar">
+          <div class="wizard-step-item active" id="wstep-1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Oda Şekli</div>
+          </div>
+          <div class="wizard-step-item" id="wstep-2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Ölçüler</div>
+          </div>
+          <div class="wizard-step-item" id="wstep-3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Kapı & Pencere</div>
+          </div>
+          <div class="wizard-step-item" id="wstep-4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Zemin & Cihazlar</div>
+          </div>
+          <div class="wizard-step-item" id="wstep-5">
+            <div class="step-circle">5</div>
+            <div class="step-label">Tasarım Başlasın</div>
+          </div>
+        </div>
+
+        <!-- Wizard Pane 1: Shape -->
+        <div id="wizard-pane-1" class="wizard-step-pane">
+          <h3 style="margin-bottom:0.5rem;">Odanızın Yerleşim Tipini Seçiniz</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+            Dolapların yerleştirileceği duvar düzenini belirleyin.
+          </p>
+
+          <div class="shape-options">
+            <div class="shape-box selected" id="shape-single_wall" onclick="selectLayoutShape('single_wall')">
+              <div class="shape-preview">
+                <svg class="shape-svg" viewBox="0 0 100 100">
+                  <rect x="10" y="80" width="80" height="12" fill="#3b82f6" rx="2" />
+                  <line x1="5" y1="95" x2="95" y2="95" stroke="#64748b" stroke-width="4" />
+                </svg>
+              </div>
+              <strong>Düz Tek Duvar</strong>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Doğrusal tek hat yerleşim</div>
+            </div>
+
+            <div class="shape-box" id="shape-l_right" onclick="selectLayoutShape('l_right')">
+              <div class="shape-preview">
+                <svg class="shape-svg" viewBox="0 0 100 100">
+                  <path d="M 10 80 L 85 80 L 85 15" fill="none" stroke="#3b82f6" stroke-width="12" stroke-linejoin="round" />
+                  <path d="M 5 95 L 95 95 L 95 5" fill="none" stroke="#64748b" stroke-width="4" />
+                </svg>
+              </div>
+              <strong>L-Köşe (Sağ)</strong>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Sağa dönen köşe modülü</div>
+            </div>
+
+            <div class="shape-box" id="shape-l_left" onclick="selectLayoutShape('l_left')">
+              <div class="shape-preview">
+                <svg class="shape-svg" viewBox="0 0 100 100">
+                  <path d="M 90 80 L 15 80 L 15 15" fill="none" stroke="#3b82f6" stroke-width="12" stroke-linejoin="round" />
+                  <path d="M 95 95 L 5 95 L 5 5" fill="none" stroke="#64748b" stroke-width="4" />
+                </svg>
+              </div>
+              <strong>L-Köşe (Sol)</strong>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Sola dönen köşe modülü</div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; margin-top:2rem;">
+            <button class="btn btn-primary" onclick="nextWizardStep(2)">Ölçülere Geç →</button>
+          </div>
+        </div>
+
+        <!-- Wizard Pane 2: Dimensions -->
+        <div id="wizard-pane-2" class="wizard-step-pane" style="display:none;">
+          <h3 style="margin-bottom:0.5rem;">Oda Boyutlarını Giriniz (Milimetre Cinsinden)</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+            1 metre = 1000 mm. Örneğin 3.6 metre için 3600 yazınız.
+          </p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Oda Genişliği (Ana Duvar - mm)</label>
+              <input type="number" id="wizard-room-w" class="form-control" value="3600" step="100">
+            </div>
+            <div class="form-group">
+              <label>Oda Derinliği (mm)</label>
+              <input type="number" id="wizard-room-d" class="form-control" value="2600" step="100">
+            </div>
+            <div class="form-group">
+              <label>Tavan Net Yüksekliği (mm)</label>
+              <input type="number" id="wizard-room-h" class="form-control" value="2600" step="50">
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; margin-top:2rem;">
+            <button class="btn btn-outline" onclick="nextWizardStep(1)">← Geri</button>
+            <button class="btn btn-primary" onclick="nextWizardStep(3)">Kapı & Pencereye Geç →</button>
+          </div>
+        </div>
+
+        <!-- Wizard Pane 3: Door & Window Clearance -->
+        <div id="wizard-pane-3" class="wizard-step-pane" style="display:none;">
+          <h3 style="margin-bottom:0.5rem;">Kapı ve Pencere Konumlandırması</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+            Sistemimiz kapının açılış tarama yayını (clearance swing arc) hesaplar ve dolapların kapıya çarpmasını önler!
+          </p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Kapı Duvarı</label>
+              <select id="wizard-door-wall" class="form-control">
+                <option value="left" selected>Sol Duvar</option>
+                <option value="bottom">Alt / Giriş Duvarı</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Köşeden Kapı Mesafesi (mm)</label>
+              <input type="number" id="wizard-door-pos" class="form-control" value="400" step="50">
+            </div>
+            <div class="form-group">
+              <label>Kapı Kanat Genişliği (mm)</label>
+              <input type="number" id="wizard-door-w" class="form-control" value="900" step="50">
+            </div>
+          </div>
+
+          <div style="background:rgba(56, 189, 248, 0.1); border:1px solid #38bdf8; border-radius:6px; padding:0.85rem; margin-top:1rem; font-size:0.85rem; color:#93c5fd;">
+            💡 <strong>Akıllı Çakışma Kontrolü:</strong> Tasarım esnasında kapının açıldığı alana dolap yerleştirirseniz sistem sizi kırmızı uyarı ile anında uyaracaktır.
+          </div>
+
+          <div style="display:flex; justify-content:space-between; margin-top:2rem;">
+            <button class="btn btn-outline" onclick="nextWizardStep(2)">← Geri</button>
+            <button class="btn btn-primary" onclick="nextWizardStep(4)">Zemin ve Cihazlara Geç →</button>
+          </div>
+        </div>
+
+        <!-- Wizard Pane 4: Flooring & Appliances -->
+        <div id="wizard-pane-4" class="wizard-step-pane" style="display:none;">
+          <h3 style="margin-bottom:0.5rem;">Zemin Seçimi ve Cihaz Entegrasyonu</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+            Zemin kaplamasını ve mutfakta yer alacak beyaz eşyaları işaretleyin.
+          </p>
+
+          <div class="form-group">
+            <label>Zemin Türü (Sponsor Entegreli)</label>
+            <select id="wizard-flooring" class="form-control">
+              <option value="AGT Parke Doğal Meşe (Sponsor: AGT)" selected>AGT Parke Doğal Meşe (Sponsor: AGT Zemin)</option>
+              <option value="AGT Parke Ilgaz Meşe (Sponsor: AGT)">AGT Parke Ilgaz Meşe (Sponsor: AGT Zemin)</option>
+              <option value="Bien Seramik Antrasit Granit Zemin (Sponsor: Bien)">Bien Seramik Antrasit Granit Zemin (Sponsor: Bien)</option>
+              <option value="Kütahya Porselen Mat Mermer Doku (Sponsor: Kütahya)">Kütahya Porselen Mat Mermer Doku (Sponsor: Kütahya)</option>
+            </select>
+          </div>
+
+          <label style="font-size:0.85rem; font-weight:600; margin-bottom:0.5rem; display:block;">Dahili Cihazlar & Beyaz Eşya:</label>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; margin-bottom:1.5rem;">
+            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
+              <input type="checkbox" id="app-fridge" checked> 🧊 No-Frost Buzdolabı
+            </label>
+            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
+              <input type="checkbox" id="app-oven" checked> ♨️ Ankastre Fırın
+            </label>
+            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
+              <input type="checkbox" id="app-hob" checked> 🍳 Ankastre Ocak
+            </label>
+            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
+              <input type="checkbox" id="app-hood" checked> 💨 Eğimli Davlumbaz
+            </label>
+            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
+              <input type="checkbox" id="app-dishwasher" checked> 🍽️ Bulaşık Makinesi
+            </label>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; margin-top:2rem;">
+            <button class="btn btn-outline" onclick="nextWizardStep(3)">← Geri</button>
+            <button class="btn btn-success btn-lg" onclick="nextWizardStep(5)">Stüdyoyu Başlat & Tasarla 🚀</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. INTERACTIVE 2D/3D STUDIO VIEW -->
+    <section id="view-studio" class="view-section">
+      <div class="studio-layout">
+
+        <!-- Left Sidebar: ADeko Style Accordion Module Palette -->
+        <aside class="sidebar-panel">
+          <div class="panel-header">
+            <span>📚 Hazır Modül Tipleri</span>
+            <small id="cat-label-display" style="color:#38bdf8; font-weight:700;">ADeko Modu</small>
+          </div>
+
+          <!-- Search Filter -->
+          <div class="adeko-search-box">
+            <span class="adeko-search-icon">🔍</span>
+            <input type="text" id="module-search-input" class="adeko-search-input" placeholder="Modül ara (fırın, eviye, çekmece...)" oninput="filterCatalogModules(this.value)">
+          </div>
+
+          <!-- Accordion Categories Container -->
+          <div id="studio-module-catalog" class="adeko-accordion-wrapper">
+            <!-- Populated via JavaScript as collapsible accordions -->
+          </div>
+        </aside>
+
+        <!-- Center Viewport: Synchronized 2D/3D Canvas -->
+        <div class="viewport-center">
+          <div class="viewport-toolbar">
+            <!-- View Mode Switcher -->
+            <div class="view-mode-tabs">
+              <button class="view-tab active" id="tab-3d" onclick="setCanvasMode('3d')">
+                🌟 3D Showroom (360°)
+              </button>
+              <button class="view-tab" id="tab-elevation" onclick="setCanvasMode('elevation')">
+                🏛️ 2D Ön Görünüş
+              </button>
+              <button class="view-tab" id="tab-plan" onclick="setCanvasMode('plan')">
+                📐 2D Mimari Plan
+              </button>
+            </div>
+
+            <!-- Active Wall Selector (Arka Duvar / Sol Duvar) -->
+            <div class="active-wall-selector" id="active-wall-selector" title="Aktif Çalışma Duvarı Seçimi">
+              <button class="wall-btn active" id="wall-btn-back" onclick="setActiveWall('back')">
+                <span>🧱 Arka Duvar</span>
+                <span class="wall-cap-badge" id="wall-cap-back">3600 mm</span>
+              </button>
+              <button class="wall-btn" id="wall-btn-left" onclick="setActiveWall('left')">
+                <span>🧱 Sol Duvar</span>
+                <span class="wall-cap-badge" id="wall-cap-left">2600 mm</span>
+              </button>
+            </div>
+
+            <!-- 360° Camera Preset & Orbit Toolbar -->
+            <div class="camera-controls-bar" id="camera-controls-bar">
+              <button class="cam-btn" id="cam-auto" onclick="setCameraPreset('auto')" title="360° Otomatik Döner Podyum Modu">
+                🔄 360° Döndür
+              </button>
+              <button class="cam-btn" onclick="setCameraPreset('showroom')" title="Göz Hizası Showroom Açısı">
+                👁️ Showroom
+              </button>
+              <button class="cam-btn" onclick="setCameraPreset('front')" title="Tam Karşıdan Ön Cephe (Arka Duvar)">
+                📐 Arka Cephe
+              </button>
+              <button class="cam-btn" onclick="setCameraPreset('left_wall')" title="Sol Duvar Cephesi">
+                📐 Sol Cephe
+              </button>
+              <button class="cam-btn" onclick="setCameraPreset('top')" title="Kuşbakışı Plan Açısı">
+                🗺️ Üstten
+              </button>
+              <button class="cam-btn" onclick="setCameraPreset('reset')" title="Kamera Açısını ve Yakınlaştırmayı Sıfırla">
+                🔍 Sıfırla
+              </button>
+            </div>
+
+            <!-- Accessibility / Low Depth Perception Toggle Badge -->
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="badge badge-info" title="Perspektif yanılgısını sıfırlayan paralel aksonometrik projeksiyon">
+                ♿ Düşük Derinlik Algısı Desteği
+              </span>
+            </div>
+          </div>
+
+          <div class="canvas-wrapper" id="canvas-drop-wrapper">
+            <!-- Floating Orbit Hint Badge -->
+            <div class="orbit-hint-badge" id="orbit-hint-badge">
+              <span>🖱️ Fare ile basılı tutarak 360° çevirin | Modülleri tutup sürükleyerek yerlerini değiştirin</span>
+            </div>
+
+            <!-- Floating Selected Cabinet Action Toolbar -->
+            <div id="selected-module-toolbar" class="floating-module-toolbar" style="display:none;">
+              <div class="fmt-info">
+                <span class="fmt-icon">🗄️</span>
+                <div>
+                  <strong id="fmt-title">MOD-02: 3 Çekmeceli Alt Dolap</strong>
+                  <div id="fmt-details" style="font-size:0.75rem; color:#94a3b8;">600x600 mm | Arka Duvar (X: 700 mm)</div>
+                </div>
+              </div>
+              <div class="fmt-actions">
+                <button class="fmt-btn" onclick="shiftSelectedModule(-100)" title="100mm Sola Kaydır">◀ Sola</button>
+                <button class="fmt-btn" onclick="shiftSelectedModule(100)" title="100mm Sağa Kaydır">▶ Sağa</button>
+                <button class="fmt-btn" onclick="toggleSelectedModuleWall()" title="Diğer Duvara Taşı (Arka ↔ Sol)">🧱 Duvar Değiştir</button>
+                <button class="fmt-btn fmt-btn-danger" onclick="deleteSelectedModule()" title="Modülü Sil">🗑️ Sil</button>
+                <button class="fmt-btn fmt-btn-close" onclick="deselectModule()" title="Seçimi Kapat">✕</button>
+              </div>
+            </div>
+
+            <!-- Floating Drag Coordinate Badge (Tracks dragging in 3D scene) -->
+            <div id="canvas-drag-pill" class="canvas-drag-pill" style="display:none;">
+              <span id="canvas-drag-text">↔ MOD-02 | Konum: 1200 mm</span>
+            </div>
+
+            <!-- Drag & Drop Dropzone Overlay -->
+            <div id="dropzone-overlay">
+              <div class="dropzone-pill">
+                <span>🎯</span>
+                <span>Modülü Buraya Bırakın (Duvara Otomatik Hizalanır)</span>
+              </div>
+            </div>
+
+            <!-- Door Clearance Warning Banner -->
+            <div class="door-clearance-alert" id="door-clearance-warning">
+              ⚠️ DİKKAT: Dolap kapı açılış tarama yayına taşıyor! Kapı tam açılamayabilir.
+            </div>
+
+            <!-- 3D Canvas (Primary Showroom View) -->
+            <canvas id="canvas3d-viewport" width="900" height="600"></canvas>
+            <!-- 2D Canvas -->
+            <canvas id="canvas2d-viewport" width="900" height="600" style="display:none;"></canvas>
+          </div>
+        </div>
+
+        <!-- Right Sidebar: Placed Modules, Materials, Submit Quote -->
+        <aside class="sidebar-panel">
+          <div class="panel-header">
+            <span>Yerleşim Listesi</span>
+            <span class="badge badge-info" id="placed-count-badge">0 Modül</span>
+          </div>
+
+          <!-- Placed Modules List -->
+          <div id="placed-modules-list" style="max-height:220px; overflow-y:auto; margin-bottom:1rem;">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Material & Finish Selectors -->
+          <div class="panel-header" style="margin-top:0.5rem;">
+            <span>🎨 Malzeme & Renk</span>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label style="font-size:0.8rem;">Gövde Malzemesi (18mm)</label>
+            <select id="mat-body" class="form-control" style="font-size:0.85rem; padding:0.4rem;">
+              <option value="mdf_18mm_standart" selected>18mm MDFlam Standart (Kaşmir Gri)</option>
+              <option value="mdf_18mm_highgloss">18mm MDFlam Beyaz Meşe</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0.75rem;">
+            <label style="font-size:0.8rem;">Kapak Malzemesi & Finish</label>
+            <select id="mat-door" class="form-control" style="font-size:0.85rem; padding:0.4rem;">
+              <option value="mdf_18mm_highgloss" selected>18mm High-Gloss Akrilik Kapak</option>
+              <option value="mdf_18mm_lake">18mm İpek Mat Lake Boya (Özel İmalat)</option>
+              <option value="mdf_18mm_standart">18mm Mat Antrasit MDFlam</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label style="font-size:0.8rem;">Tezgah Seçimi</label>
+            <select id="mat-countertop" class="form-control" style="font-size:0.85rem; padding:0.4rem;">
+              <option value="tezgah_cimstone" selected>Çimstone Calacatta Kuvars</option>
+              <option value="tezgah_granit">Doğal Granit Tezgah (Siyah)</option>
+              <option value="tezgah_porselen">Ultra Kompakt Porselen Tezgah</option>
+              <option value="tezgah_masif">Masif Meşe Yağlı Tezgah</option>
+              <option value="tezgah_laminat">Postforming Laminat Tezgah</option>
+            </select>
+          </div>
+
+          <!-- Strict Rule: Customer CANNOT see prices or cutting details -->
+          <div style="background:rgba(15, 23, 42, 0.7); border:1px solid #475569; border-radius:6px; padding:0.85rem; font-size:0.8rem; color:#94a3b8; margin-bottom:1rem;">
+            🔒 <strong>Fabrika Fiyatlandırma İlkesi:</strong> Tasarımınız tamamlandığında atölye yöneticimiz dinamik maliyet matrisi üzerinden net fiyat teklifinizi oluşturup randevu saatinde size sunacaktır.
+          </div>
+
+          <button class="btn btn-success btn-lg" style="width:100%;" onclick="openSubmitQuoteModal()">
+            Tasarımı Kaydet & Teklif İste 📩
+          </button>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- 4. ADMIN PANEL VIEW (MANAGER / EŞİNİZİN PANELİ) -->
+    <section id="view-admin" class="view-section">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <div>
+          <h2>Yönetici Paneli (Eşinizin Paneli)</h2>
+          <p style="color:var(--text-muted); font-size:0.95rem;">Dinamik Fiyat Matrisi, Otomatik Maliyet Hesaplama, 2D Nesting ve Pegasus/Honda Benk CNC Entegrasyonu</p>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <input type="text" id="admin-ref-search" placeholder="Referans Kodu (TR-8421)" class="form-control" style="width:200px;">
+          <button class="btn btn-primary" onclick="AdminPanel.lookupReferenceCode()">Kodu Yükle</button>
+        </div>
+      </div>
+
+      <!-- Admin Grid Layout -->
+      <div class="admin-grid">
+
+        <!-- Left: Settings & Pricing Matrix -->
+        <div>
+          <!-- System Settings & Margins -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-dark); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+            <h3 style="font-size:1.05rem; margin-bottom:1rem;">⚙️ Kar Marjı & İşçilik Parametreleri</h3>
+            <div class="form-group">
+              <label>Fabrika Kar Marjı (%)</label>
+              <input type="number" id="setting-margin" class="form-control" value="35">
+            </div>
+            <div class="form-group">
+              <label>Modül Başına İmalat & Montaj İşçiliği (₺)</label>
+              <input type="number" id="setting-labor" class="form-control" value="480">
+            </div>
+            <div class="form-group">
+              <label>Nakliye ve Kurulum Sabit Ücreti (₺)</label>
+              <input type="number" id="setting-transport" class="form-control" value="3200">
+            </div>
+            <div class="form-group">
+              <label>KDV Oranı (%)</label>
+              <input type="number" id="setting-vat" class="form-control" value="20">
+            </div>
+            <button class="btn btn-primary btn-sm" style="width:100%;" onclick="AdminPanel.saveSystemSettings()">Parametreleri Güncelle</button>
+          </div>
+
+          <!-- Dynamic Pricing Matrix -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-dark); border-radius:var(--radius-md); padding:1.25rem;">
+            <h3 style="font-size:1.05rem; margin-bottom:0.5rem;">📊 Dinamik Fiyat Matrisi</h3>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:1rem;">Birim fiyatlar değiştiğinde tüm projelerin maliyeti otomatik olarak güncellenir.</p>
+
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th>Malzeme / Kalem</th>
+                  <th>Birim</th>
+                  <th>Birim Fiyat</th>
+                  <th>İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="pricing-matrix-tbody">
+                <!-- Rendered by AdminPanel -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: Incoming Designs, Cost Breakdown & CNC Nesting Center -->
+        <div>
+          <!-- Incoming Customer Designs Queue -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-dark); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+            <h3 style="font-size:1.1rem; margin-bottom:1rem;">📥 Gelen Müşteri Tasarımları & Teklif Talepleri</h3>
+            <div style="overflow-x:auto;">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>Ref Kodu</th>
+                    <th>Müşteri Bilgisi</th>
+                    <th>Kategori</th>
+                    <th>Teklif Bedeli</th>
+                    <th>Durum</th>
+                    <th>İşlem</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-designs-tbody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Cost Inspection & BOM Breakdown Card -->
+          <div id="cost-inspection-section" style="display:none; background:var(--bg-surface); border:1px solid #38bdf8; border-radius:var(--radius-md); padding:1.5rem; margin-bottom:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border-dark); padding-bottom:0.75rem;">
+              <div>
+                <span class="badge badge-info" style="font-size:0.85rem;" id="inspect-category">MUTFAK</span>
+                <h3 style="display:inline-block; margin-left:0.5rem; font-size:1.3rem;">
+                  Proje: <span id="inspect-ref-code" style="color:#38bdf8; font-family:monospace;">TR-8421</span>
+                </h3>
+              </div>
+              <div style="text-align:right;">
+                <strong id="inspect-customer-name" style="font-size:1.05rem;">Ahmet Yılmaz</strong><br>
+                <small style="color:#94a3b8;"><span id="inspect-phone"></span> | <span id="inspect-city"></span></small>
+              </div>
+            </div>
+
+            <div style="background:rgba(255, 255, 255, 0.02); padding:0.75rem; border-radius:4px; font-size:0.85rem; margin-bottom:1rem;">
+              <strong>Müşteri Notu:</strong> <span id="inspect-notes"></span>
+            </div>
+
+            <!-- Itemized BOM Table -->
+            <h4 style="margin-bottom:0.5rem;">Ayrıntılı İmalat Reçetesi (BOM - Bill of Materials)</h4>
+            <div style="max-height:260px; overflow-y:auto; margin-bottom:1.25rem;">
+              <table class="matrix-table">
+                <thead>
+                  <tr>
+                    <th>Bileşen / Malzeme</th>
+                    <th>Miktar</th>
+                    <th>Birim Fiyat</th>
+                    <th>Toplam Tutar</th>
+                  </tr>
+                </thead>
+                <tbody id="bom-items-tbody"></tbody>
+              </table>
+            </div>
+
+            <!-- Cost Summary Breakdown -->
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; background:#0f172a; padding:1.25rem; border-radius:var(--radius-sm); margin-bottom:1.25rem; font-size:0.9rem;">
+              <div>Hammadde & Hırdavat: <br><strong id="cost-materials-subtotal" style="color:#fff;">0 ₺</strong></div>
+              <div>İmalat & Montaj İşçiliği: <br><strong id="cost-labor" style="color:#fff;">0 ₺</strong></div>
+              <div>Nakliye Bedeli: <br><strong id="cost-transport" style="color:#fff;">0 ₺</strong></div>
+              <div>Fabrika Maliyeti: <br><strong id="cost-base-production" style="color:#f59e0b;">0 ₺</strong></div>
+              <div>Kar Marjı: <br><strong id="cost-profit-margin" style="color:#10b981;">0 ₺</strong></div>
+              <div>KDV: <br><strong id="cost-vat" style="color:#fff;">0 ₺</strong></div>
+              <div style="grid-column: 1 / -1; border-top:1px solid #334155; padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:1.1rem; font-weight:700;">Hesaplanan Satış Fiyatı (KDV Dahil):</span>
+                <span id="cost-grand-total" style="font-size:1.6rem; font-weight:900; color:#10b981;">0 ₺</span>
+              </div>
+            </div>
+
+            <!-- Admin Price Adjust & Offer Form -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+              <div class="form-group">
+                <label>Müşteriye Sunulacak Nihai Fiyat (₺):</label>
+                <input type="number" id="admin-offer-price" class="form-control" style="font-size:1.1rem; font-weight:700; color:#10b981;">
+              </div>
+              <div class="form-group">
+                <label>Yönetici Notu / Randevu Saati:</label>
+                <input type="text" id="admin-offer-notes" class="form-control" placeholder="Örn: 20 Ekim Saat 14:00 Showroom Keşif Randevusu">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <button class="btn btn-outline" onclick="AdminPanel.updateQuoteOffer()">Teklifi Kaydet & Müşteriye Sun</button>
+              <button class="btn btn-success btn-lg" onclick="AdminPanel.sendToProductionAndNesting()">
+                🚀 Üretime Gönder & CNC Nesting Çalıştır
+              </button>
+            </div>
+
+            <!-- CNC Export Buttons -->
+            <div id="cnc-export-buttons" style="display:none; gap:1rem; margin-top:1.5rem; padding-top:1.25rem; border-top:1px dashed #38bdf8;">
+              <button class="btn btn-primary" onclick="AdminPanel.downloadDXF()">
+                📥 Pegasus / Honda Benk CNC DXF İndir
+              </button>
+              <button class="btn btn-warning" onclick="AdminPanel.downloadCSV()">
+                📊 OptiCut / Ardis Kesim Listesi (CSV) İndir
+              </button>
+            </div>
+          </div>
+
+          <!-- Nesting Visualizer Container -->
+          <div id="nesting-visual-container" style="display:none;"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SUBMIT QUOTE MODAL -->
+  <div class="modal-overlay" id="submit-quote-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Fiyat Teklifi ve Randevu Talebi</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('submit-quote-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.25rem;">
+          Tasarımınız fabrikamıza iletilecek, eşinizin/yöneticimizin dinamik fiyatlandırma sisteminde hesaplanacak ve size özel referans kodu oluşturulacaktır.
+        </p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Adınız ve Soyadınız *</label>
+            <input type="text" id="quote-cust-name" class="form-control" placeholder="Örn: Ahmet Yılmaz">
+          </div>
+          <div class="form-group">
+            <label>Telefon Numaranız *</label>
+            <input type="tel" id="quote-cust-phone" class="form-control" placeholder="05xx xxx xx xx">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>E-Posta Adresiniz</label>
+            <input type="email" id="quote-cust-email" class="form-control" placeholder="ornek@gmail.com">
+          </div>
+          <div class="form-group">
+            <label>İl / İlçe</label>
+            <input type="text" id="quote-cust-city" class="form-control" value="İstanbul / Kadıköy">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Özel İstekleriniz / Notlar</label>
+          <textarea id="quote-cust-notes" class="form-control" rows="3" placeholder="Frenli mekanizma, montaj zamanı veya özel renk talepleriniz..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('submit-quote-modal')">İptal</button>
+        <button class="btn btn-success" onclick="submitDesignForQuote()">Teklif Talebini Gönder 🚀</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERENCE CODE SUCCESS MODAL -->
+  <div class="modal-overlay" id="ref-success-modal">
+    <div class="modal-box" style="text-align:center;">
+      <div class="modal-body" style="padding:2.5rem;">
+        <div style="font-size:3rem; margin-bottom:1rem;">🎉</div>
+        <h2 style="margin-bottom:0.5rem;">Tebrikler <span id="success-cust-name"></span>!</h2>
+        <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:1.5rem;">
+          Özel mobilya tasarımınız başarıyla fabrikamıza ulaştı. Tasarımınıza ait takip kodunuz:
+        </p>
+
+        <div class="ref-hero-card">
+          <div style="font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; color:#93c5fd;">Proje Referans Kodu</div>
+          <div class="ref-code-display" id="success-ref-code">TR-8421</div>
+          <small style="color:#d1fae5;">Bu kodu saklayarak tasarımınızın imalat aşamalarını takip edebilirsiniz.</small>
+        </div>
+
+        <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:1.5rem;">
+          Yöneticimiz projenizi inceleyip dinamik fiyatlandırma ve randevu detaylarıyla sizi arayacaktır.
+        </p>
+
+        <button class="btn btn-primary btn-lg" onclick="closeModal('ref-success-modal'); navigateTo('categories');">
+          Tamam, Ana Sayfaya Dön
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="auth-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="auth-modal-title">ModulerCraft Hesabı</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('auth-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Login Form -->
+        <div id="auth-login-pane">
+          <div class="form-group">
+            <label>E-Posta</label>
+            <input type="email" id="login-email" class="form-control" placeholder="adiniz@firma.com">
+          </div>
+          <div class="form-group">
+            <label>Şifre</label>
+            <input type="password" id="login-password" class="form-control" placeholder="••••••••">
+          </div>
+          <button class="btn btn-primary" style="width:100%; margin-top:1rem;" onclick="handleAuthSubmit('login')">Giriş Yap</button>
+          <div style="text-align:center; margin-top:1rem; font-size:0.85rem;">
+            Hesabınız yok mu? <a href="javascript:void(0)" onclick="toggleAuthMode('register')" style="color:#38bdf8;">Kayıt Olun</a>
+          </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="auth-register-pane" style="display:none;">
+          <div class="form-group">
+            <label>Adınız ve Soyadınız</label>
+            <input type="text" id="reg-fullname" class="form-control" placeholder="Mimar Selin Korkmaz">
+          </div>
+          <div class="form-group">
+            <label>E-Posta</label>
+            <input type="email" id="reg-email" class="form-control" placeholder="mimar@proje.com">
+          </div>
+          <div class="form-group">
+            <label>Telefon</label>
+            <input type="tel" id="reg-phone" class="form-control" placeholder="0533 xxx xx xx">
+          </div>
+          <div class="form-group">
+            <label>Hesap Tipi</label>
+            <select id="reg-role" class="form-control">
+              <option value="customer">Standart Müşteri</option>
+              <option value="professional" selected>Profesyonel (İç Mimar / Müteahhit - 25 Hediye Jeton)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Firma / Ofis Adı</label>
+            <input type="text" id="reg-company" class="form-control" placeholder="Artisan Mimarlık">
+          </div>
+          <div class="form-group">
+            <label>Şifre Belirleyin</label>
+            <input type="password" id="reg-password" class="form-control" placeholder="••••••••">
+          </div>
+          <button class="btn btn-success" style="width:100%; margin-top:1rem;" onclick="handleAuthSubmit('register')">Hesap Oluştur</button>
+          <div style="text-align:center; margin-top:1rem; font-size:0.85rem;">
+            Zaten hesabınız var mı? <a href="javascript:void(0)" onclick="toggleAuthMode('login')" style="color:#38bdf8;">Giriş Yapın</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFESSIONAL TOKEN RECHARGE MODAL -->
+  <div class="modal-overlay" id="token-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>⚡ Profesyonel Jeton Paketi Alımı</h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('token-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.25rem;">
+          İç mimarlar ve müteahhitler için doğrudan CNC Nesting çıktısı ve teknik detay alma jetonları:
+        </p>
+
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; margin-bottom:1.5rem;">
+          <div style="background:#334155; border:1px solid #475569; border-radius:8px; padding:1.25rem; text-align:center; cursor:pointer;" onclick="buyTokens(10)">
+            <div style="font-size:1.4rem; font-weight:800; color:#fbbf24;">10 Jeton</div>
+            <div style="font-size:1.1rem; font-weight:700; margin:0.5rem 0;">2.500 ₺</div>
+            <button class="btn btn-primary btn-sm">Seç</button>
+          </div>
+          <div style="background:#1e3a8a; border:2px solid #38bdf8; border-radius:8px; padding:1.25rem; text-align:center; cursor:pointer;" onclick="buyTokens(25)">
+            <span class="badge badge-warning" style="margin-bottom:4px;">POPÜLER</span>
+            <div style="font-size:1.4rem; font-weight:800; color:#fbbf24;">25 Jeton</div>
+            <div style="font-size:1.1rem; font-weight:700; margin:0.5rem 0;">5.000 ₺</div>
+            <button class="btn btn-success btn-sm">Seç</button>
+          </div>
+          <div style="background:#334155; border:1px solid #475569; border-radius:8px; padding:1.25rem; text-align:center; cursor:pointer;" onclick="buyTokens(50)">
+            <div style="font-size:1.4rem; font-weight:800; color:#fbbf24;">50 Jeton</div>
+            <div style="font-size:1.1rem; font-weight:700; margin:0.5rem 0;">8.500 ₺</div>
+            <button class="btn btn-primary btn-sm">Seç</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEDICATED ADMIN LOGIN MODAL -->
+  <div class="modal-overlay" id="admin-login-modal">
+    <div class="modal-box" style="max-width:440px;">
+      <div class="modal-header" style="border-bottom:1px solid rgba(239, 68, 68, 0.4);">
+        <h3 style="color:#f87171; display:flex; align-items:center; gap:0.5rem;">
+          <span>👑</span> Yönetici Girişi (Eşinizin Paneli)
+        </h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('admin-login-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem;">
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1.25rem; line-height:1.4;">
+          Bu panel atölye yöneticisi (eşiniz) içindir. Dinamik maliyet matrisini yönetebilir, gelen müşteri tasarımlarını inceleyebilir ve CNC kesim kodlarını indirebilirsiniz.
+        </p>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label style="font-size:0.85rem;">Yönetici E-Posta</label>
+          <input type="email" id="admin-login-email" class="form-control" value="admin@modulercraft.com">
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label style="font-size:0.85rem;">Şifre</label>
+          <input type="password" id="admin-login-password" class="form-control" value="admin123">
+        </div>
+
+        <button class="btn btn-admin" style="width:100%; margin-bottom:0.75rem; padding:0.75rem;" onclick="handleAdminLoginSubmit()">
+          🔐 Yönetici Paneline Giriş Yap
+        </button>
+
+        <div style="background:rgba(255, 255, 255, 0.04); border:1px dashed #475569; border-radius:6px; padding:0.75rem; text-align:center;">
+          <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.4rem;">Hızlı Test / Demo Erişimi:</div>
+          <button class="btn btn-outline btn-sm" style="width:100%;" onclick="quickAdminLogin()">
+            ⚡ Tek Tıkla Yönetici Olarak Doğrudan Aç
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast"></div>
+
+  <!-- SCRIPTS -->
+  <script src="/three.min.js"></script>
+  <script src="/OrbitControls.js"></script>
+  <script src="/canvas2d.js"></script>
+  <script src="/canvas3d.js"></script>
+  <script src="/admin.js"></script>
+  <script src="/app.js"></script>
+
+  <script>
+    function openRefLookupModal() {
+      const code = prompt("Lütfen sorgulamak istediğiniz Referans Kodunu giriniz (örn: TR-8421):");
+      if (code) {
+        fetch(`/api/designs/reference/${code.trim().toUpperCase()}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.error) {
+              alert(data.error);
+            } else {
+              const d = data.design;
+              alert(`Proje Referansı: ${d.reference_code}\nMüşteri: ${d.customer_name}\nKategori: ${d.category.toUpperCase()}\nDurum: ${d.status === 'in_production' ? 'Üretimde (CNC Hazır)' : (d.status === 'reviewed' ? 'Teklif Hazırlandı' : 'İnceleme Bekliyor')}`);
+            }
+          })
+          .catch(() => alert("Sorgulama yapılamadı."));
+      }
+    }
+  </script>
+</body>
+</html>

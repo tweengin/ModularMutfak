@@ -10,22 +10,50 @@ import hashlib
 import json
 import os
 import time
+import shutil
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modulercraft.db")
+IS_VERCEL = bool(os.environ.get("VERCEL") or os.environ.get("VERCEL_ENV") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+
+if IS_VERCEL:
+    DB_PATH = "/tmp/modulercraft.db"
+else:
+    DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modulercraft.db")
+
+def ensure_db_exists():
+    if IS_VERCEL and not os.path.exists(DB_PATH):
+        seed_db = os.path.join(os.path.dirname(os.path.abspath(__file__)), "modulercraft.db")
+        if os.path.exists(seed_db):
+            try:
+                shutil.copyfile(seed_db, DB_PATH)
+            except Exception as e:
+                print("Could not copy seed DB to /tmp:", e)
+        if not os.path.exists(DB_PATH):
+            init_db()
 
 def hash_password(password: str) -> str:
     salt = "mc_salt_2026_x89"
     return hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
+    if IS_VERCEL:
+        ensure_db_exists()
+    conn = sqlite3.connect(DB_PATH, timeout=15)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL;")
-    conn.execute("PRAGMA foreign_keys=ON;")
+    try:
+        if IS_VERCEL:
+            conn.execute("PRAGMA journal_mode=MEMORY;")
+        else:
+            conn.execute("PRAGMA journal_mode=WAL;")
+        conn.execute("PRAGMA foreign_keys=ON;")
+    except Exception:
+        pass
     return conn
 
 def init_db():
-    conn = get_db()
+    if IS_VERCEL:
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = sqlite3.connect(DB_PATH, timeout=15)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     # Users Table
@@ -120,6 +148,17 @@ def init_db():
         amount INTEGER NOT NULL,
         transaction_type TEXT NOT NULL, -- 'purchase', 'spend', 'bonus'
         description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    );
+    """)
+
+    # Serverless Sessions Table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        data_json TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users (id)
     );

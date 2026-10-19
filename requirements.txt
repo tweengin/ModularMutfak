@@ -1,0 +1,2 @@
+# ModulerCraft Pro
+# Pure Python 3 standard library architecture (sqlite3, json, math, http.server, urllib)
