@@ -1573,7 +1573,7 @@ window.runAutoKitchenGenerator = function() {
     }
 
     // LEFT WALL
-    let leftZ = cornerW;
+    leftZ = (cornerChoice === 'straight' ? 600 : 900);
     const ovenZ = leftZ;
     if (hasOven && (rd - leftZ) >= 600) {
       generatedModules.push({
@@ -2273,7 +2273,6 @@ function start72HourTimer(remainingSeconds) {
 
     updateDisplay();
     customerTimerInterval = setInterval(updateDisplay, 1000);
-  }
 }
 window.start72HourTimer = start72HourTimer;
 
