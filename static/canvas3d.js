@@ -326,10 +326,17 @@ class StudioCanvas3D {
 
       if (targetMod) {
         this.selectedModuleId = targetMod.id;
-        this.isDraggingCabinet = true;
-        this.draggedModule = targetMod;
-        this.controls.enabled = false; // FREEZE CAMERA ROTATION!
-        dom.style.cursor = 'grabbing';
+        if (window.CURRENT_DESIGN_LOCKED) {
+          this.isDraggingCabinet = false;
+          this.draggedModule = null;
+          this.controls.enabled = true;
+          dom.style.cursor = 'default';
+        } else {
+          this.isDraggingCabinet = true;
+          this.draggedModule = targetMod;
+          this.controls.enabled = false; // FREEZE CAMERA ROTATION!
+          dom.style.cursor = 'grabbing';
+        }
 
         // Calculate offset along wall
         const wall = targetMod.wall || 'back';
@@ -422,7 +429,7 @@ class StudioCanvas3D {
       // Hover mode check for grab cursor
       const intersects = this.raycaster.intersectObjects(this.cabinetsGroup.children, true);
       if (intersects.length > 0) {
-        dom.style.cursor = 'grab';
+        dom.style.cursor = window.CURRENT_DESIGN_LOCKED ? 'pointer' : 'grab';
       } else {
         dom.style.cursor = 'default';
       }

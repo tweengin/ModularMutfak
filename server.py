@@ -14,6 +14,7 @@ import urllib.parse
 import mimetypes
 import random
 import string
+from datetime import datetime, timedelta
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
@@ -285,6 +286,17 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             conn.close()
             return self.send_json({"materials": items})
 
+        elif path == '/api/admin/locks':
+            user = self.get_auth_user()
+            if not user or user.get('role') != 'admin':
+                return self.send_json({"error": "Yönetici yetkisi gereklidir."}, 403)
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM customer_access_locks ORDER BY id DESC")
+            items = [dict(r) for r in c.fetchall()]
+            conn.close()
+            return self.send_json({"locks": items})
+
         elif path.startswith('/api/designs/reference/'):
             ref_code = path.split('/')[-1].upper()
             conn = get_db()
@@ -526,7 +538,121 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             user['tokens_balance'] = new_balance
             return self.send_json({"success": True, "new_balance": new_balance, "message": f"{token_qty} jeton hesabınıza yüklendi."})
 
-        # Customer Portal: Save Design & Request Quote
+        # Customer Access Check (Anti-Abuse 72-Hour Timer & Lockout)
+        elif path == '/api/customer/check-access':
+            phone = body.get('phone', '').strip().replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            if not phone:
+                return self.send_json({"error": "Telefon numarası gereklidir."}, 400)
+
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM customer_access_locks WHERE phone = ?", (phone,))
+            row = c.fetchone()
+
+            if not row:
+                conn.close()
+                return self.send_json({
+                    "exists": False,
+                    "is_locked": False,
+                    "remaining_hours": 72,
+                    "remaining_seconds": 72 * 3600
+                })
+
+            lock = dict(row)
+            try:
+                expires_at = datetime.strptime(lock['expires_at'], '%Y-%m-%d %H:%M:%S')
+            except Exception:
+                try:
+                    expires_at = datetime.fromisoformat(lock['expires_at'])
+                except Exception:
+                    expires_at = datetime.now() + timedelta(hours=72)
+
+            now = datetime.now()
+            if now > expires_at and not lock['is_locked']:
+                c.execute("UPDATE customer_access_locks SET is_locked = 1, locked_reason = 'expired' WHERE phone = ?", (phone,))
+                conn.commit()
+                lock['is_locked'] = 1
+                lock['locked_reason'] = 'expired'
+
+            diff = (expires_at - now).total_seconds()
+            rem_secs = max(0, int(diff))
+            rem_hours = max(0, int(rem_secs / 3600))
+            conn.close()
+
+            return self.send_json({
+                "exists": True,
+                "phone": phone,
+                "customer_name": lock['customer_name'],
+                "is_locked": bool(lock['is_locked']),
+                "locked_reason": lock['locked_reason'],
+                "expires_at": lock['expires_at'],
+                "remaining_hours": rem_hours,
+                "remaining_seconds": rem_secs,
+                "active_reference_code": lock['active_reference_code']
+            })
+
+        # Start or update 72-hour design session for customer phone
+        elif path == '/api/customer/init-session':
+            phone = body.get('phone', '').strip().replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            cust_name = body.get('customer_name', '').strip()
+            if not phone:
+                return self.send_json({"error": "Telefon numarası gereklidir."}, 400)
+
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM customer_access_locks WHERE phone = ?", (phone,))
+            row = c.fetchone()
+
+            if not row:
+                expires_at = (datetime.now() + timedelta(hours=72)).strftime('%Y-%m-%d %H:%M:%S')
+                c.execute("""
+                INSERT INTO customer_access_locks (phone, customer_name, expires_at, is_locked)
+                VALUES (?, ?, ?, 0)
+                """, (phone, cust_name, expires_at))
+                conn.commit()
+                conn.close()
+                return self.send_json({
+                    "success": True,
+                    "is_new": True,
+                    "is_locked": False,
+                    "remaining_hours": 72,
+                    "remaining_seconds": 72 * 3600,
+                    "expires_at": expires_at
+                })
+
+            lock = dict(row)
+            try:
+                expires_at = datetime.strptime(lock['expires_at'], '%Y-%m-%d %H:%M:%S')
+            except Exception:
+                try:
+                    expires_at = datetime.fromisoformat(lock['expires_at'])
+                except Exception:
+                    expires_at = datetime.now() + timedelta(hours=72)
+
+            now = datetime.now()
+            if now > expires_at and not lock['is_locked']:
+                c.execute("UPDATE customer_access_locks SET is_locked = 1, locked_reason = 'expired' WHERE phone = ?", (phone,))
+                conn.commit()
+                lock['is_locked'] = 1
+                lock['locked_reason'] = 'expired'
+
+            diff = (expires_at - now).total_seconds()
+            rem_secs = max(0, int(diff))
+            rem_hours = max(0, int(rem_secs / 3600))
+            conn.close()
+
+            return self.send_json({
+                "success": True,
+                "is_new": False,
+                "is_locked": bool(lock['is_locked']),
+                "locked_reason": lock['locked_reason'],
+                "remaining_hours": rem_hours,
+                "remaining_seconds": rem_secs,
+                "expires_at": lock['expires_at'],
+                "active_reference_code": lock['active_reference_code']
+            })
+
+        # Customer Portal: Save Design & Request Quote (Locks Design & Phone Access!)
         elif path == '/api/designs':
             user = self.get_auth_user()
             user_id = user['id'] if user else None
@@ -559,14 +685,30 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
                 reference_code, user_id, customer_name, customer_phone, customer_email, customer_city,
                 category, layout_type, room_width, room_depth, room_height,
                 room_config_json, modules_json, appliances_json, materials_json,
-                notes, appointment_date, appointment_time_slot, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'quote_requested')
+                notes, appointment_date, appointment_time_slot, status, is_locked
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'quote_requested', 1)
             """, (
                 ref_code, user_id, customer_name, customer_phone, customer_email, customer_city,
                 category, layout_type, room_w, room_d, room_h,
                 room_config_json, modules_json, appliances_json, materials_json,
                 notes, appointment_date, appointment_time_slot
             ))
+
+            # Strictly Lock Customer Phone Access upon Appointment Request
+            clean_phone = customer_phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            if clean_phone:
+                expires_at = (datetime.now() + timedelta(hours=72)).strftime('%Y-%m-%d %H:%M:%S')
+                c.execute("""
+                INSERT INTO customer_access_locks (phone, customer_name, expires_at, is_locked, locked_reason, active_reference_code)
+                VALUES (?, ?, ?, 1, 'appointment_submitted', ?)
+                ON CONFLICT(phone) DO UPDATE SET
+                    is_locked = 1,
+                    locked_reason = 'appointment_submitted',
+                    active_reference_code = ?,
+                    customer_name = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                """, (clean_phone, customer_name, expires_at, ref_code, ref_code, customer_name))
+
             conn.commit()
             conn.close()
 
@@ -574,7 +716,8 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             return self.send_json({
                 "success": True,
                 "reference_code": ref_code,
-                "message": "Tasarımınız başarıyla kaydedildi ve randevu/teklif talebiniz yöneticimize iletildi.",
+                "is_locked": True,
+                "message": "Tasarımınız kilitlenerek fabrikamıza iletildi.",
                 "customer_name": customer_name,
                 "status": "quote_requested"
             })
@@ -819,6 +962,40 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             return self.send_json({"success": True, "message": "Malzeme başarıyla silindi."})
+
+        # Admin: Unlock or Extend 72h Design Window
+        elif path == '/api/admin/locks/extend':
+            user = self.get_auth_user()
+            if not user or user.get('role') != 'admin':
+                return self.send_json({"error": "Yönetici yetkisi gereklidir."}, 403)
+
+            phone = body.get('phone', '').strip().replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            extra_hours = int(body.get('extra_hours', 72))
+            unlock_design = bool(body.get('unlock_design', True))
+
+            if not phone:
+                return self.send_json({"error": "Telefon numarası gereklidir."}, 400)
+
+            new_expires = (datetime.now() + timedelta(hours=extra_hours)).strftime('%Y-%m-%d %H:%M:%S')
+
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("""
+            UPDATE customer_access_locks
+            SET is_locked = 0,
+                locked_reason = NULL,
+                expires_at = ?,
+                extension_count = extension_count + 1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE phone = ?
+            """, (new_expires, phone))
+
+            if unlock_design:
+                c.execute("UPDATE designs SET is_locked = 0 WHERE customer_phone LIKE ?", (f"%{phone[-8:]}%",))
+
+            conn.commit()
+            conn.close()
+            return self.send_json({"success": True, "message": f"{phone} için {extra_hours} saat ek revize süresi tanımlandı ve kilit kaldırıldı."})
 
         return self.send_json({"error": "Endpoint not found"}, 404)
 

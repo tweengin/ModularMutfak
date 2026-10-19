@@ -202,13 +202,33 @@ def init_db():
     );
     """)
 
-    # Safe schema migration for appointment columns
+    # Customer Access Locks Table (Anti-Abuse, 72-Hour Timer & Freezing)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS customer_access_locks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        phone TEXT UNIQUE NOT NULL,
+        customer_name TEXT,
+        first_access_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL,
+        is_locked INTEGER NOT NULL DEFAULT 0,
+        locked_reason TEXT, -- 'appointment_submitted', 'expired', 'admin_frozen'
+        active_reference_code TEXT,
+        extension_count INTEGER DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # Safe schema migration for appointment and lock columns
     try:
         c.execute("ALTER TABLE designs ADD COLUMN appointment_date TEXT;")
     except Exception:
         pass
     try:
         c.execute("ALTER TABLE designs ADD COLUMN appointment_time_slot TEXT;")
+    except Exception:
+        pass
+    try:
+        c.execute("ALTER TABLE designs ADD COLUMN is_locked INTEGER DEFAULT 0;")
     except Exception:
         pass
 

@@ -165,5 +165,60 @@ class TestModulerCraftPro(unittest.TestCase):
         self.assertIn("TR-TEST-99;P1;Alt Dolap;Yan Panel;2;720;560;18", csv_str)
         self.assertIn("PVC 0.8mm", csv_str)
 
+    def test_07_customer_access_lockout_and_expiry(self):
+        from datetime import datetime, timedelta
+        conn = get_db()
+        c = conn.cursor()
+
+        test_phone = "05329998877"
+        c.execute("DELETE FROM customer_access_locks WHERE phone = ?", (test_phone,))
+        conn.commit()
+
+        # 1. New session: 72 hours granted
+        expires_at = (datetime.now() + timedelta(hours=72)).strftime('%Y-%m-%d %H:%M:%S')
+        c.execute("""
+        INSERT INTO customer_access_locks (phone, customer_name, expires_at, is_locked)
+        VALUES (?, 'Test Müşteri', ?, 0)
+        """, (test_phone, expires_at))
+        conn.commit()
+
+        c.execute("SELECT * FROM customer_access_locks WHERE phone = ?", (test_phone,))
+        row = dict(c.fetchone())
+        self.assertEqual(row['is_locked'], 0)
+        self.assertEqual(row['extension_count'], 0)
+
+        # 2. Simulate appointment submission lock
+        c.execute("""
+        UPDATE customer_access_locks
+        SET is_locked = 1, locked_reason = 'appointment_submitted', active_reference_code = 'TR-9999'
+        WHERE phone = ?
+        """, (test_phone,))
+        conn.commit()
+
+        c.execute("SELECT is_locked, locked_reason, active_reference_code FROM customer_access_locks WHERE phone = ?", (test_phone,))
+        locked_row = dict(c.fetchone())
+        self.assertEqual(locked_row['is_locked'], 1)
+        self.assertEqual(locked_row['locked_reason'], 'appointment_submitted')
+        self.assertEqual(locked_row['active_reference_code'], 'TR-9999')
+
+        # 3. Simulate Admin 72h extension and unlock
+        new_expires = (datetime.now() + timedelta(hours=72)).strftime('%Y-%m-%d %H:%M:%S')
+        c.execute("""
+        UPDATE customer_access_locks
+        SET is_locked = 0, locked_reason = NULL, expires_at = ?, extension_count = extension_count + 1
+        WHERE phone = ?
+        """, (new_expires, test_phone))
+        conn.commit()
+
+        c.execute("SELECT is_locked, extension_count FROM customer_access_locks WHERE phone = ?", (test_phone,))
+        unlocked_row = dict(c.fetchone())
+        self.assertEqual(unlocked_row['is_locked'], 0)
+        self.assertEqual(unlocked_row['extension_count'], 1)
+
+        c.execute("DELETE FROM customer_access_locks WHERE phone = ?", (test_phone,))
+        conn.commit()
+        conn.close()
+
 if __name__ == '__main__':
     unittest.main()
+

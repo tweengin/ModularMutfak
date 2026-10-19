@@ -11,6 +11,7 @@ const AdminPanel = {
   settings: {},
   moduleTemplates: [],
   materials: [],
+  accessLocks: [],
   currentDesign: null,
   currentCostResult: null,
   adminCanvas2D: null,
@@ -22,6 +23,7 @@ const AdminPanel = {
     await this.loadModuleTemplates();
     await this.loadMaterials();
     await this.loadDesignsList();
+    await this.loadAccessLocks();
   },
 
   async loadPricingMatrix() {
@@ -771,6 +773,88 @@ const AdminPanel = {
       }
     } catch (e) {
       alert("Hata oluştu.");
+    }
+  },
+
+  // 72h Access & Anti-Abuse Lockout Management
+  async loadAccessLocks() {
+    const token = localStorage.getItem('mc_token');
+    try {
+      const res = await fetch('/api/admin/locks', {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      });
+      const data = await res.json();
+      this.accessLocks = data.locks || [];
+      this.renderAccessLocksTable();
+    } catch (e) {
+      console.error("Error loading access locks:", e);
+    }
+  },
+
+  renderAccessLocksTable() {
+    const tbody = document.getElementById('admin-locks-tbody');
+    if (!tbody) return;
+
+    if (this.accessLocks.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#94a3b8; padding:1.25rem;">Henüz kayıtlı müşteri tasarım oturumu bulunmuyor.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = this.accessLocks.map(l => {
+      let statusBadge = '';
+      if (l.is_locked) {
+        if (l.locked_reason === 'appointment_submitted') {
+          statusBadge = `<span class="badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🔒 Randevu Alındı (Kilitli)</span>`;
+        } else {
+          statusBadge = `<span class="badge" style="background:rgba(239,68,68,0.2); color:#ef4444; border:1px solid #ef4444;">⏰ 72s Doldu (Kilitli)</span>`;
+        }
+      } else {
+        statusBadge = `<span class="badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 Aktif (${l.remaining_hours}s kaldı)</span>`;
+      }
+
+      const refBadge = l.active_reference_code ? `<span class="badge badge-info">${l.active_reference_code}</span>` : `<span style="color:#64748b;">-</span>`;
+
+      return `
+        <tr>
+          <td><strong style="font-family:monospace; color:#38bdf8;">${l.phone}</strong></td>
+          <td>${l.customer_name || '<em style="color:#64748b;">İsimsiz Müşteri</em>'}</td>
+          <td>${refBadge}</td>
+          <td>${statusBadge}</td>
+          <td><small style="color:#94a3b8;">${l.extension_count || 0} kez</small></td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="AdminPanel.extendAccessLock('${l.phone}', 72)" title="72 Saat Ek Süre Tanımla ve Kilidi Kaldır" style="padding:0.25rem 0.6rem; font-size:0.75rem;">
+              ➕ 72s Ek Süre Ver
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  async extendAccessLock(phone, extraHours = 72) {
+    if (!phone) return;
+    const token = localStorage.getItem('mc_token');
+    try {
+      const res = await fetch('/api/admin/locks/extend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ phone, extra_hours: extraHours, unlock_design: true })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || "72 saat ek süre tanımlandı ve kilit kaldırıldı!", "success");
+        await this.loadAccessLocks();
+        await this.loadDesignsList();
+      } else {
+        alert(data.error || "İşlem başarısız.");
+      }
+    } catch (e) {
+      alert("Sunucuya bağlanırken hata oluştu.");
     }
   }
 };

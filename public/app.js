@@ -277,6 +277,7 @@ function navigateTo(viewId) {
       renderActiveCanvas();
       updatePlacedModulesUI();
       checkRulerBubbleInitialDisplay();
+      checkCustomerAccessSession();
     }, 100);
   } else if (viewId === 'admin') {
     AdminPanel.init();
@@ -846,6 +847,13 @@ function setupDragAndDrop() {
     e.preventDefault();
     dropWrapper.classList.remove('drag-over');
 
+    if (window.CURRENT_DESIGN_LOCKED) {
+      showToast("🔒 Tasarımınız kilitlidir. Yeni modül eklenemez.", "error");
+      if (canvas3D) canvas3D.clearGhostModule();
+      window.CURRENT_DRAGGED_MODULE = null;
+      return;
+    }
+
     let modTemplate = window.CURRENT_DRAGGED_MODULE;
     if (!modTemplate) {
       try {
@@ -904,6 +912,10 @@ function getWallCapacity(wall = 'back') {
 // ADD MODULE WITH STRICT WALL BOUNDARY ENFORCEMENT & MULTI-WALL WRAP
 function addModuleToDesign(template, customPos = null, targetWall = null) {
   if (!template) return false;
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlenmiştir. Yeni modül eklemek veya revize yapmak için fabrika yöneticiniz ile görüşünüz.", "error");
+    return false;
+  }
   const modWidth = template.selected_w || template.w || 600;
   const wall = targetWall || window.CURRENT_ACTIVE_WALL || 'back';
   const cap = getWallCapacity(wall);
@@ -1062,6 +1074,10 @@ window.shiftSelectedModule = function(delta) {
 };
 
 window.toggleSelectedModuleWall = function() {
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlidir. Değişiklik yapılamaz.", "error");
+    return;
+  }
   const selId = canvas3D?.selectedModuleId || canvas2D?.selectedModuleId;
   if (selId) {
     toggleModuleWall(selId);
@@ -1069,6 +1085,10 @@ window.toggleSelectedModuleWall = function() {
 };
 
 window.deleteSelectedModule = function() {
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlidir. Modül silinemez.", "error");
+    return;
+  }
   const selId = canvas3D?.selectedModuleId || canvas2D?.selectedModuleId;
   if (selId) {
     removeModule(selId);
@@ -1614,10 +1634,24 @@ function applyWizardSettings() {
 
 // SUBMISSION & REFERENCE CODE
 async function openSubmitQuoteModal() {
+  if (window.CURRENT_DESIGN_LOCKED) {
+    alert("🔒 Tasarımınız kilitlenmiştir ve fabrikayla randevu sürecindedir. Randevunuzda net fiyat ve özel aksesuarlarınızı görüşebilirsiniz. Yeni bir revize süresi için lütfen fabrika yöneticimiz ile iletişime geçiniz.");
+    return;
+  }
+
   if (canvas2D && canvas2D.doorCollisionDetected) {
     if (!confirm("⚠️ DİKKAT: Dolap modüllerinizden biri kapının açılış yayına çarpıyor! Yine de devam edip yönetici incelemesine göndermek istiyor musunuz?")) {
       return;
     }
+  }
+
+  const savedPhone = localStorage.getItem('mc_customer_phone') || window.CURRENT_USER?.phone || '';
+  const savedName = localStorage.getItem('mc_customer_name') || window.CURRENT_USER?.name || '';
+  if (savedPhone && document.getElementById('quote-cust-phone')) {
+    document.getElementById('quote-cust-phone').value = savedPhone;
+  }
+  if (savedName && document.getElementById('quote-cust-name')) {
+    document.getElementById('quote-cust-name').value = savedName;
   }
 
   const modal = document.getElementById('submit-quote-modal');
@@ -1658,6 +1692,9 @@ async function submitDesignForQuote() {
     });
     const data = await res.json();
     if (data.success) {
+      localStorage.setItem('mc_customer_phone', custPhone);
+      localStorage.setItem('mc_customer_name', custName);
+      lockStudioCanvas('appointment_submitted', data.reference_code);
       closeModal('submit-quote-modal');
       showReferenceSuccessModal(data.reference_code, custName);
     } else {
@@ -1998,3 +2035,177 @@ function setupEventListeners() {
     if (studioDoor) studioDoor.value = e.target.value;
   });
 }
+
+// ==========================================
+// 72-HOUR CUSTOMER DESIGN ACCESS & ANTI-ABUSE
+// ==========================================
+window.CURRENT_DESIGN_LOCKED = false;
+let customerTimerInterval = null;
+
+async function checkCustomerAccessSession(forcePhone = null) {
+  const phone = forcePhone || localStorage.getItem('mc_customer_phone') || window.CURRENT_USER?.phone;
+  if (!phone) {
+    const modal = document.getElementById('customer-phone-session-modal');
+    if (modal && !window.CURRENT_USER) {
+      modal.classList.add('active');
+    }
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/customer/check-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    if (data.exists) {
+      if (data.is_locked) {
+        lockStudioCanvas(data.locked_reason, data.active_reference_code);
+      } else {
+        unlockStudioCanvas(data.remaining_seconds);
+      }
+    } else {
+      initCustomerPhoneSession(phone);
+    }
+  } catch (e) {
+    console.error("Access session check error:", e);
+  }
+}
+window.checkCustomerAccessSession = checkCustomerAccessSession;
+
+async function initCustomerPhoneSession(phone, custName = '') {
+  if (!phone) return;
+  try {
+    const res = await fetch('/api/customer/init-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, customer_name: custName })
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('mc_customer_phone', phone);
+      if (custName) localStorage.setItem('mc_customer_name', custName);
+      if (data.is_locked) {
+        lockStudioCanvas(data.locked_reason, data.active_reference_code);
+      } else {
+        unlockStudioCanvas(data.remaining_seconds);
+      }
+    }
+  } catch (e) {
+    console.error("Init session error:", e);
+  }
+}
+window.initCustomerPhoneSession = initCustomerPhoneSession;
+
+window.submitPhoneSession = async function() {
+  const phoneInput = document.getElementById('session-cust-phone');
+  const nameInput = document.getElementById('session-cust-name');
+  const phone = phoneInput?.value.trim() || '';
+  const name = nameInput?.value.trim() || '';
+  if (!phone || phone.length < 10) {
+    alert("Lütfen geçerli bir telefon numarası giriniz.");
+    return;
+  }
+  await initCustomerPhoneSession(phone, name);
+  closeModal('customer-phone-session-modal');
+  if (document.getElementById('quote-cust-phone')) document.getElementById('quote-cust-phone').value = phone;
+  if (name && document.getElementById('quote-cust-name')) document.getElementById('quote-cust-name').value = name;
+};
+
+function lockStudioCanvas(reason = 'appointment_submitted', refCode = '') {
+  window.CURRENT_DESIGN_LOCKED = true;
+  if (customerTimerInterval) clearInterval(customerTimerInterval);
+
+  const banner = document.getElementById('studio-locked-banner');
+  const badge = document.getElementById('customer-timer-badge');
+  const timerText = document.getElementById('timer-badge-text');
+  const bannerTitle = document.getElementById('locked-banner-title');
+  const bannerDesc = document.getElementById('locked-banner-desc');
+  const refBadge = document.getElementById('locked-ref-badge');
+  const submitBtn = document.getElementById('btn-studio-submit-quote');
+
+  if (banner) {
+    banner.style.display = 'flex';
+    if (reason === 'appointment_submitted') {
+      if (bannerTitle) bannerTitle.textContent = "🔒 Tasarımınız Onaylanıp Kilitlenmiştir!";
+      if (bannerDesc) bannerDesc.textContent = "Tasarımınız fabrikamıza iletilmiştir. Randevu görüşmenizde net fiyat ve özel donanımlarınız (kör köşe fasulye sepet vb.) profesyonelce belirlenecektir. Doğrudan revize yapılamaz.";
+      if (refBadge) {
+        refBadge.textContent = refCode || 'TR-ONAYLI';
+        refBadge.style.display = 'inline-block';
+      }
+    } else {
+      if (bannerTitle) bannerTitle.textContent = "⏰ 72 Saatlik Tasarım Süreniz Dolmuştur!";
+      if (bannerDesc) bannerDesc.textContent = "Bireysel kullanım hakkınızın süresi dolduğu için tuval kilitlenmiştir. Yeniden tasarım yapmak veya revize süresi almak için lütfen fabrika yöneticimiz ile iletişime geçiniz.";
+      if (refBadge) refBadge.style.display = 'none';
+    }
+  }
+
+  if (timerText) {
+    timerText.textContent = reason === 'appointment_submitted' ? '🔒 Tasarım Kilitli' : '⏰ Süre Doldu';
+    if (badge) {
+      badge.style.borderColor = '#ef4444';
+      badge.style.color = '#ef4444';
+    }
+  }
+
+  if (submitBtn) {
+    submitBtn.textContent = '🔒 Tasarım Kilitlendi';
+    submitBtn.classList.remove('btn-success');
+    submitBtn.classList.add('btn-outline');
+    submitBtn.style.opacity = '0.6';
+    submitBtn.style.cursor = 'not-allowed';
+  }
+}
+window.lockStudioCanvas = lockStudioCanvas;
+
+function unlockStudioCanvas(remainingSeconds = 72 * 3600) {
+  window.CURRENT_DESIGN_LOCKED = false;
+  const banner = document.getElementById('studio-locked-banner');
+  if (banner) banner.style.display = 'none';
+
+  const badge = document.getElementById('customer-timer-badge');
+  if (badge) {
+    badge.style.borderColor = '#38bdf8';
+    badge.style.color = '#38bdf8';
+  }
+
+  const submitBtn = document.getElementById('btn-studio-submit-quote');
+  if (submitBtn) {
+    submitBtn.innerHTML = '<span>📅</span> Tasarımı Tamamla & Randevu Al';
+    submitBtn.classList.add('btn-success');
+    submitBtn.classList.remove('btn-outline');
+    submitBtn.style.opacity = '1';
+    submitBtn.style.cursor = 'pointer';
+  }
+
+  start72HourTimer(remainingSeconds);
+}
+window.unlockStudioCanvas = unlockStudioCanvas;
+
+function start72HourTimer(remainingSeconds) {
+  if (customerTimerInterval) clearInterval(customerTimerInterval);
+  let sec = remainingSeconds;
+
+  function updateDisplay() {
+    const timerText = document.getElementById('timer-badge-text');
+    if (!timerText) return;
+
+    if (sec <= 0) {
+      clearInterval(customerTimerInterval);
+      lockStudioCanvas('expired');
+      alert("⏰ DİKKAT: 72 saatlik tasarım süreniz dolmuştur! Tasarımınız kilitlendi. Ek süre veya revize için fabrika yöneticimiz ile iletişime geçiniz.");
+      return;
+    }
+
+    const hours = Math.floor(sec / 3600);
+    const mins = Math.floor((sec % 3600) / 60);
+    timerText.textContent = `Kalan Süre: ${hours}s ${mins < 10 ? '0' : ''}${mins}dk`;
+    sec--;
+  }
+
+  updateDisplay();
+  customerTimerInterval = setInterval(updateDisplay, 1000);
+}
+window.start72HourTimer = start72HourTimer;
+
