@@ -1813,4 +1813,92 @@ canvas {
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
 
+/* ==========================================================================
+   AUTO-LAYOUT WIZARD & DESIGN METHOD SELECTION
+   ========================================================================== */
+.wizard-method-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .wizard-method-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wizard-method-card {
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid #334155;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.wizard-method-card:hover {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.wizard-method-card.recommended {
+  border-color: #0284c7;
+  background: rgba(2, 132, 199, 0.1);
+}
+
+.wizard-method-card.recommended::before {
+  content: '★ 2026 ÖNERİLEN';
+  position: absolute;
+  top: -11px;
+  right: 16px;
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.auto-appliance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.auto-appliance-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.auto-appliance-card:hover {
+  border-color: #38bdf8;
+  background: #334155;
+}
+
+.auto-appliance-card.mandatory {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.08);
+  cursor: default;
+}
+
+
 

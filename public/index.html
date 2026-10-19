@@ -337,11 +337,11 @@
           </div>
           <div class="wizard-step-item" id="wstep-4">
             <div class="step-circle">4</div>
-            <div class="step-label">Zemin & Cihazlar</div>
+            <div class="step-label">Tasarım Yöntemi</div>
           </div>
           <div class="wizard-step-item" id="wstep-5">
             <div class="step-circle">5</div>
-            <div class="step-label">Tasarım Başlasın</div>
+            <div class="step-label">Akıllı Sihirbaz</div>
           </div>
         </div>
 
@@ -455,14 +455,14 @@
           </div>
         </div>
 
-        <!-- Wizard Pane 4: Flooring & Appliances -->
+        <!-- Wizard Pane 4: Design Method Selection (Flooring + Mode) -->
         <div id="wizard-pane-4" class="wizard-step-pane" style="display:none;">
-          <h3 style="margin-bottom:0.5rem;">Zemin Seçimi ve Cihaz Entegrasyonu</h3>
+          <h3 style="margin-bottom:0.5rem;">Zemin Seçimi & Tasarım Yöntemi</h3>
           <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
-            Zemin kaplamasını ve mutfakta yer alacak beyaz eşyaları işaretleyin.
+            Zemin kaplamasını belirleyin ve mutfağınızı nasıl oluşturmak istediğinizi seçin.
           </p>
 
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom:1.5rem;">
             <label>Zemin Türü (Sponsor Entegreli)</label>
             <select id="wizard-flooring" class="form-control">
               <option value="AGT Parke Doğal Meşe (Sponsor: AGT)" selected>AGT Parke Doğal Meşe (Sponsor: AGT Zemin)</option>
@@ -472,28 +472,177 @@
             </select>
           </div>
 
-          <label style="font-size:0.85rem; font-weight:600; margin-bottom:0.5rem; display:block;">Dahili Cihazlar & Beyaz Eşya:</label>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; margin-bottom:1.5rem;">
-            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
-              <input type="checkbox" id="app-fridge" checked> 🧊 No-Frost Buzdolabı
+          <label style="font-size:0.95rem; font-weight:700; margin-bottom:0.75rem; display:block; color:#f8fafc;">
+            Mutfağınızı Nasıl Tasarlamak İstersiniz?
+          </label>
+
+          <div class="wizard-method-grid">
+            <!-- Method 1: Manual -->
+            <div class="wizard-method-card" onclick="startManualStudio()">
+              <div>
+                <div style="font-size:36px; margin-bottom:10px;">🎨</div>
+                <h4 style="font-size:1.05rem; color:#f8fafc; margin-bottom:6px;">Sıfırdan Kendim Tasarlayacağım</h4>
+                <p style="font-size:0.8rem; color:#94a3b8; line-height:1.45;">
+                  Boş bir tuval ile başlayın. Çekmeceden modülleri tek tek seçip dilediğiniz gibi yerleştirin.
+                </p>
+              </div>
+              <button class="btn btn-outline" style="margin-top:1.25rem; width:100%;">
+                🎨 Boş Tuvalde Başla →
+              </button>
+            </div>
+
+            <!-- Method 2: Smart Auto-Layout Wizard (Recommended) -->
+            <div class="wizard-method-card recommended" onclick="nextWizardStep(5)">
+              <div>
+                <div style="font-size:36px; margin-bottom:10px;">🪄</div>
+                <h4 style="font-size:1.05rem; color:#38bdf8; margin-bottom:6px;">Akıllı Tasarım Sihirbazı</h4>
+                <p style="font-size:0.8rem; color:#cbd5e1; line-height:1.45;">
+                  Temel ihtiyaçlarınızı (Evye, Fırın, Buzdolabı) seçin; sihirbazımız ergonomik altın üçgene göre mutfağınızı döşesin.
+                </p>
+              </div>
+              <button class="btn btn-primary" style="margin-top:1.25rem; width:100%;">
+                🪄 İhtiyaçları Seçmeye Başla →
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-start; margin-top:1.5rem;">
+            <button class="btn btn-outline" onclick="nextWizardStep(3)">← Geri</button>
+          </div>
+        </div>
+
+        <!-- Wizard Pane 5: Smart Appliance & Module Selection -->
+        <div id="wizard-pane-5" class="wizard-step-pane" style="display:none;">
+          <h3 style="margin-bottom:0.5rem;">🪄 Akıllı Mutfak İhtiyaç & Modül Seçimi</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+            Mutfağınızda yer almasını istediğiniz temel üniteleri işaretleyin. Sistem duvar ölçülerinize göre boşlukları kusursuz tamamlayacaktır.
+          </p>
+
+          <label style="font-size:0.85rem; font-weight:700; margin-bottom:0.6rem; display:block; color:#f8fafc;">
+            Temel Mutfak Modülleri & Dahili Cihazlar:
+          </label>
+
+          <div class="auto-appliance-grid">
+            <!-- 1. Sink (Mandatory) -->
+            <div class="auto-appliance-card mandatory" title="Bir mutfakta eviye dolabı zorunludur">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">💧</span>
+                <div>
+                  <strong style="font-size:0.85rem; color:#34d399;">Eviye Alt Dolabı (2 Kapak)</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">Zorunlu Temel Ünite</div>
+                </div>
+              </div>
+              <span class="badge badge-success" style="font-size:0.7rem;">ZORUNLU</span>
+            </div>
+
+            <!-- 2. Fridge -->
+            <label class="auto-appliance-card">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">🧊</span>
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc;">No-Frost Buzdolabı Kabini</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">70 cm Boy Kiler Modülü</div>
+                </div>
+              </div>
+              <input type="checkbox" id="auto-app-fridge" checked>
             </label>
-            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
-              <input type="checkbox" id="app-oven" checked> ♨️ Ankastre Fırın
+
+            <!-- 3. Oven & Cooktop -->
+            <label class="auto-appliance-card">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">♨️</span>
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc;">Ankastre Fırın & Ocak</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">60 cm Pişirme Ünitesi</div>
+                </div>
+              </div>
+              <input type="checkbox" id="auto-app-oven" checked>
             </label>
-            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
-              <input type="checkbox" id="app-hob" checked> 🍳 Ankastre Ocak
+
+            <!-- 4. Dishwasher -->
+            <label class="auto-appliance-card">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">🍽️</span>
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc;">Bulaşık Makinesi Paneli</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">60 cm Tam Ankastre</div>
+                </div>
+              </div>
+              <input type="checkbox" id="auto-app-dishwasher" checked>
             </label>
-            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
-              <input type="checkbox" id="app-hood" checked> 💨 Eğimli Davlumbaz
+
+            <!-- 5. 3 Drawers -->
+            <label class="auto-appliance-card">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">🗄️</span>
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc;">3 Çekmeceli Alt Dolap</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">Çatal-bıçak & tencere çekmecesi</div>
+                </div>
+              </div>
+              <input type="checkbox" id="auto-app-drawer" checked>
             </label>
-            <label style="display:flex; align-items:center; gap:0.5rem; background:#334155; padding:0.6rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">
-              <input type="checkbox" id="app-dishwasher" checked> 🍽️ Bulaşık Makinesi
+
+            <!-- 6. Range Hood -->
+            <label class="auto-appliance-card">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">💨</span>
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc;">Davlumbaz & Aspiratör</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">Fırın üstü hava tahliyesi</div>
+                </div>
+              </div>
+              <input type="checkbox" id="auto-app-hood" checked>
+            </label>
+
+            <!-- 7. Glass Wall Cabinet -->
+            <label class="auto-appliance-card">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:22px;">🪟</span>
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc;">Camlı Yatay Kalkar Dolap</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">Buzlu cam & aventos mekanizma</div>
+                </div>
+              </div>
+              <input type="checkbox" id="auto-app-glass" checked>
             </label>
           </div>
 
+          <!-- L-Kitchen Corner Requirement Section (Visible ONLY for L-kitchen) -->
+          <div id="auto-corner-section" style="display:none; background:rgba(56, 189, 248, 0.08); border:1px solid #38bdf8; border-radius:8px; padding:1.25rem; margin-bottom:1.5rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+              <strong style="color:#f8fafc; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                <span>📐</span> L-Mutfak Köşe Modülü Çözümü
+              </strong>
+              <span class="badge badge-warning">L-MUTFAK İÇİN ZORUNLU</span>
+            </div>
+            <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:1rem; line-height:1.4;">
+              L-Mutfak seçtiğiniz için iki duvarın kesişim köşesine bir köşe modülü yerleştirilmelidir:
+            </p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+              <label style="display:flex; align-items:center; gap:10px; background:#1e293b; padding:0.75rem; border-radius:6px; cursor:pointer; border:1px solid #475569;">
+                <input type="radio" name="auto-corner-choice" value="900" checked>
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc; display:block;">90x90 cm Kör Köşe</strong>
+                  <span style="font-size:0.7rem; color:#94a3b8;">Döner sepet uyumlu 90° dönüş</span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:center; gap:10px; background:#1e293b; padding:0.75rem; border-radius:6px; cursor:pointer; border:1px solid #475569;">
+                <input type="radio" name="auto-corner-choice" value="1050">
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc; display:block;">105 cm Kör Köşe</strong>
+                  <span style="font-size:0.7rem; color:#94a3b8;">Geniş fasulye sepet dolap</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
           <div style="display:flex; justify-content:space-between; margin-top:2rem;">
-            <button class="btn btn-outline" onclick="nextWizardStep(3)">← Geri</button>
-            <button class="btn btn-success btn-lg" onclick="nextWizardStep(5)">Stüdyoyu Başlat & Tasarla 🚀</button>
+            <button class="btn btn-outline" onclick="nextWizardStep(4)">← Geri</button>
+            <button class="btn btn-success btn-lg" onclick="runAutoKitchenGenerator()">
+              🪄 Tasarımı Otomatik Oluştur & 3D Stüdyoda Aç 🚀
+            </button>
           </div>
         </div>
 

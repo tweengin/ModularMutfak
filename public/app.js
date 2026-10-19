@@ -1172,9 +1172,324 @@ function nextWizardStep(step) {
 
   if (step === 5) {
     applyWizardSettings();
-    navigateTo('studio');
+    const layout = window.CURRENT_DESIGN.layout_type || 'single_wall';
+    const isL = layout.startsWith('l_');
+    const cornerSec = document.getElementById('auto-corner-section');
+    if (cornerSec) {
+      cornerSec.style.display = isL ? 'block' : 'none';
+    }
   }
 }
+
+window.startManualStudio = function() {
+  applyWizardSettings();
+  window.CURRENT_DESIGN.modules = [];
+  navigateTo('studio');
+  showToast('🎨 Manuel Tasarım: Boş tuval açıldı. Sol menüden modül eklemeye başlayabilirsiniz.', 'info');
+};
+
+window.runAutoKitchenGenerator = function() {
+  applyWizardSettings();
+  const layout = window.CURRENT_DESIGN.layout_type || 'single_wall';
+  const isL = layout.startsWith('l_');
+  const rw = window.CURRENT_DESIGN.room_width || 3600;
+  const rd = window.CURRENT_DESIGN.room_depth || 2600;
+
+  const hasFridge = document.getElementById('auto-app-fridge')?.checked ?? true;
+  const hasOven = document.getElementById('auto-app-oven')?.checked ?? true;
+  const hasDishwasher = document.getElementById('auto-app-dishwasher')?.checked ?? true;
+  const hasDrawer = document.getElementById('auto-app-drawer')?.checked ?? true;
+  const hasHood = document.getElementById('auto-app-hood')?.checked ?? true;
+  const hasGlassWall = document.getElementById('auto-app-glass')?.checked ?? true;
+
+  const cornerType = document.querySelector('input[name="auto-corner-choice"]:checked')?.value || '900';
+  const cornerW = parseInt(cornerType);
+
+  const generatedModules = [];
+  let modIndex = 1;
+  const nextModId = () => `MOD-${modIndex < 10 ? '0' + modIndex++ : modIndex++}`;
+
+  if (!isL) {
+    // SINGLE WALL (BACK WALL ONLY)
+    let curX = 0;
+
+    // 1. Tall Fridge on far left edge
+    if (hasFridge && (rw - curX) >= 700) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'tall_fridge',
+        name: 'No-Frost Buzdolabı Kabini',
+        category: 'tall',
+        wall: 'back',
+        w: 700, d: 600, h: 2100, x: curX
+      });
+      curX += 700;
+    }
+
+    // 2. Base 3-Drawer Prep Counter
+    if (hasDrawer && (rw - curX) >= 600) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_drawer_3',
+        name: '3 Çekmeceli Alt Dolap',
+        category: 'base',
+        wall: 'back',
+        w: 600, d: 600, h: 720, x: curX,
+        drawers: 3, hinges: 0
+      });
+      curX += 600;
+    }
+
+    // 3. Sink Unit (Mandatory)
+    const sinkW = (rw - curX) >= 900 ? 900 : 800;
+    const sinkX = curX;
+    if ((rw - curX) >= sinkW) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_sink',
+        name: 'Eviye Alt Dolabı (2 Kapak)',
+        category: 'base',
+        wall: 'back',
+        w: sinkW, d: 600, h: 720, x: curX,
+        hinges: 4
+      });
+      curX += sinkW;
+
+      if (hasGlassWall) {
+        generatedModules.push({
+          id: nextModId(),
+          type: 'wall_glass',
+          name: 'Camlı Yatay Kalkar Dolap',
+          category: 'wall',
+          wall: 'back',
+          w: sinkW, d: 350, h: 720, x: sinkX,
+          hinges: 2
+        });
+      }
+    }
+
+    // 4. Dishwasher adjacent to sink
+    if (hasDishwasher && (rw - curX) >= 600) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_dishwasher',
+        name: 'Bulaşık Makinesi Paneli',
+        category: 'base',
+        wall: 'back',
+        w: 600, d: 600, h: 720, x: curX
+      });
+      curX += 600;
+    }
+
+    // 5. Oven & Cooktop
+    const ovenX = curX;
+    if (hasOven && (rw - curX) >= 600) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_oven',
+        name: 'Ankastre Fırın & Ocak Modülü',
+        category: 'base',
+        wall: 'back',
+        w: 600, d: 600, h: 720, x: curX
+      });
+      curX += 600;
+
+      if (hasHood) {
+        generatedModules.push({
+          id: nextModId(),
+          type: 'wall_hood',
+          name: 'Davlumbaz Üstü Aspiratör Dolabı',
+          category: 'wall',
+          wall: 'back',
+          w: 600, d: 350, h: 720, x: ovenX,
+          hinges: 2
+        });
+      }
+    }
+
+    // 6. Fill remaining space with standard modular cabinets
+    let remSpace = rw - curX;
+    while (remSpace >= 400) {
+      const fillW = remSpace >= 800 ? 800 : (remSpace >= 600 ? 600 : (remSpace >= 500 ? 500 : 400));
+      generatedModules.push({
+        id: nextModId(),
+        type: fillW >= 800 ? 'base_double' : 'base_standard',
+        name: fillW >= 800 ? 'Çift Kapaklı Geniş Alt Dolap' : 'Standart Tek Kapak Alt Dolap',
+        category: 'base',
+        wall: 'back',
+        w: fillW, d: 600, h: 720, x: curX,
+        hinges: fillW >= 800 ? 4 : 2
+      });
+
+      generatedModules.push({
+        id: nextModId(),
+        type: fillW >= 800 ? 'wall_double' : 'wall_single',
+        name: fillW >= 800 ? 'Çift Kapaklı Üst Dolap' : 'Tek Kapaklı Üst Dolap',
+        category: 'wall',
+        wall: 'back',
+        w: fillW, d: 350, h: 720, x: curX,
+        hinges: fillW >= 800 ? 4 : 2
+      });
+
+      curX += fillW;
+      remSpace = rw - curX;
+    }
+  } else {
+    // L-KITCHEN (CORNER AT 0,0, SINK ON BACK, COOKING/FRIDGE ON LEFT)
+    generatedModules.push({
+      id: nextModId(),
+      type: 'base_corner_l',
+      name: cornerW === 1050 ? '105 cm Kör Köşe Alt Dolap' : '90x90 cm Kör Köşe Alt Dolap',
+      category: 'base',
+      wall: 'back',
+      w: cornerW, d: cornerW, h: 720, x: 0
+    });
+
+    generatedModules.push({
+      id: nextModId(),
+      type: 'wall_corner_l',
+      name: 'L-Mutfak Köşe Üst Dolabı',
+      category: 'wall',
+      wall: 'back',
+      w: 650, d: 650, h: 720, x: 0
+    });
+
+    // BACK WALL
+    let backX = cornerW;
+    const sinkX = backX;
+    if ((rw - backX) >= 900) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_sink',
+        name: 'Eviye Alt Dolabı (2 Kapak)',
+        category: 'base',
+        wall: 'back',
+        w: 900, d: 600, h: 720, x: backX,
+        hinges: 4
+      });
+      backX += 900;
+
+      if (hasGlassWall) {
+        generatedModules.push({
+          id: nextModId(),
+          type: 'wall_glass',
+          name: 'Camlı Yatay Kalkar Dolap',
+          category: 'wall',
+          wall: 'back',
+          w: 900, d: 350, h: 720, x: sinkX
+        });
+      }
+    }
+
+    if (hasDishwasher && (rw - backX) >= 600) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_dishwasher',
+        name: 'Bulaşık Makinesi Paneli',
+        category: 'base',
+        wall: 'back',
+        w: 600, d: 600, h: 720, x: backX
+      });
+      backX += 600;
+    }
+
+    // Fill remaining on back wall
+    let remBack = rw - backX;
+    while (remBack >= 400) {
+      const fillW = remBack >= 800 ? 800 : (remBack >= 600 ? 600 : (remBack >= 500 ? 500 : 400));
+      generatedModules.push({
+        id: nextModId(),
+        type: fillW >= 800 ? 'base_double' : 'base_standard',
+        name: fillW >= 800 ? 'Çift Kapaklı Geniş Alt Dolap' : 'Standart Tek Kapak Alt Dolap',
+        category: 'base',
+        wall: 'back',
+        w: fillW, d: 600, h: 720, x: backX,
+        hinges: fillW >= 800 ? 4 : 2
+      });
+      generatedModules.push({
+        id: nextModId(),
+        type: fillW >= 800 ? 'wall_double' : 'wall_single',
+        name: fillW >= 800 ? 'Çift Kapaklı Üst Dolap' : 'Tek Kapaklı Üst Dolap',
+        category: 'wall',
+        wall: 'back',
+        w: fillW, d: 350, h: 720, x: backX
+      });
+      backX += fillW;
+      remBack = rw - backX;
+    }
+
+    // LEFT WALL
+    let leftZ = cornerW;
+    const ovenZ = leftZ;
+    if (hasOven && (rd - leftZ) >= 600) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_oven',
+        name: 'Ankastre Fırın & Ocak Modülü',
+        category: 'base',
+        wall: 'left',
+        w: 600, d: 600, h: 720, x: leftZ
+      });
+      leftZ += 600;
+
+      if (hasHood) {
+        generatedModules.push({
+          id: nextModId(),
+          type: 'wall_hood',
+          name: 'Davlumbaz Üstü Aspiratör Dolabı',
+          category: 'wall',
+          wall: 'left',
+          w: 600, d: 350, h: 720, x: ovenZ
+        });
+      }
+    }
+
+    if (hasDrawer && (rd - leftZ) >= 600) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_drawer_3',
+        name: '3 Çekmeceli Alt Dolap',
+        category: 'base',
+        wall: 'left',
+        w: 600, d: 600, h: 720, x: leftZ,
+        drawers: 3
+      });
+      leftZ += 600;
+    }
+
+    if (hasFridge && (rd - leftZ) >= 700) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'tall_fridge',
+        name: 'No-Frost Buzdolabı Kabini',
+        category: 'tall',
+        wall: 'left',
+        w: 700, d: 600, h: 2100, x: leftZ
+      });
+      leftZ += 700;
+    }
+
+    // Fill remaining on left wall
+    let remLeft = rd - leftZ;
+    while (remLeft >= 400) {
+      const fillW = remLeft >= 600 ? 600 : (remLeft >= 500 ? 500 : 400);
+      generatedModules.push({
+        id: nextModId(),
+        type: 'base_standard',
+        name: 'Standart Tek Kapak Alt Dolap',
+        category: 'base',
+        wall: 'left',
+        w: fillW, d: 600, h: 720, x: leftZ
+      });
+      leftZ += fillW;
+      remLeft = rd - leftZ;
+    }
+  }
+
+  window.CURRENT_DESIGN.modules = generatedModules;
+  navigateTo('studio');
+  showToast('✨ Mutfak Tasarım Sihirbazı: Ergonomik mutfağınız başarıyla hazırlandı!', 'success');
+};
 
 function selectLayoutShape(shapeKey) {
   window.CURRENT_DESIGN.layout_type = shapeKey;
