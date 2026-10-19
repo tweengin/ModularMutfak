@@ -91,11 +91,12 @@ class StudioCanvas3D {
     this.controls.maxDistance = 14000;
     this.controls.target.set(1800, 950, 400);
 
-    // 5. Lighting (Warm interior ADeko showroom studio)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    // 5. High-End Showroom Lighting (Studio PBR Warm Neutral)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.70);
     this.scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xfff7ed, 0.9);
+    // Key Directional Light (Warm showroom track daylight)
+    const dirLight = new THREE.DirectionalLight(0xfffaf0, 0.95);
     dirLight.position.set(3000, 4500, 3500);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 2048;
@@ -107,16 +108,27 @@ class StudioCanvas3D {
     dirLight.shadow.camera.right = d;
     dirLight.shadow.camera.top = d;
     dirLight.shadow.camera.bottom = -d;
+    dirLight.shadow.bias = -0.0005;
     this.scene.add(dirLight);
 
+    // Rim / Edge Accent Light (Opposite angle to highlight marble bevels & acrylic reflections)
+    const rimLight = new THREE.DirectionalLight(0xe0f2fe, 0.45);
+    rimLight.position.set(-2500, 3200, -2000);
+    this.scene.add(rimLight);
+
     // Overhead Spotlights
-    const spot1 = new THREE.PointLight(0xffedd5, 0.55, 3500);
-    spot1.position.set(1200, 2300, 700);
+    const spot1 = new THREE.PointLight(0xffedd5, 0.65, 4500);
+    spot1.position.set(1200, 2400, 800);
     this.scene.add(spot1);
 
-    const spot2 = new THREE.PointLight(0xffedd5, 0.55, 3500);
-    spot2.position.set(2400, 2300, 700);
+    const spot2 = new THREE.PointLight(0xffedd5, 0.65, 4500);
+    spot2.position.set(2400, 2400, 800);
     this.scene.add(spot2);
+
+    // Under-Cabinet Architectural Warm Glow (LED Strip simulation)
+    const underCabLight = new THREE.PointLight(0xfef3c7, 0.35, 3000);
+    underCabLight.position.set(1800, 1450, 250);
+    this.scene.add(underCabLight);
 
     this.roomGroup = new THREE.Group();
     this.cabinetsGroup = new THREE.Group();
@@ -133,87 +145,247 @@ class StudioCanvas3D {
   }
 
   setupProceduralTextures() {
-    // 1. Natural Oak Wood Texture
+    // 1. Natural Organic Oak Wood Texture + Bump Map
     const woodCanvas = document.createElement('canvas');
-    woodCanvas.width = 512;
-    woodCanvas.height = 512;
+    woodCanvas.width = 1024;
+    woodCanvas.height = 1024;
     const wctx = woodCanvas.getContext('2d');
     wctx.fillStyle = "#c89a68";
-    wctx.fillRect(0, 0, 512, 512);
-    for (let i = 0; i < 500; i++) {
-      wctx.strokeStyle = `rgba(138, 90, 48, ${0.05 + Math.random() * 0.12})`;
-      wctx.lineWidth = 1 + Math.random() * 2;
+    wctx.fillRect(0, 0, 1024, 1024);
+
+    // Natural wood growth rings & grain waves
+    for (let i = 0; i < 700; i++) {
+      const alpha = 0.04 + Math.random() * 0.12;
+      const isDark = Math.random() > 0.3;
+      wctx.strokeStyle = isDark ? `rgba(120, 75, 35, ${alpha})` : `rgba(230, 185, 130, ${alpha * 0.7})`;
+      wctx.lineWidth = 1 + Math.random() * 2.5;
       wctx.beginPath();
-      const y = Math.random() * 512;
+      const y = Math.random() * 1024;
+      const wave = Math.random() * 25 - 12;
       wctx.moveTo(0, y);
-      wctx.bezierCurveTo(150, y + Math.random() * 10 - 5, 350, y + Math.random() * 10 - 5, 512, y);
+      wctx.bezierCurveTo(300, y + wave, 700, y - wave, 1024, y + (wave * 0.5));
       wctx.stroke();
     }
     const woodTex = new THREE.CanvasTexture(woodCanvas);
     woodTex.wrapS = THREE.RepeatWrapping;
     woodTex.wrapT = THREE.RepeatWrapping;
+    woodTex.repeat.set(1.5, 1.5);
 
-    // 2. Glossy Tile Floor Texture
-    const tileCanvas = document.createElement('canvas');
-    tileCanvas.width = 256;
-    tileCanvas.height = 256;
-    const tctx = tileCanvas.getContext('2d');
-    tctx.fillStyle = "#e2e8f0";
-    tctx.fillRect(0, 0, 256, 256);
-    tctx.fillStyle = "rgba(203, 213, 225, 0.5)";
-    for (let i = 0; i < 200; i++) {
-      tctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 2);
+    // Companion Wood Bump Map (pore tactile depth)
+    const woodBumpCanvas = document.createElement('canvas');
+    woodBumpCanvas.width = 512;
+    woodBumpCanvas.height = 512;
+    const wbctx = woodBumpCanvas.getContext('2d');
+    wbctx.fillStyle = "#808080";
+    wbctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 400; i++) {
+      wbctx.strokeStyle = Math.random() > 0.5 ? "rgba(40, 40, 40, 0.15)" : "rgba(220, 220, 220, 0.15)";
+      wbctx.lineWidth = 1 + Math.random();
+      wbctx.beginPath();
+      const y = Math.random() * 512;
+      wbctx.moveTo(0, y);
+      wbctx.lineTo(512, y + Math.random() * 6 - 3);
+      wbctx.stroke();
     }
-    tctx.strokeStyle = "#94a3b8";
-    tctx.lineWidth = 4;
-    tctx.strokeRect(0, 0, 256, 256);
-    const tileTex = new THREE.CanvasTexture(tileCanvas);
-    tileTex.wrapS = THREE.RepeatWrapping;
-    tileTex.wrapT = THREE.RepeatWrapping;
-    tileTex.repeat.set(6, 4);
+    const woodBumpTex = new THREE.CanvasTexture(woodBumpCanvas);
+    woodBumpTex.wrapS = THREE.RepeatWrapping;
+    woodBumpTex.wrapT = THREE.RepeatWrapping;
+    this.woodTex = woodTex;
+    this.woodBumpTex = woodBumpTex;
 
-    // 3. Speckled Natural Granite Texture
+    // 2. High-End Calacatta Porcelain Marble Texture (Flowing Smoky & Gold Veins)
+    const porcCanvas = document.createElement('canvas');
+    porcCanvas.width = 1024;
+    porcCanvas.height = 1024;
+    const pctx = porcCanvas.getContext('2d');
+    pctx.fillStyle = "#ffffff";
+    pctx.fillRect(0, 0, 1024, 1024);
+
+    // Soft marble clouding
+    const grad = pctx.createLinearGradient(0, 0, 1024, 1024);
+    grad.addColorStop(0, "rgba(241, 245, 249, 0.4)");
+    grad.addColorStop(0.5, "rgba(255, 255, 255, 0.8)");
+    grad.addColorStop(1, "rgba(241, 245, 249, 0.4)");
+    pctx.fillStyle = grad;
+    pctx.fillRect(0, 0, 1024, 1024);
+
+    // Primary & secondary marble veins
+    const drawVein = (startX, startY, endX, endY, color, width) => {
+      pctx.strokeStyle = color;
+      pctx.lineWidth = width;
+      pctx.beginPath();
+      pctx.moveTo(startX, startY);
+      const cp1x = startX + (endX - startX) * 0.35 + (Math.random() * 80 - 40);
+      const cp1y = startY + (endY - startY) * 0.35 + (Math.random() * 80 - 40);
+      const cp2x = startX + (endX - startX) * 0.70 + (Math.random() * 80 - 40);
+      const cp2y = startY + (endY - startY) * 0.70 + (Math.random() * 80 - 40);
+      pctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endX, endY);
+      pctx.stroke();
+
+      // Micro branch
+      if (Math.random() > 0.4) {
+        pctx.lineWidth = width * 0.45;
+        pctx.beginPath();
+        pctx.moveTo(cp1x, cp1y);
+        pctx.lineTo(cp1x + Math.random() * 90 - 45, cp1y + Math.random() * 90 - 45);
+        pctx.stroke();
+      }
+    };
+
+    // Major Grey Veins
+    for (let i = 0; i < 7; i++) {
+      const alpha = 0.18 + Math.random() * 0.22;
+      drawVein(Math.random() * 300, 0, 600 + Math.random() * 424, 1024, `rgba(71, 85, 105, ${alpha})`, 2 + Math.random() * 4);
+    }
+    // Subtle Champagne Gold Micro-Veins
+    for (let i = 0; i < 5; i++) {
+      drawVein(Math.random() * 400, 0, 500 + Math.random() * 524, 1024, "rgba(180, 140, 75, 0.18)", 1.2 + Math.random() * 2);
+    }
+
+    const porcelainTex = new THREE.CanvasTexture(porcCanvas);
+    porcelainTex.wrapS = THREE.RepeatWrapping;
+    porcelainTex.wrapT = THREE.RepeatWrapping;
+    porcelainTex.repeat.set(2, 2);
+    this.porcelainTex = porcelainTex;
+
+    // 3. Çimstone White Quartz Texture (Fine Sparkling Quartz Grains & Subtle Mineral Matrix)
+    const cimCanvas = document.createElement('canvas');
+    cimCanvas.width = 512;
+    cimCanvas.height = 512;
+    const cctx = cimCanvas.getContext('2d');
+    cctx.fillStyle = "#f8fafc";
+    cctx.fillRect(0, 0, 512, 512);
+
+    for (let i = 0; i < 1500; i++) {
+      const isSparkle = Math.random() > 0.85;
+      cctx.fillStyle = isSparkle ? "rgba(255, 255, 255, 0.95)" : (Math.random() > 0.5 ? "rgba(203, 213, 225, 0.35)" : "rgba(148, 163, 184, 0.25)");
+      const s = isSparkle ? 1.5 : (1 + Math.random() * 2);
+      cctx.fillRect(Math.random() * 512, Math.random() * 512, s, s);
+    }
+    const cimstoneTex = new THREE.CanvasTexture(cimCanvas);
+    cimstoneTex.wrapS = THREE.RepeatWrapping;
+    cimstoneTex.wrapT = THREE.RepeatWrapping;
+    cimstoneTex.repeat.set(3, 3);
+    this.cimstoneTex = cimstoneTex;
+
+    // 4. Nero Star Galaxy Granite Texture (Deep Charcoal with Multi-Layered Sparkling Minerals)
     const gCanvas = document.createElement('canvas');
-    gCanvas.width = 256;
-    gCanvas.height = 256;
+    gCanvas.width = 512;
+    gCanvas.height = 512;
     const gctx = gCanvas.getContext('2d');
-    gctx.fillStyle = "#27272a";
-    gctx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 900; i++) {
-      const shade = Math.random() > 0.5 ? 210 : 80;
-      gctx.fillStyle = `rgba(${shade}, ${shade}, ${shade}, ${0.15 + Math.random() * 0.35})`;
-      gctx.fillRect(Math.random() * 256, Math.random() * 256, 2 + Math.random() * 3, 2 + Math.random() * 3);
+    gctx.fillStyle = "#18181b";
+    gctx.fillRect(0, 0, 512, 512);
+
+    // Multi-frequency mineral particles
+    for (let i = 0; i < 2200; i++) {
+      const r = Math.random();
+      if (r > 0.92) {
+        gctx.fillStyle = "rgba(255, 255, 255, 0.85)"; // Reflective quartz sparkle
+      } else if (r > 0.80) {
+        gctx.fillStyle = "rgba(217, 119, 6, 0.55)"; // Bronze mica mineral
+      } else if (r > 0.40) {
+        gctx.fillStyle = "rgba(113, 113, 122, 0.35)"; // Feldspar matrix
+      } else {
+        gctx.fillStyle = "rgba(39, 39, 42, 0.6)"; // Deep black grains
+      }
+      const sz = 1.2 + Math.random() * 2.8;
+      gctx.fillRect(Math.random() * 512, Math.random() * 512, sz, sz);
     }
     const graniteTex = new THREE.CanvasTexture(gCanvas);
     graniteTex.wrapS = THREE.RepeatWrapping;
     graniteTex.wrapT = THREE.RepeatWrapping;
-    graniteTex.repeat.set(4, 4);
-    this.woodTex = woodTex;
+    graniteTex.repeat.set(3, 3);
     this.graniteTex = graniteTex;
 
-    // Common Materials
+    // 5. Glossy Ceramic Floor Tile Texture
+    const tileCanvas = document.createElement('canvas');
+    tileCanvas.width = 512;
+    tileCanvas.height = 512;
+    const tctx = tileCanvas.getContext('2d');
+    tctx.fillStyle = "#f1f5f9";
+    tctx.fillRect(0, 0, 512, 512);
+    tctx.fillStyle = "rgba(226, 232, 240, 0.6)";
+    for (let i = 0; i < 400; i++) {
+      tctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+    }
+    tctx.strokeStyle = "#94a3b8";
+    tctx.lineWidth = 4;
+    tctx.strokeRect(0, 0, 512, 512);
+    const tileTex = new THREE.CanvasTexture(tileCanvas);
+    tileTex.wrapS = THREE.RepeatWrapping;
+    tileTex.wrapT = THREE.RepeatWrapping;
+    tileTex.repeat.set(5, 4);
+
+    // PBR Physical Materials Cache (Photorealistic Showroom Shaders)
     this.matCache = {
-      woodOak: new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.35, metalness: 0.05 }),
-      acrylicGloss: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.06, metalness: 0.15 }),
-      countertopQuartz: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.18, metalness: 0.05 }),
-      countertopCimstone: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.18, metalness: 0.05 }),
-      countertopGranite: new THREE.MeshStandardMaterial({ map: graniteTex, roughness: 0.28, metalness: 0.12 }),
-      countertopPorcelain: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.14, metalness: 0.02 }),
-      plinthAlu: new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4, metalness: 0.6 }),
-      frostedGlass: new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.2, transparent: true, opacity: 0.65 }),
-      handleChrome: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.15, metalness: 0.9 }),
-      ovenGlass: new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.8 }),
-      fridgeInox: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.3, metalness: 0.4 }),
-      sinkSteel: new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.25, metalness: 0.85 }),
-      floorTile: new THREE.MeshStandardMaterial({ map: tileTex, roughness: 0.25, metalness: 0.15 }),
-      wallPaint: new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8, metalness: 0.0 }),
-      wallBacksplash: new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7, metalness: 0.05 }),
+      // Cabinet Door Materials
+      acrylicGloss: new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        roughness: 0.02,
+        metalness: 0.04,
+        clearcoat: 1.0, // Maximum mirror automotive lacquer clearcoat
+        clearcoatRoughness: 0.02,
+        reflectivity: 0.98,
+        ior: 1.50
+      }),
+      woodOak: new THREE.MeshPhysicalMaterial({
+        color: 0xc89a68,
+        map: woodTex,
+        bumpMap: woodBumpTex,
+        bumpScale: 0.02,
+        roughness: 0.38,
+        metalness: 0.02,
+        clearcoat: 0.18,
+        clearcoatRoughness: 0.30
+      }),
+
+      // Countertop Materials
+      countertopCimstone: new THREE.MeshPhysicalMaterial({
+        color: 0xf8fafc,
+        map: cimstoneTex,
+        roughness: 0.12,
+        metalness: 0.04,
+        clearcoat: 0.88,
+        clearcoatRoughness: 0.05,
+        reflectivity: 0.92,
+        ior: 1.52
+      }),
+      countertopPorcelain: new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        map: porcelainTex,
+        roughness: 0.06,
+        metalness: 0.02,
+        clearcoat: 0.96,
+        clearcoatRoughness: 0.03,
+        reflectivity: 0.96,
+        ior: 1.55
+      }),
+      countertopGranite: new THREE.MeshPhysicalMaterial({
+        color: 0x27272a,
+        map: graniteTex,
+        roughness: 0.16,
+        metalness: 0.24, // Metallic mineral sparkle under spotlights
+        clearcoat: 0.86,
+        clearcoatRoughness: 0.08,
+        reflectivity: 0.88
+      }),
+
+      // Hardware & Architecture
+      plinthAlu: new THREE.MeshPhysicalMaterial({ color: 0x64748b, roughness: 0.28, metalness: 0.75, clearcoat: 0.3 }),
+      frostedGlass: new THREE.MeshPhysicalMaterial({ color: 0xf8fafc, roughness: 0.15, transmission: 0.7, transparent: true, opacity: 0.75 }),
+      handleChrome: new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.04, metalness: 0.98, clearcoat: 1.0 }),
+      ovenGlass: new THREE.MeshPhysicalMaterial({ color: 0x090d16, roughness: 0.04, metalness: 0.85, clearcoat: 0.98 }),
+      fridgeInox: new THREE.MeshPhysicalMaterial({ color: 0xe2e8f0, roughness: 0.26, metalness: 0.45, clearcoat: 0.2 }),
+      sinkSteel: new THREE.MeshPhysicalMaterial({ color: 0xb0bec5, roughness: 0.20, metalness: 0.92, clearcoat: 0.40 }),
+      floorTile: new THREE.MeshPhysicalMaterial({ map: tileTex, roughness: 0.20, metalness: 0.10, clearcoat: 0.65 }),
+      wallPaint: new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.85, metalness: 0.0 }),
+      wallBacksplash: new THREE.MeshPhysicalMaterial({ color: 0x475569, roughness: 0.25, metalness: 0.05, clearcoat: 0.5 }),
       wallBorderMat: new THREE.LineBasicMaterial({ color: 0x3b82f6, linewidth: 3 }),
       ghostValidMat: new THREE.MeshStandardMaterial({ color: 0x0284c7, transparent: true, opacity: 0.45 }),
       ghostInvalidMat: new THREE.MeshStandardMaterial({ color: 0xef4444, transparent: true, opacity: 0.55 }),
       ghostWireMat: new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 }),
       ghostWireInvalidMat: new THREE.LineBasicMaterial({ color: 0xf87171, linewidth: 2 }),
-      selectedMat: new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.3, metalness: 0.1 })
+      selectedMat: new THREE.MeshPhysicalMaterial({ color: 0x0284c7, roughness: 0.2, metalness: 0.15, clearcoat: 0.8 })
     };
   }
 
@@ -225,13 +397,19 @@ class StudioCanvas3D {
     const catalog = window.ACTIVE_CATALOG_MATERIALS?.cabinet || [];
     const found = catalog.find(m => (m.key || '').toLowerCase() === key);
     if (found) {
-      const mat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(found.color_hex || '#c89a68'),
-        roughness: typeof found.roughness === 'number' ? found.roughness : 0.35,
-        metalness: typeof found.metalness === 'number' ? found.metalness : 0.05
+      const isAcrylic = (found.texture_type === 'acrylic' || key.includes('acrylic') || key.includes('akrilik'));
+      const mat = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(found.color_hex || (isAcrylic ? '#ffffff' : '#c89a68')),
+        roughness: isAcrylic ? 0.02 : (typeof found.roughness === 'number' ? found.roughness : 0.38),
+        metalness: isAcrylic ? 0.04 : (typeof found.metalness === 'number' ? found.metalness : 0.02),
+        clearcoat: isAcrylic ? 1.0 : 0.18,
+        clearcoatRoughness: isAcrylic ? 0.02 : 0.30,
+        reflectivity: isAcrylic ? 0.98 : 0.50
       });
-      if (found.texture_type === 'wood' && this.woodTex) {
+      if (!isAcrylic && this.woodTex) {
         mat.map = this.woodTex;
+        mat.bumpMap = this.woodBumpTex;
+        mat.bumpScale = 0.02;
       }
       this.matCache['door_' + key] = mat;
       return mat;
@@ -250,14 +428,27 @@ class StudioCanvas3D {
     const catalog = window.ACTIVE_CATALOG_MATERIALS?.countertop || [];
     const found = catalog.find(m => (m.key || '').toLowerCase() === key);
     if (found) {
-      const mat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(found.color_hex || '#f8fafc'),
-        roughness: typeof found.roughness === 'number' ? found.roughness : 0.2,
-        metalness: typeof found.metalness === 'number' ? found.metalness : 0.05
+      const isPorcelain = (found.texture_type === 'marble' || key.includes('porcelain') || key.includes('porselen'));
+      const isGranite = (key.includes('granite') || key.includes('granit'));
+      
+      const mat = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(found.color_hex || (isGranite ? '#27272a' : '#f8fafc')),
+        roughness: isPorcelain ? 0.06 : (isGranite ? 0.16 : 0.12),
+        metalness: isGranite ? 0.24 : 0.03,
+        clearcoat: isPorcelain ? 0.96 : 0.88,
+        clearcoatRoughness: isPorcelain ? 0.03 : 0.06,
+        reflectivity: 0.92,
+        ior: isPorcelain ? 1.55 : 1.52
       });
-      if (found.texture_type === 'stone' && this.graniteTex) {
+
+      if (isPorcelain && this.porcelainTex) {
+        mat.map = this.porcelainTex;
+      } else if (isGranite && this.graniteTex) {
         mat.map = this.graniteTex;
+      } else if (this.cimstoneTex) {
+        mat.map = this.cimstoneTex;
       }
+
       this.matCache['ct_' + key] = mat;
       return mat;
     }
