@@ -1654,6 +1654,8 @@ async function openSubmitQuoteModal() {
     document.getElementById('quote-cust-name').value = savedName;
   }
 
+  await loadSuggestedAppointmentSlots();
+
   const modal = document.getElementById('submit-quote-modal');
   if (modal) modal.classList.add('active');
 }
@@ -2204,8 +2206,147 @@ function start72HourTimer(remainingSeconds) {
     sec--;
   }
 
-  updateDisplay();
-  customerTimerInterval = setInterval(updateDisplay, 1000);
+    updateDisplay();
+    customerTimerInterval = setInterval(updateDisplay, 1000);
+  }
 }
 window.start72HourTimer = start72HourTimer;
+
+// ==========================================
+// APPOINTMENT SLOTS (NEAREST 3) & STATUS TRACKING
+// ==========================================
+async function loadSuggestedAppointmentSlots() {
+  const container = document.getElementById('nearest-slots-container');
+  if (!container) return;
+
+  container.innerHTML = '<div style="color:#94a3b8; font-size:0.8rem; grid-column:1/-1;">Uygun randevu saatleri yükleniyor...</div>';
+  try {
+    const res = await fetch('/api/appointments/suggested-slots');
+    const data = await res.json();
+    const slots = data.slots || [];
+
+    if (slots.length === 0) {
+      container.innerHTML = '<div style="color:#f59e0b; font-size:0.8rem; grid-column:1/-1;">Şu an için aktif randevu slotu bulunamadı.</div>';
+      return;
+    }
+
+    container.innerHTML = slots.map((s, idx) => `
+      <div class="slot-option-card ${idx === 0 ? 'selected' : ''}" 
+           style="background:${idx === 0 ? 'rgba(56, 189, 248, 0.2)' : '#0f172a'}; border:2px solid ${idx === 0 ? '#38bdf8' : '#334155'}; border-radius:8px; padding:0.6rem; cursor:pointer; text-align:center; transition:all 0.2s;" 
+           onclick="selectAppointmentSlot(this, '${s.date}', '${s.time_slot}')">
+        <div style="font-size:0.7rem; font-weight:700; color:#93c5fd; text-transform:uppercase;">Seçenek ${idx + 1}</div>
+        <div style="font-size:0.85rem; font-weight:700; color:#ffffff; margin:4px 0;">${s.date_label}</div>
+        <div style="font-size:0.75rem; color:#38bdf8; font-weight:600;">⏰ ${s.time_label}</div>
+      </div>
+    `).join('');
+
+    // Pre-select first slot
+    const first = slots[0];
+    const dateInput = document.getElementById('quote-cust-date');
+    const timeInput = document.getElementById('quote-cust-time');
+    if (dateInput) dateInput.value = first.date;
+    if (timeInput) timeInput.value = first.time_slot;
+  } catch (e) {
+    container.innerHTML = '<div style="color:#ef4444; font-size:0.8rem; grid-column:1/-1;">Randevu slotları alınamadı.</div>';
+  }
+}
+window.loadSuggestedAppointmentSlots = loadSuggestedAppointmentSlots;
+
+function selectAppointmentSlot(element, date, slot) {
+  document.querySelectorAll('#nearest-slots-container .slot-option-card').forEach(c => {
+    c.style.background = '#0f172a';
+    c.style.borderColor = '#334155';
+    c.classList.remove('selected');
+  });
+
+  if (element) {
+    element.style.background = 'rgba(56, 189, 248, 0.2)';
+    element.style.borderColor = '#38bdf8';
+    element.classList.add('selected');
+  }
+
+  const dateInput = document.getElementById('quote-cust-date');
+  const timeInput = document.getElementById('quote-cust-time');
+  if (dateInput) dateInput.value = date;
+  if (timeInput) timeInput.value = slot;
+}
+window.selectAppointmentSlot = selectAppointmentSlot;
+
+window.openAppointmentStatusModal = function(defaultIdentifier = '') {
+  const modal = document.getElementById('appointment-status-modal');
+  const input = document.getElementById('status-search-input');
+  const savedRef = defaultIdentifier || localStorage.getItem('mc_last_ref') || window.CURRENT_DESIGN?.reference_code || localStorage.getItem('mc_customer_phone') || '';
+  if (input && savedRef) {
+    input.value = savedRef;
+  }
+  if (modal) modal.classList.add('active');
+  if (savedRef) {
+    lookupAppointmentStatus();
+  }
+};
+window.openRefLookupModal = window.openAppointmentStatusModal; // Backward-compatible alias
+
+window.lookupAppointmentStatus = async function() {
+  const input = document.getElementById('status-search-input');
+  const container = document.getElementById('status-result-container');
+  const val = input?.value.trim();
+  if (!val) {
+    alert("Lütfen referans kodunuzu veya telefon numaranızı giriniz.");
+    return;
+  }
+
+  container.style.display = 'block';
+  container.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:1rem;">Durum sorgulanıyor...</div>';
+
+  try {
+    const res = await fetch('/api/customer/track-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier: val })
+    });
+    const data = await res.json();
+    if (!data.success) {
+      container.innerHTML = `<div style="color:#ef4444; font-size:0.9rem; text-align:center; padding:1rem;">❌ ${data.error || 'Kayıt bulunamadı.'}</div>`;
+      return;
+    }
+
+    const isConfirmed = data.status === 'appointment_confirmed';
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155; padding-bottom:0.75rem; margin-bottom:0.75rem;">
+        <div>
+          <span style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase;">Proje Referansı</span>
+          <div style="font-family:monospace; font-size:1.2rem; font-weight:900; color:#38bdf8;">${data.reference_code}</div>
+        </div>
+        <div style="text-align:right;">
+          <span class="badge" style="background:${isConfirmed ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}; color:${isConfirmed ? '#10b981' : '#f59e0b'}; border:1px solid ${isConfirmed ? '#10b981' : '#f59e0b'};">
+            ${data.status_label}
+          </span>
+        </div>
+      </div>
+
+      <div style="font-size:0.85rem; color:#cbd5e1; line-height:1.6; margin-bottom:1rem;">
+        <div>👤 <strong>Müşteri:</strong> ${data.customer_name}</div>
+        <div>📅 <strong>Randevu Tarihi:</strong> ${data.appointment_date || 'En Yakın Mesai'} (${data.appointment_time_slot || ''})</div>
+        <div>🔒 <strong>Tasarım Durumu:</strong> ${data.is_locked ? 'Kilitli & Fabrika İncelemesinde' : 'Açık'}</div>
+        ${data.admin_notes ? `<div style="background:#0f172a; border-left:3px solid #38bdf8; padding:6px 10px; margin-top:8px; color:#e0f2fe;"><strong>Yönetici Notu:</strong> ${data.admin_notes}</div>` : ''}
+      </div>
+
+      ${data.customer_email ? `
+        <div style="background:rgba(56, 189, 248, 0.1); border:1px solid #38bdf8; border-radius:6px; padding:0.6rem 0.8rem; font-size:0.8rem; color:#93c5fd; margin-bottom:1rem;">
+          📧 Randevu takip ve teyit şablonu <strong>${data.customer_email}</strong> adresinize gönderilmiştir.
+        </div>
+      ` : ''}
+
+      <div style="display:flex; justify-content:flex-end; gap:0.5rem;">
+        <button class="btn btn-outline btn-sm" onclick="closeModal('appointment-status-modal')">Kapat</button>
+        <button class="btn btn-primary btn-sm" onclick="closeModal('appointment-status-modal'); navigateTo('studio');">
+          🎨 3D Showroom'da İncele
+        </button>
+      </div>
+    `;
+  } catch (e) {
+    container.innerHTML = '<div style="color:#ef4444; font-size:0.9rem; text-align:center; padding:1rem;">Sunucuya bağlanırken hata oluştu.</div>';
+  }
+};
+
 

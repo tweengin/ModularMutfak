@@ -57,6 +57,160 @@ def generate_reference_code(category: str = "kitchen") -> str:
     rand_digits = "".join(random.choices(string.digits, k=4))
     return f"{prefix}-{rand_digits}"
 
+def get_nearest_appointment_slots():
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT value FROM system_settings WHERE key = 'appointment_working_days'")
+    row_days = c.fetchone()
+    c.execute("SELECT value FROM system_settings WHERE key = 'appointment_daily_slots'")
+    row_slots = c.fetchone()
+    conn.close()
+
+    TR_MONTHS = ["", "Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+    TR_DAYS = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+
+    working_days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"]
+    if row_days:
+        try:
+            working_days = json.loads(row_days[0])
+        except Exception:
+            pass
+
+    daily_slots = ["10:00 - 12:00 (Sabah)", "13:30 - 15:30 (Öğle)", "16:00 - 18:00 (Akşamüstü)"]
+    if row_slots:
+        try:
+            daily_slots = json.loads(row_slots[0])
+        except Exception:
+            pass
+
+    suggested = []
+    curr = datetime.now() + timedelta(days=1)
+    for _ in range(14):
+        day_name = TR_DAYS[curr.weekday()]
+        if day_name in working_days:
+            date_str = curr.strftime("%Y-%m-%d")
+            friendly_date = f"{curr.day} {TR_MONTHS[curr.month]} {day_name}"
+            for slot in daily_slots:
+                clean_time = slot.split('(')[0].strip()
+                suggested.append({
+                    "date": date_str,
+                    "day_name": day_name,
+                    "time_slot": slot,
+                    "date_label": friendly_date,
+                    "time_label": clean_time,
+                    "full_label": f"{friendly_date} • {clean_time}"
+                })
+                if len(suggested) >= 3:
+                    break
+        if len(suggested) >= 3:
+            break
+        curr += timedelta(days=1)
+
+    return suggested
+
+def dispatch_email_notification(to_email, recipient_name, ref_code, email_type, app_date, app_slot, admin_notes='', extra_info=None):
+    if not to_email:
+        return {"status": "skipped", "message": "E-posta adresi girilmedi."}
+
+    if email_type == 'appointment_requested':
+        subject = f"📅 Randevu Talebiniz Alındı: Proje {ref_code} - ModulerCraft Pro"
+        headline = "Randevu & Teklif Talebiniz Başarıyla Alındı"
+        status_badge_color = "#f59e0b"
+        status_text = "⏳ Yönetici İncelemesinde (Talep Alındı)"
+        message_intro = f"Sayın <strong>{recipient_name or 'Değerli Müşterimiz'}</strong>,<br>3D özel mobilya tasarımınız onaylı olarak fabrikamıza aktarılmış ve randevu talebiniz sıraya alınmıştır."
+        details_box = f"""
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin:20px 0;">
+            <p style="margin:0 0 8px 0; font-size:14px; color:#475569;"><strong>Proje Referans Kodu:</strong> <span style="font-family:monospace; color:#0284c7; font-weight:700;">{ref_code}</span></p>
+            <p style="margin:0 0 8px 0; font-size:14px; color:#475569;"><strong>Talep Edilen Randevu Tarihi:</strong> {app_date or 'En Yakın Mesai Dilimi'}</p>
+            <p style="margin:0 0 8px 0; font-size:14px; color:#475569;"><strong>Saat Aralığı:</strong> {app_slot or 'Belirlenmedi'}</p>
+            <p style="margin:0; font-size:14px; color:#475569;"><strong>Durum:</strong> <span style="color:#f59e0b; font-weight:700;">Yönetici İncelemesinde</span></p>
+        </div>
+        """
+        extra_note = """
+        <div style="background:#f0fdf4; border-left:4px solid #10b981; padding:12px; margin-bottom:20px; font-size:13px; color:#166534; line-height:1.5;">
+            ✨ <strong>Randevu Görüşmesinde Birlikte Belirlenecekler:</strong><br>
+            • Kör köşe akıllı donanımları (fasulye sepet, döner sepet vb.)<br>
+            • Çekmece içi organizatörler, kaşıklık ve kulp seçenekleri<br>
+            • Fabrika net maliyeti ve size özel fiyat teklifi
+        </div>
+        """
+    else:
+        subject = f"✅ Randevunuz Onaylandı: Proje {ref_code} - ModulerCraft Pro"
+        headline = "Randevunuz Fabrika Yöneticimiz Tarafından Onaylandı!"
+        status_badge_color = "#10b981"
+        status_text = "🟢 Kesinleşti & Planlandı"
+        message_intro = f"Sayın <strong>{recipient_name or 'Değerli Müşterimiz'}</strong>,<br><strong>{ref_code}</strong> referans kodlu özel mobilya projeniz için randevunuz teyit edilmiştir."
+        admin_note_html = f'<p style="margin:8px 0 0 0; font-size:13px; color:#0369a1; background:#e0f2fe; padding:8px; border-radius:4px;"><strong>Yönetici Notu:</strong> {admin_notes}</p>' if admin_notes else ''
+        details_box = f"""
+        <div style="background:#f8fafc; border:1px solid #10b981; border-radius:8px; padding:16px; margin:20px 0;">
+            <p style="margin:0 0 8px 0; font-size:14px; color:#475569;"><strong>Proje Referans Kodu:</strong> <span style="font-family:monospace; color:#0284c7; font-weight:700;">{ref_code}</span></p>
+            <p style="margin:0 0 8px 0; font-size:15px; color:#0f172a;"><strong>Kesinleşen Randevu Tarihi:</strong> <span style="color:#10b981; font-weight:700;">{app_date}</span></p>
+            <p style="margin:0 0 8px 0; font-size:15px; color:#0f172a;"><strong>Randevu Saati:</strong> <span style="color:#10b981; font-weight:700;">{app_slot}</span></p>
+            {admin_note_html}
+        </div>
+        """
+        extra_note = """
+        <div style="background:#f0fdf4; border-left:4px solid #10b981; padding:12px; margin-bottom:20px; font-size:13px; color:#166534; line-height:1.5;">
+            📍 <strong>Görüşme Hazırlığı:</strong> Uzmanımız randevu saatinde malzeme numuneleri ve kör köşe aksesuar kataloğu ile birlikte projenizi sunacaktır.
+        </div>
+        """
+
+    body_html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>{subject}</title></head>
+<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#f1f5f9; padding:24px 0;">
+        <tr>
+            <td align="center">
+                <table width="600" border="0" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                    <tr>
+                        <td style="background:#0f172a; padding:24px 32px; text-align:left;">
+                            <h1 style="color:#38bdf8; margin:0; font-size:22px; letter-spacing:0.5px;">ModulerCraft Pro</h1>
+                            <p style="color:#94a3b8; margin:4px 0 0 0; font-size:12px;">Özel Mobilya Tasarım & CNC Fabrika Entegrasyonu</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:32px; text-align:left;">
+                            <span style="display:inline-block; background:{status_badge_color}; color:#ffffff; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; margin-bottom:12px;">{status_text}</span>
+                            <h2 style="color:#0f172a; margin:0 0 16px 0; font-size:18px;">{headline}</h2>
+                            <p style="color:#334155; font-size:14px; line-height:1.6; margin:0 0 16px 0;">
+                                {message_intro}
+                            </p>
+                            {details_box}
+                            {extra_note}
+                            <p style="color:#64748b; font-size:13px; line-height:1.5; margin:0 0 20px 0;">
+                                🔒 <strong>Güvenlik & Durum Takip:</strong> Tasarımınız kilitlenmiştir. Web aplikasyonumuz üzerinden <strong>{ref_code}</strong> referans kodunuz ile dilediğiniz an canlı durumunuzu sorgulayabilirsiniz.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background:#f8fafc; border-top:1px solid #e2e8f0; padding:20px 32px; text-align:center; font-size:12px; color:#94a3b8;">
+                            Bu e-posta ModulerCraft Pro sistemi tarafından otomatik olarak oluşturulmuştur.<br>
+                            Sorularınız veya değişiklik talepleriniz için fabrika yöneticimiz ile iletişime geçebilirsiniz.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>"""
+
+    try:
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("""
+        INSERT INTO email_notifications (recipient_email, recipient_name, reference_code, email_type, subject, body_html, status)
+        VALUES (?, ?, ?, ?, ?, ?, 'sent')
+        """, (to_email, recipient_name, ref_code, email_type, subject, body_html))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Error saving email to DB: {e}")
+
+    print(f"📧 [EMAIL DISPATCHED] To: {to_email} | Subject: {subject} | Ref: {ref_code}")
+    return {"status": "sent", "subject": subject, "recipient": to_email}
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     daemon_threads = True
 
@@ -438,6 +592,38 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             csv_content = generate_csv_cut_report(cost_res['panels'], ref_code)
             return self.send_file_download(csv_content, f"ModulerCraft_{ref_code}_Kesim_Listesi.csv", "text/csv; charset=utf-8")
 
+        elif path == '/api/appointments/suggested-slots':
+            slots = get_nearest_appointment_slots()
+            return self.send_json({"slots": slots})
+
+        elif path == '/api/admin/schedule-settings':
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT key, value FROM system_settings WHERE key IN ('appointment_working_days', 'appointment_daily_slots')")
+            rows = dict(c.fetchall())
+            conn.close()
+            try:
+                working_days = json.loads(rows.get('appointment_working_days', '["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"]'))
+            except Exception:
+                working_days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"]
+            try:
+                daily_slots = json.loads(rows.get('appointment_daily_slots', '["10:00 - 12:00 (Sabah)", "13:30 - 15:30 (Öğle)", "16:00 - 18:00 (Akşamüstü)"]'))
+            except Exception:
+                daily_slots = ["10:00 - 12:00 (Sabah)", "13:30 - 15:30 (Öğle)", "16:00 - 18:00 (Akşamüstü)"]
+            return self.send_json({
+                "working_days": working_days,
+                "daily_slots": daily_slots
+            })
+
+        elif path.startswith('/api/admin/emails/'):
+            ref_code = path.split('/')[-1].upper()
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM email_notifications WHERE reference_code = ? ORDER BY id DESC", (ref_code,))
+            items = [dict(r) for r in c.fetchall()]
+            conn.close()
+            return self.send_json({"emails": items})
+
         # Static Files Serving
         return self.serve_static(path)
 
@@ -712,6 +898,18 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
 
+            # Dispatch Initial Appointment Request Email Notification
+            if customer_email:
+                dispatch_email_notification(
+                    to_email=customer_email,
+                    recipient_name=customer_name,
+                    ref_code=ref_code,
+                    email_type='appointment_requested',
+                    app_date=appointment_date,
+                    app_slot=appointment_time_slot,
+                    admin_notes=notes
+                )
+
             # STRICT BUSINESS RULE: Return reference code and confirmation, DO NOT return price to customer!
             return self.send_json({
                 "success": True,
@@ -721,6 +919,141 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
                 "customer_name": customer_name,
                 "status": "quote_requested"
             })
+
+        # Customer Live Status Tracker (By Reference Code or Phone)
+        elif path == '/api/customer/track-status':
+            identifier = body.get('identifier', '').strip().upper()
+            if not identifier:
+                return self.send_json({"error": "Lütfen referans kodunuzu veya telefon numaranızı giriniz."}, 400)
+
+            clean_phone = identifier.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("""
+            SELECT * FROM designs
+            WHERE reference_code = ? OR customer_phone LIKE ?
+            ORDER BY id DESC LIMIT 1
+            """, (identifier, f"%{clean_phone[-8:]}%" if len(clean_phone) >= 7 else "NOMATCH"))
+            row = c.fetchone()
+
+            if not row:
+                conn.close()
+                return self.send_json({"error": "Belirtilen referans kodu veya telefon ile kayıtlı tasarım bulunamadı."}, 404)
+
+            d = dict(row)
+            # Find latest email notification
+            c.execute("SELECT email_type, subject, created_at FROM email_notifications WHERE reference_code = ? ORDER BY id DESC LIMIT 1", (d['reference_code'],))
+            email_row = c.fetchone()
+            latest_email = dict(email_row) if email_row else None
+            conn.close()
+
+            status_labels = {
+                "quote_requested": "⏳ Randevu Talebiniz Alındı (Yönetici İncelemesinde)",
+                "appointment_confirmed": "🟢 Randevunuz Fabrika Yöneticisi Tarafından Onaylandı",
+                "reviewed": "📋 Teklif ve Randevu Hazırlandı",
+                "approved": "✅ Müşteri Tarafından Onaylandı",
+                "in_production": "🚀 Fabrika Üretiminde (CNC İmalat)"
+            }
+
+            return self.send_json({
+                "success": True,
+                "reference_code": d['reference_code'],
+                "customer_name": d['customer_name'],
+                "customer_phone": d['customer_phone'],
+                "customer_email": d['customer_email'],
+                "category": d['category'],
+                "status": d['status'],
+                "status_label": status_labels.get(d['status'], d['status']),
+                "appointment_date": d['appointment_date'],
+                "appointment_time_slot": d['appointment_time_slot'],
+                "admin_notes": d['admin_notes'] or '',
+                "is_locked": bool(d.get('is_locked', 1)),
+                "created_at": d['created_at'],
+                "latest_email": latest_email
+            })
+
+        # Admin: Confirm / Adjust Appointment and Send Official Email
+        elif path == '/api/admin/appointments/confirm':
+            user = self.get_auth_user()
+            if not user or user.get('role') != 'admin':
+                return self.send_json({"error": "Sadece yönetici randevu onaylayabilir."}, 403)
+
+            ref_code = body.get('reference_code', '').strip().upper()
+            confirmed_date = body.get('confirmed_date', '').strip()
+            confirmed_slot = body.get('confirmed_slot', '').strip()
+            admin_notes = body.get('admin_notes', '').strip()
+
+            if not ref_code:
+                return self.send_json({"error": "Referans kodu gereklidir."}, 400)
+
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM designs WHERE reference_code = ?", (ref_code,))
+            row = c.fetchone()
+            if not row:
+                conn.close()
+                return self.send_json({"error": "Tasarım bulunamadı."}, 404)
+
+            d = dict(row)
+            date_to_use = confirmed_date or d['appointment_date'] or datetime.now().strftime("%Y-%m-%d")
+            slot_to_use = confirmed_slot or d['appointment_time_slot'] or "10:00 - 12:00"
+
+            c.execute("""
+            UPDATE designs
+            SET status = 'appointment_confirmed',
+                appointment_date = ?,
+                appointment_time_slot = ?,
+                admin_notes = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE reference_code = ?
+            """, (date_to_use, slot_to_use, admin_notes, ref_code))
+            conn.commit()
+            conn.close()
+
+            # Dispatch confirmation email
+            email_res = dispatch_email_notification(
+                to_email=d['customer_email'],
+                recipient_name=d['customer_name'],
+                ref_code=ref_code,
+                email_type='appointment_confirmed',
+                app_date=date_to_use,
+                app_slot=slot_to_use,
+                admin_notes=admin_notes
+            )
+
+            return self.send_json({
+                "success": True,
+                "message": f"Randevu ({date_to_use} {slot_to_use}) onaylandı ve müşteriye e-posta iletildi.",
+                "reference_code": ref_code,
+                "email_status": email_res.get('status')
+            })
+
+        # Admin: Update Working Schedule Settings
+        elif path == '/api/admin/schedule-settings':
+            user = self.get_auth_user()
+            if not user or user.get('role') != 'admin':
+                return self.send_json({"error": "Yönetici yetkisi gereklidir."}, 403)
+
+            working_days = body.get('working_days', [])
+            daily_slots = body.get('daily_slots', [])
+
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("""
+            INSERT INTO system_settings (key, value, description)
+            VALUES ('appointment_working_days', ?, 'Yönetici randevu mesai günleri')
+            ON CONFLICT(key) DO UPDATE SET value = ?
+            """, (json.dumps(working_days, ensure_ascii=False), json.dumps(working_days, ensure_ascii=False)))
+
+            c.execute("""
+            INSERT INTO system_settings (key, value, description)
+            VALUES ('appointment_daily_slots', ?, 'Günlük randevu saat blokları')
+            ON CONFLICT(key) DO UPDATE SET value = ?
+            """, (json.dumps(daily_slots, ensure_ascii=False), json.dumps(daily_slots, ensure_ascii=False)))
+
+            conn.commit()
+            conn.close()
+            return self.send_json({"success": True, "message": "Mesai ve randevu takvim ayarları güncellendi."})
 
         # Admin: Set Quote & Review
         elif path.startswith('/api/admin/design/') and path.endswith('/quote'):

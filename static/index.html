@@ -28,8 +28,8 @@
       <button class="nav-btn" id="nav-studio" onclick="navigateTo('studio')">
         📐 3D Tasarım Stüdyosu
       </button>
-      <button class="nav-btn" onclick="openRefLookupModal()">
-        🔍 Referans Sorgula
+      <button class="nav-btn" onclick="openAppointmentStatusModal()">
+        📅 Randevu & Durum Takip
       </button>
       <div id="auth-nav-container"></div>
     </nav>
@@ -1006,6 +1006,33 @@
               <!-- Rendered by AdminPanel.renderMaterialsTable() -->
             </div>
           </div>
+
+          <!-- Admin Appointment Working Schedule Settings -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-dark); border-radius:var(--radius-md); padding:1.25rem; margin-top:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <h3 style="font-size:1.05rem;">📅 Randevu Mesai Takvimi</h3>
+              <span class="badge badge-info" style="font-size:0.75rem;">En Yakın 3 Slot Motoru</span>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:1rem;">
+              Müşteriye teklif ekranında otomatik sunulacak en yakın 3 randevu seçeneği için mesai günleri ve saat aralıklarını belirleyin.
+            </p>
+
+            <div class="form-group">
+              <label style="font-size:0.8rem; font-weight:700;">Çalışma Günleri:</label>
+              <div id="admin-schedule-days" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:4px;">
+                <!-- Populated via AdminPanel.renderScheduleSettings() -->
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:0.75rem;">
+              <label style="font-size:0.8rem; font-weight:700;">Günlük Randevu Saat Aralıkları (Virgülle ayırın):</label>
+              <input type="text" id="admin-schedule-slots-input" class="form-control" value="10:00 - 12:00, 13:30 - 15:30, 16:00 - 18:00">
+            </div>
+
+            <button class="btn btn-primary btn-sm" style="width:100%; margin-top:0.5rem;" onclick="AdminPanel.saveScheduleSettings()">
+              Mesai ve Randevu Saatlerini Kaydet
+            </button>
+          </div>
         </div>
 
         <!-- Right: Incoming Designs, Cost Breakdown & CNC Nesting Center -->
@@ -1126,6 +1153,36 @@
               </div>
             </div>
 
+            <!-- Admin Appointment Review & Confirmation Card -->
+            <div style="background:#0f172a; border:1px solid #10b981; border-radius:var(--radius-sm); padding:1.25rem; margin-bottom:1.25rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <h4 style="margin:0; color:#10b981; display:flex; align-items:center; gap:8px;">
+                  <span>📅</span> Müşteri Randevu Talebi & Onay Yönetimi
+                </h4>
+                <span id="inspect-appointment-status-badge" class="badge badge-warning">Randevu Beklemede</span>
+              </div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:0.75rem;">
+                <div class="form-group">
+                  <label style="color:#94a3b8; font-size:0.8rem;">Onaylanan Randevu Tarihi:</label>
+                  <input type="date" id="admin-confirm-date" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label style="color:#94a3b8; font-size:0.8rem;">Onaylanan Saat Aralığı:</label>
+                  <input type="text" id="admin-confirm-slot" class="form-control" placeholder="10:00 - 12:00">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label style="color:#94a3b8; font-size:0.8rem;">Müşteriye İletilecek Özel Görüşme Notu:</label>
+                <input type="text" id="admin-confirm-notes" class="form-control" placeholder="Örn: Kör köşe fasulye sepet ve akrilik kapak numuneleri hazırlanmıştır.">
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <button class="btn btn-success btn-sm" onclick="AdminPanel.confirmAppointment()" style="font-weight:700;">
+                  ✅ Randevuyu Onayla & Müşteriye Resmi E-Posta Gönder 📧
+                </button>
+                <small style="color:#94a3b8;" id="inspect-email-notice">E-posta: -</small>
+              </div>
+            </div>
+
             <!-- Admin Price Adjust & Offer Form -->
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
               <div class="form-group">
@@ -1225,8 +1282,11 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>E-Posta Adresiniz</label>
+            <label>E-Posta Adresiniz *</label>
             <input type="email" id="quote-cust-email" class="form-control" placeholder="ornek@gmail.com">
+            <small style="color:#38bdf8; font-size:0.75rem; margin-top:3px; display:block;">
+              ℹ️ Proje referans kodunuz ve randevu onay detaylarınız bu e-postanıza resmi mail şablonu ile iletilecektir.
+            </small>
           </div>
           <div class="form-group">
             <label>İl / İlçe</label>
@@ -1234,21 +1294,24 @@
           </div>
         </div>
 
-        <!-- Appointment Date & Time Selection -->
-        <div class="form-row" style="background:#1e293b; padding:0.85rem; border-radius:6px; border:1px solid #334155; margin-bottom:1rem;">
-          <div class="form-group">
-            <label style="color:#38bdf8; font-weight:700;">📅 Tercih Edilen Randevu Tarihi</label>
-            <input type="date" id="quote-cust-date" class="form-control">
+        <!-- Appointment Date & Time Selection (Nearest 3 Working Slots) -->
+        <div style="background:#1e293b; padding:0.9rem; border-radius:8px; border:1px solid #38bdf8; margin-bottom:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <label style="color:#38bdf8; font-weight:700; font-size:0.9rem; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>📅</span> Size En Uygun Randevu Zamanı (En Yakın 3 Seçenek)
+            </label>
+            <span class="badge badge-info" style="font-size:0.75rem;">Yönetici Mesai Takvimi</span>
           </div>
-          <div class="form-group">
-            <label style="color:#38bdf8; font-weight:700;">⏰ Randevu Saat Aralığı</label>
-            <select id="quote-cust-time" class="form-control">
-              <option value="10:00 - 12:00 (Sabah)" selected>Sabah (10:00 - 12:00)</option>
-              <option value="13:00 - 15:00 (Öğle)">Öğle (13:00 - 15:00)</option>
-              <option value="15:00 - 17:00 (Öğleden Sonra)">Öğleden Sonra (15:00 - 17:00)</option>
-              <option value="17:00 - 19:00 (Akşamüstü)">Akşamüstü (17:00 - 19:00)</option>
-            </select>
+          <p style="color:#94a3b8; font-size:0.8rem; margin-bottom:0.75rem;">
+            Fabrika yöneticimizin çalışma takvimine göre belirlenen en yakın 3 randevu seçeneğinden birini işaretleyiniz:
+          </p>
+
+          <div id="nearest-slots-container" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:0.6rem;">
+            <!-- Populated via loadSuggestedAppointmentSlots() -->
           </div>
+
+          <input type="hidden" id="quote-cust-date">
+          <input type="hidden" id="quote-cust-time">
         </div>
 
         <div class="form-group">
@@ -1300,6 +1363,32 @@
     </div>
   </div>
 
+  <!-- APPOINTMENT & PROJECT STATUS TRACKER MODAL -->
+  <div class="modal-overlay" id="appointment-status-modal">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="modal-header">
+        <h3 style="display:flex; align-items:center; gap:8px;">
+          <span>🔍</span> Randevu & Proje Durum Takibi
+        </h3>
+        <button class="btn btn-outline btn-sm" onclick="closeModal('appointment-status-modal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem;">
+        <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;">
+          Proje Referans Kodunuz (örn: <strong>TR-8421</strong>) veya telefon numaranızı girerek randevu onay durumunuzu canlı sorgulayabilirsiniz:
+        </p>
+
+        <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem;">
+          <input type="text" id="status-search-input" class="form-control" placeholder="Örn: TR-8421 veya 05xx..." style="font-weight:700; font-family:monospace; font-size:1.05rem;">
+          <button class="btn btn-primary" onclick="lookupAppointmentStatus()">Sorgula 🔎</button>
+        </div>
+
+        <div id="status-result-container" style="display:none; background:#1e293b; border:1px solid #38bdf8; border-radius:8px; padding:1.25rem;">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- AUTH MODAL -->
   <div class="modal-overlay" id="auth-modal">
     <div class="modal-box">
@@ -1333,6 +1422,9 @@
           <div class="form-group">
             <label>E-Posta</label>
             <input type="email" id="reg-email" class="form-control" placeholder="mimar@proje.com">
+            <small style="color:#38bdf8; font-size:0.75rem; margin-top:3px; display:block;">
+              ℹ️ Proje referans kodlarınız, randevu teyitleri ve teklif durumu resmi e-posta şablonu ile bu adrese gönderilecektir.
+            </small>
           </div>
           <div class="form-group">
             <label>Telefon</label>

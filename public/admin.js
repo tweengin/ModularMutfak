@@ -12,6 +12,7 @@ const AdminPanel = {
   moduleTemplates: [],
   materials: [],
   accessLocks: [],
+  scheduleSettings: { working_days: [], daily_slots: [] },
   currentDesign: null,
   currentCostResult: null,
   adminCanvas2D: null,
@@ -24,6 +25,7 @@ const AdminPanel = {
     await this.loadMaterials();
     await this.loadDesignsList();
     await this.loadAccessLocks();
+    await this.loadScheduleSettings();
   },
 
   async loadPricingMatrix() {
@@ -165,10 +167,16 @@ const AdminPanel = {
 
     tbody.innerHTML = '';
     designs.forEach((d) => {
-      const tr = document.createElement('tr');
-      const statusBadge = d.status === 'in_production'
-        ? '<span class="badge badge-success">Üretimde (CNC)</span>'
-        : (d.status === 'reviewed' ? '<span class="badge badge-warning">Teklif Verildi</span>' : '<span class="badge badge-info">Fiyat Bekliyor</span>');
+      let statusBadge = '<span class="badge badge-info">Fiyat Bekliyor</span>';
+      if (d.status === 'in_production') {
+        statusBadge = '<span class="badge badge-success">Üretimde (CNC)</span>';
+      } else if (d.status === 'appointment_confirmed') {
+        statusBadge = '<span class="badge badge-success" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 Randevu Onaylandı</span>';
+      } else if (d.status === 'reviewed') {
+        statusBadge = '<span class="badge badge-warning">Teklif Verildi</span>';
+      } else if (d.status === 'quote_requested') {
+        statusBadge = '<span class="badge badge-warning" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">⏳ Randevu Beklemede</span>';
+      }
 
       tr.innerHTML = `
         <td><strong style="color:#38bdf8; font-family:monospace; font-size:1rem;">${d.reference_code}</strong></td>
@@ -240,11 +248,34 @@ const AdminPanel = {
     document.getElementById('inspect-ref-code').textContent = design.reference_code;
     document.getElementById('inspect-customer-name').textContent = design.customer_name;
     document.getElementById('inspect-category').textContent = design.category.toUpperCase();
-    document.getElementById('inspect-phone').textContent = design.customer_phone;
     const appText = design.appointment_date 
       ? `📅 Tercih Edilen Randevu: ${design.appointment_date} (${design.appointment_time_slot || 'Saat belirtilmedi'})` 
       : 'Randevu tarihi belirtilmedi';
     document.getElementById('inspect-notes').innerHTML = `${design.notes || 'Müşteri notu yok.'}<br><strong style="color:#10b981; display:inline-block; margin-top:4px;">${appText}</strong>`;
+
+    const confirmDate = document.getElementById('admin-confirm-date');
+    const confirmSlot = document.getElementById('admin-confirm-slot');
+    const confirmNotes = document.getElementById('admin-confirm-notes');
+    const statusBadge = document.getElementById('inspect-appointment-status-badge');
+    const emailNotice = document.getElementById('inspect-email-notice');
+
+    if (confirmDate) confirmDate.value = design.appointment_date || '';
+    if (confirmSlot) confirmSlot.value = design.appointment_time_slot || '';
+    if (confirmNotes) confirmNotes.value = design.admin_notes || '';
+
+    if (statusBadge) {
+      if (design.status === 'appointment_confirmed') {
+        statusBadge.textContent = "🟢 Randevu Onaylandı & Mail İletildi";
+        statusBadge.className = "badge badge-success";
+      } else {
+        statusBadge.textContent = "⏳ Randevu Beklemede";
+        statusBadge.className = "badge badge-warning";
+      }
+    }
+
+    if (emailNotice) {
+      emailNotice.textContent = design.customer_email ? `Müşteri E-Posta: ${design.customer_email}` : 'E-posta belirtilmemiş';
+    }
 
     // BOM Items Table
     const tbody = document.getElementById('bom-items-tbody');
@@ -855,6 +886,109 @@ const AdminPanel = {
       }
     } catch (e) {
       alert("Sunucuya bağlanırken hata oluştu.");
+    }
+  },
+
+  // Appointment Review & Official Email Confirmation
+  async confirmAppointment() {
+    if (!this.currentDesign) return;
+    const refCode = this.currentDesign.reference_code;
+    const date = document.getElementById('admin-confirm-date')?.value || '';
+    const slot = document.getElementById('admin-confirm-slot')?.value || '';
+    const notes = document.getElementById('admin-confirm-notes')?.value || '';
+    const token = localStorage.getItem('mc_token');
+
+    try {
+      const res = await fetch('/api/admin/appointments/confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          reference_code: refCode,
+          confirmed_date: date,
+          confirmed_slot: slot,
+          admin_notes: notes
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || "Randevu onaylandı ve teyit e-postası iletildi!", "success");
+        await this.inspectDesign(refCode);
+        await this.loadDesignsList();
+      } else {
+        alert(data.error || "İşlem başarısız.");
+      }
+    } catch (e) {
+      alert("Sunucuya bağlanırken hata oluştu.");
+    }
+  },
+
+  // Working Schedule & Nearest 3 Slots Manager
+  async loadScheduleSettings() {
+    try {
+      const res = await fetch('/api/admin/schedule-settings');
+      const data = await res.json();
+      this.scheduleSettings = data;
+      this.renderScheduleSettings();
+    } catch (e) {
+      console.error("Error loading schedule settings:", e);
+    }
+  },
+
+  renderScheduleSettings() {
+    const daysContainer = document.getElementById('admin-schedule-days');
+    const slotsInput = document.getElementById('admin-schedule-slots-input');
+    if (!daysContainer) return;
+
+    const allDays = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"];
+    const activeDays = this.scheduleSettings.working_days || ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+
+    daysContainer.innerHTML = allDays.map(d => `
+      <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; background:#0f172a; padding:4px 8px; border-radius:4px; border:1px solid #334155; cursor:pointer;">
+        <input type="checkbox" name="workday" value="${d}" ${activeDays.includes(d) ? 'checked' : ''}>
+        <span>${d}</span>
+      </label>
+    `).join('');
+
+    if (slotsInput && this.scheduleSettings.daily_slots) {
+      slotsInput.value = this.scheduleSettings.daily_slots.join(', ');
+    }
+  },
+
+  async saveScheduleSettings() {
+    const token = localStorage.getItem('mc_token');
+    const checkedDays = Array.from(document.querySelectorAll('#admin-schedule-days input[name="workday"]:checked')).map(el => el.value);
+    const slotsRaw = document.getElementById('admin-schedule-slots-input')?.value || '';
+    const slots = slotsRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+
+    if (checkedDays.length === 0) {
+      alert("En az bir mesai günü seçmelisiniz.");
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/schedule-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          working_days: checkedDays,
+          daily_slots: slots
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Mesai ve randevu saatleri başarıyla kaydedildi!", "success");
+        await this.loadScheduleSettings();
+      } else {
+        alert(data.error || "Hata oluştu.");
+      }
+    } catch (e) {
+      alert("Kaydedilemedi.");
     }
   }
 };

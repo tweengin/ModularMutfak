@@ -218,6 +218,21 @@ def init_db():
     );
     """)
 
+    # Email Notifications Log Table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS email_notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        recipient_email TEXT NOT NULL,
+        recipient_name TEXT,
+        reference_code TEXT,
+        email_type TEXT NOT NULL, -- 'appointment_requested', 'appointment_confirmed'
+        subject TEXT NOT NULL,
+        body_html TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'sent',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
     # Safe schema migration for appointment and lock columns
     try:
         c.execute("ALTER TABLE designs ADD COLUMN appointment_date TEXT;")
@@ -342,7 +357,9 @@ def init_db():
         ('transport_assembly_fee', '3200.0', 'Şehir içi nakliye ve profesyonel kurulum ücreti (TL)'),
         ('vat_tax_percent', '20.0', 'KDV Vergisi Oranı (%)'),
         ('token_price_try', '250.0', '1 Profesyonel Tasarım Jetonu Bedeli (TL)'),
-        ('token_per_design_export', '1', 'Profesyonel proje çıktısı için gereken jeton')
+        ('token_per_design_export', '1', 'Profesyonel proje çıktısı için gereken jeton'),
+        ('appointment_working_days', '["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"]', 'Yönetici randevu kabul edilen mesai günleri'),
+        ('appointment_daily_slots', '["10:00 - 12:00 (Sabah)", "13:30 - 15:30 (Öğle)", "16:00 - 18:00 (Akşamüstü)"]', 'Günlük randevu saat blokları')
     ]
 
     for s in default_settings:

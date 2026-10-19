@@ -219,6 +219,43 @@ class TestModulerCraftPro(unittest.TestCase):
         conn.commit()
         conn.close()
 
+    def test_08_appointment_slots_and_email_notification(self):
+        from server import get_nearest_appointment_slots, dispatch_email_notification
+
+        # 1. Test Nearest 3 Slots calculation
+        slots = get_nearest_appointment_slots()
+        self.assertEqual(len(slots), 3, "System must provide exactly 3 nearest working slots")
+        for s in slots:
+            self.assertIn('date', s)
+            self.assertIn('time_slot', s)
+            self.assertIn('full_label', s)
+
+        # 2. Test Email Dispatcher & Database Persistence
+        test_email = "musteri_test@example.com"
+        res = dispatch_email_notification(
+            to_email=test_email,
+            recipient_name="Mehmet Bey",
+            ref_code="TR-TEST-12",
+            email_type="appointment_requested",
+            app_date=slots[0]['date'],
+            app_slot=slots[0]['time_slot'],
+            admin_notes="Özel kör köşe talebi"
+        )
+        self.assertEqual(res['status'], 'sent')
+
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT * FROM email_notifications WHERE reference_code = 'TR-TEST-12'")
+        mail_row = dict(c.fetchone())
+        self.assertEqual(mail_row['recipient_email'], test_email)
+        self.assertEqual(mail_row['email_type'], 'appointment_requested')
+        self.assertIn("TR-TEST-12", mail_row['body_html'])
+
+        c.execute("DELETE FROM email_notifications WHERE reference_code = 'TR-TEST-12'")
+        conn.commit()
+        conn.close()
+
 if __name__ == '__main__':
     unittest.main()
+
 
