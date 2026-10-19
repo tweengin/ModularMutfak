@@ -800,6 +800,11 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Tezgah Arası Görsel Ton Değiştirici (Açık / Koyu) -->
+              <button class="cam-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" title="Tezgah Arası Görsel Tonunu Değiştir (Açık / Koyu)">
+                🎨 Tezgah Arası: <span id="backsplash-tone-status" style="color:#38bdf8; font-weight:bold;">AÇIK TON</span>
+              </button>
             </div>
 
             <!-- Accessibility / Low Depth Perception Toggle Badge -->
@@ -826,6 +831,13 @@
                 </div>
               </div>
               <div class="fmt-actions">
+                <!-- Open Shelf Quick Adjuster (Only shown for open modules) -->
+                <div id="fmt-shelf-group" style="display:none; align-items:center; gap:4px; margin-right:6px; border-right:1px solid #475569; padding-right:8px;">
+                  <span style="font-size:0.75rem; color:#cbd5e1; font-weight:600;">📚 Raf:</span>
+                  <button class="fmt-btn" onclick="setSelectedModuleShelves(1)" title="1 Raf">1</button>
+                  <button class="fmt-btn" onclick="setSelectedModuleShelves(2)" title="2 Raf">2</button>
+                  <button class="fmt-btn" onclick="setSelectedModuleShelves(3)" title="3 Raf">3</button>
+                </div>
                 <button class="fmt-btn" onclick="shiftSelectedModule(-100)" title="100mm Sola Kaydır">◀ Sola</button>
                 <button class="fmt-btn" onclick="shiftSelectedModule(100)" title="100mm Sağa Kaydır">▶ Sağa</button>
                 <button class="fmt-btn" onclick="toggleSelectedModuleWall()" title="Diğer Duvara Taşı (Arka ↔ Sol)">🧱 Duvar Değiştir</button>

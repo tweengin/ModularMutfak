@@ -57,7 +57,8 @@ const ADEKO_MODULE_GROUPS = {
         { type: 'base_double', name: 'Çift Kapaklı Geniş Alt Dolap', category: 'base', w: 800, d: 600, h: 720, drawers: 0, hinges: 4, icon: '🚪', desc: 'Geniş tencere depolama' },
         { type: 'base_corner_straight', name: 'Düz Kör Köşe Alt Dolap', category: 'base', w: 1000, d: 600, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe dönüş dolabı (Tek Raflı)' },
         { type: 'base_corner_l', name: '90° L-Köşe Alt Dolap', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe dönüş dolabı (Tek Raflı)' },
-        { type: 'base_corner_v', name: 'V-Köşe (45° Diyagonal) Alt Dolap', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe dolabı (Tek Raflı)' }
+        { type: 'base_corner_v', name: 'V-Köşe (45° Diyagonal) Alt Dolap', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe dolabı (Tek Raflı)' },
+        { type: 'base_open_shelf', name: 'Açık Raflı Alt Modül (Kapaksız)', category: 'base', w: 400, d: 600, h: 720, isOpenShelf: true, shelfCount: 1, drawers: 0, hinges: 0, icon: '📚', desc: '1-3 ayarlı raflı açık alt modül' }
       ]
     },
     {
@@ -67,12 +68,13 @@ const ADEKO_MODULE_GROUPS = {
       open: true,
       items: [
         { type: 'wall_glass', name: 'Camlı Yatay Kalkar Dolap', category: 'wall', w: 900, d: 350, h: 720, drawers: 0, hinges: 2, icon: '🪟', desc: 'Buzlu cam insets & aventos' },
-        { type: 'wall_double', name: 'Çift Kapaklı Üst Dolap', category: 'wall', w: 800, d: 350, h: 720, drawers: 0, hinges: 4, icon: '📦', desc: '2 ayarlı raflı standart üst' },
+        { type: 'wall_double', name: 'Çift Kapaklı Üst Dolap', category: 'wall', w: 800, d: 350, h: 720, drawers: 0, hinges: 4, icon: '📦', desc: 'Standart çift kapaklı üst' },
         { type: 'wall_single', name: 'Tek Kapaklı Üst Dolap', category: 'wall', w: 500, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📦', desc: 'Dar alan üst depolama' },
         { type: 'wall_hood', name: 'Davlumbaz Üstü Aspiratör Dolabı', category: 'wall', w: 600, d: 350, h: 720, drawers: 0, hinges: 2, icon: '💨', desc: 'Karbon filtreli gömme' },
         { type: 'wall_corner_straight', name: 'Düz Kör Köşe Üst Dolap', category: 'wall', w: 650, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe üst dolap (Tek Raflı)' },
         { type: 'wall_corner_l', name: '90° L-Köşe Üst Dolabı', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe üst asma (Tek Raflı)' },
-        { type: 'wall_corner_v', name: 'V-Köşe (45° Diyagonal) Üst Dolap', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe üst dolabı (Tek Raflı)' }
+        { type: 'wall_corner_v', name: 'V-Köşe (45° Diyagonal) Üst Dolap', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe üst dolabı (Tek Raflı)' },
+        { type: 'wall_open_shelf', name: 'Açık Raflı Üst Modül (Kapaksız)', category: 'wall', w: 400, d: 350, h: 720, isOpenShelf: true, shelfCount: 2, drawers: 0, hinges: 0, icon: '📚', desc: '1-3 ayarlı raflı açık üst modül' }
       ]
     },
     {
@@ -976,7 +978,9 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
     x: targetX,
     drawers: template.drawers || 0,
     hinges: template.hinges || 0,
-    shelves: template.category === 'wall' ? 2 : 1
+    shelves: template.category === 'wall' ? 2 : 1,
+    isOpenShelf: !!(template.isOpenShelf || template.type?.includes('open_shelf')),
+    shelfCount: template.shelfCount || (template.category === 'wall' ? 2 : 1)
   };
 
   currentMods.push(newMod);
@@ -1053,12 +1057,60 @@ window.showSelectedModuleGizmo = function(mod) {
   const bar = document.getElementById('selected-module-toolbar');
   const title = document.getElementById('fmt-title');
   const details = document.getElementById('fmt-details');
+  const shelfGroup = document.getElementById('fmt-shelf-group');
   if (!bar || !title || !details || !mod) return;
 
   const wallLabel = (mod.wall === 'left') ? 'Sol Duvar' : 'Arka Duvar';
   title.textContent = `${mod.id}: ${mod.name}`;
   details.textContent = `${mod.w}x${mod.d}x${mod.h} mm | ${wallLabel} (Konum: ${mod.x} mm)`;
+
+  if (shelfGroup) {
+    const isOpen = !!(mod.isOpenShelf || mod.type?.includes('open_shelf'));
+    shelfGroup.style.display = isOpen ? 'flex' : 'none';
+  }
+
   bar.style.display = 'flex';
+};
+
+window.setSelectedModuleShelves = function(count) {
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlidir. Değişiklik yapılamaz.", "error");
+    return;
+  }
+  const selId = canvas3D?.selectedModuleId || canvas2D?.selectedModuleId;
+  const mod = window.CURRENT_DESIGN.modules.find(m => m.id === selId);
+  if (mod) {
+    mod.shelfCount = parseInt(count) || 1;
+    renderActiveCanvas();
+    updatePlacedModulesUI();
+    showToast(`📚 ${mod.name} için raf sayısı ${mod.shelfCount} olarak ayarlandı.`, 'success');
+  }
+};
+
+window.updateModuleShelfCount = function(modId, count) {
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlidir. Değişiklik yapılamaz.", "error");
+    return;
+  }
+  const mod = window.CURRENT_DESIGN.modules.find(m => m.id === modId);
+  if (mod) {
+    mod.shelfCount = parseInt(count) || 1;
+    renderActiveCanvas();
+    updatePlacedModulesUI();
+    showToast(`📚 ${mod.name} için raf sayısı ${mod.shelfCount} olarak güncellendi.`, 'success');
+  }
+};
+
+window.toggleBacksplashTone = function() {
+  if (!canvas3D) return;
+  const newTone = (canvas3D.backsplashTone === 'dark') ? 'light' : 'dark';
+  canvas3D.setBacksplashTone(newTone);
+  const statusElem = document.getElementById('backsplash-tone-status');
+  if (statusElem) {
+    statusElem.textContent = (newTone === 'dark') ? 'KOYU TON' : 'AÇIK TON';
+    statusElem.style.color = (newTone === 'dark') ? '#f59e0b' : '#38bdf8';
+  }
+  showToast(`🎨 Tezgah Arası: ${newTone === 'dark' ? 'Koyu Füme/Antrasit Taş' : 'Açık Porselen Seramik'} tonuna ayarlandı.`, 'info');
 };
 
 window.hideSelectedModuleGizmo = function() {
@@ -1161,6 +1213,18 @@ function updatePlacedModulesUI() {
       div.className = 'placed-item';
       if (isSel) div.style.borderLeftColor = '#38bdf8';
 
+      const isOpen = !!(m.isOpenShelf || m.type?.includes('open_shelf'));
+      const shelfSelectHtml = isOpen ? `
+        <div style="margin-top:4px; font-size:0.75rem; color:#cbd5e1; display:flex; align-items:center; gap:4px;">
+          <span>📚 Raf:</span>
+          <select onchange="updateModuleShelfCount('${m.id}', this.value)" style="background:#1e293b; color:#38bdf8; border:1px solid #475569; border-radius:4px; padding:1px 6px; font-size:0.75rem; font-weight:700;">
+            <option value="1" ${(m.shelfCount == 1) ? 'selected' : ''}>1 Raf</option>
+            <option value="2" ${(m.shelfCount == 2 || !m.shelfCount) ? 'selected' : ''}>2 Raf</option>
+            <option value="3" ${(m.shelfCount == 3) ? 'selected' : ''}>3 Raf</option>
+          </select>
+        </div>
+      ` : '';
+
       div.innerHTML = `
         <div style="flex:1;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1175,6 +1239,7 @@ function updatePlacedModulesUI() {
             <span>Konum:</span>
             <input type="number" class="pos-input" value="${m.x || 0}" step="50" onchange="setModuleCustomX('${m.id}', this.value)" title="Konumu milimetre cinsinden değiştirin"> mm
           </div>
+          ${shelfSelectHtml}
         </div>
         <div style="display:flex; flex-direction:column; gap:3px;">
           <div style="display:flex; gap:2px;">

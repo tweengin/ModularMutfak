@@ -50,6 +50,7 @@ class StudioCanvas3D {
 
     // Procedural Materials Cache
     this.matCache = {};
+    this.backsplashTone = 'light';
 
     this.initThree();
     this.setupProceduralTextures();
@@ -380,6 +381,30 @@ class StudioCanvas3D {
       floorTile: new THREE.MeshPhysicalMaterial({ map: tileTex, roughness: 0.20, metalness: 0.10, clearcoat: 0.65 }),
       wallPaint: new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.85, metalness: 0.0 }),
       wallBacksplash: new THREE.MeshPhysicalMaterial({ color: 0x475569, roughness: 0.25, metalness: 0.05, clearcoat: 0.5 }),
+      wallBacksplashLight: new THREE.MeshPhysicalMaterial({
+        color: 0xf8fafc,
+        map: porcelainTex,
+        roughness: 0.08,
+        metalness: 0.02,
+        clearcoat: 0.94,
+        clearcoatRoughness: 0.04,
+        reflectivity: 0.95
+      }),
+      wallBacksplashDark: new THREE.MeshPhysicalMaterial({
+        color: 0x334155,
+        map: graniteTex,
+        roughness: 0.18,
+        metalness: 0.16,
+        clearcoat: 0.75,
+        clearcoatRoughness: 0.08,
+        reflectivity: 0.88
+      }),
+      ledStripMat: new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0xfff0c2,
+        emissiveIntensity: 2.2,
+        roughness: 0.1
+      }),
       wallBorderMat: new THREE.LineBasicMaterial({ color: 0x3b82f6, linewidth: 3 }),
       ghostValidMat: new THREE.MeshStandardMaterial({ color: 0x0284c7, transparent: true, opacity: 0.45 }),
       ghostInvalidMat: new THREE.MeshStandardMaterial({ color: 0xef4444, transparent: true, opacity: 0.55 }),
@@ -387,6 +412,14 @@ class StudioCanvas3D {
       ghostWireInvalidMat: new THREE.LineBasicMaterial({ color: 0xf87171, linewidth: 2 }),
       selectedMat: new THREE.MeshPhysicalMaterial({ color: 0x0284c7, roughness: 0.2, metalness: 0.15, clearcoat: 0.8 })
     };
+  }
+
+  setBacksplashTone(tone) {
+    this.backsplashTone = (tone === 'dark') ? 'dark' : 'light';
+    const mat = (this.backsplashTone === 'dark') ? this.matCache.wallBacksplashDark : this.matCache.wallBacksplashLight;
+    if (this.backsplashMeshBack) this.backsplashMeshBack.material = mat;
+    if (this.backsplashMeshLeft) this.backsplashMeshLeft.material = mat;
+    if (this.backWallMesh) this.backWallMesh.material = mat;
   }
 
   getDoorMaterial(isSelected = false) {
@@ -708,11 +741,20 @@ class StudioCanvas3D {
     this.roomGroup.add(floorMesh);
 
     // 2. Back Wall (XY Plane at Z = 0)
+    const currentBsMat = (this.backsplashTone === 'dark') ? this.matCache.wallBacksplashDark : this.matCache.wallBacksplashLight;
     const backWallGeo = new THREE.PlaneGeometry(rw, rh);
-    const backWallMesh = new THREE.Mesh(backWallGeo, this.matCache.wallBacksplash);
+    const backWallMesh = new THREE.Mesh(backWallGeo, this.matCache.wallPaint);
     backWallMesh.position.set(rw / 2, rh / 2, 0);
     backWallMesh.receiveShadow = true;
     this.roomGroup.add(backWallMesh);
+
+    // Dedicated Backsplash Panel on Back Wall (between Y=860 and Y=1500, height 640mm)
+    const backBsGeo = new THREE.PlaneGeometry(rw, 640);
+    const backBsMesh = new THREE.Mesh(backBsGeo, currentBsMat);
+    backBsMesh.position.set(rw / 2, 860 + 320, 1.5);
+    backBsMesh.receiveShadow = true;
+    this.roomGroup.add(backBsMesh);
+    this.backsplashMeshBack = backBsMesh;
 
     // Back Wall Boundary Line at X = rw (Wall End)
     const bwEndGeo = new THREE.BufferGeometry().setFromPoints([
@@ -729,6 +771,15 @@ class StudioCanvas3D {
     leftWallMesh.position.set(0, rh / 2, rd / 2);
     leftWallMesh.receiveShadow = true;
     this.roomGroup.add(leftWallMesh);
+
+    // Dedicated Backsplash Panel on Left Wall (between Y=860 and Y=1500, height 640mm)
+    const leftBsGeo = new THREE.PlaneGeometry(rd, 640);
+    const leftBsMesh = new THREE.Mesh(leftBsGeo, currentBsMat);
+    leftBsMesh.rotation.y = Math.PI / 2;
+    leftBsMesh.position.set(1.5, 860 + 320, rd / 2);
+    leftBsMesh.receiveShadow = true;
+    this.roomGroup.add(leftBsMesh);
+    this.backsplashMeshLeft = leftBsMesh;
 
     // Left Wall Boundary Line at Z = rd (Wall End)
     const lwEndGeo = new THREE.BufferGeometry().setFromPoints([
@@ -1003,12 +1054,43 @@ class StudioCanvas3D {
         plinthMesh.receiveShadow = true;
         group.add(plinthMesh);
 
-        const bodyGeo = new THREE.BoxGeometry(mw, bodyH, md);
-        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-        bodyMesh.position.set(0, plinthH + bodyH / 2, md / 2);
-        bodyMesh.castShadow = true;
-        bodyMesh.receiveShadow = true;
-        group.add(bodyMesh);
+        const isOpen = mod.isOpenShelf || mod.type?.includes('open_shelf');
+        if (isOpen) {
+          // OPEN SHELF BASE CABINET (Kapaksız Alt Dolap - İçi ve Rafları Görünür)
+          const t = 18;
+          const leftP = new THREE.Mesh(new THREE.BoxGeometry(t, bodyH, md), bodyMat);
+          leftP.position.set(-mw / 2 + t / 2, plinthH + bodyH / 2, md / 2);
+          group.add(leftP);
+
+          const rightP = new THREE.Mesh(new THREE.BoxGeometry(t, bodyH, md), bodyMat);
+          rightP.position.set(mw / 2 - t / 2, plinthH + bodyH / 2, md / 2);
+          group.add(rightP);
+
+          const botP = new THREE.Mesh(new THREE.BoxGeometry(mw - 2 * t, t, md), bodyMat);
+          botP.position.set(0, plinthH + t / 2, md / 2);
+          group.add(botP);
+
+          const backP = new THREE.Mesh(new THREE.BoxGeometry(mw - 2 * t, bodyH - t, 8), bodyMat);
+          backP.position.set(0, plinthH + (bodyH + t) / 2, 4);
+          group.add(backP);
+
+          const shelfCount = Math.max(1, Math.min(3, parseInt(mod.shelfCount) || 1));
+          const spacing = (bodyH - t) / (shelfCount + 1);
+          for (let s = 1; s <= shelfCount; s++) {
+            const sY = plinthH + t + s * spacing;
+            const shelfMesh = new THREE.Mesh(new THREE.BoxGeometry(mw - 2 * t, 18, md - 20), this.matCache.woodOak);
+            shelfMesh.position.set(0, sY, md / 2);
+            group.add(shelfMesh);
+          }
+        } else {
+          // CLOSED BASE CABINET (Kapaklı Modül - İçi Kapalı, Dıştan Görünmez)
+          const bodyGeo = new THREE.BoxGeometry(mw, bodyH, md);
+          const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+          bodyMesh.position.set(0, plinthH + bodyH / 2, md / 2);
+          bodyMesh.castShadow = true;
+          bodyMesh.receiveShadow = true;
+          group.add(bodyMesh);
+        }
 
         const ctDepth = md + 20;
         const ctGeo = new THREE.BoxGeometry(mw + 4, ctThick, ctDepth);
@@ -1019,39 +1101,35 @@ class StudioCanvas3D {
         group.add(ctMesh);
 
         // DETAILS: Oven, Cooktop, Sink, Drawers, or Standard Doors
-        if (mod.type?.includes('oven')) {
-          const ovenMesh = this.createOvenMesh(mw, bodyH, md);
-          ovenMesh.position.set(0, plinthH + bodyH / 2, md + 2);
-          group.add(ovenMesh);
+        if (!isOpen) {
+          if (mod.type?.includes('oven')) {
+            const ovenMesh = this.createOvenMesh(mw, bodyH, md);
+            ovenMesh.position.set(0, plinthH + bodyH / 2, md + 2);
+            group.add(ovenMesh);
 
-          const cooktopMesh = this.createCooktopMesh(mw, ctDepth);
-          cooktopMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
-          group.add(cooktopMesh);
+            const cooktopMesh = this.createCooktopMesh(mw, ctDepth);
+            cooktopMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
+            group.add(cooktopMesh);
 
-        } else if (mod.type?.includes('sink')) {
-          const sinkMesh = this.createSinkMesh(mw, ctDepth);
-          sinkMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
-          group.add(sinkMesh);
+          } else if (mod.type?.includes('sink')) {
+            const sinkMesh = this.createSinkMesh(mw, ctDepth);
+            sinkMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
+            group.add(sinkMesh);
 
-        } else if (mod.drawers > 0) {
-          const dh = bodyH / mod.drawers;
-          for (let i = 0; i < mod.drawers; i++) {
-            const dy = plinthH + (i * dh) + (dh / 2);
-            const handleMesh = this.createHandle3D(Math.min(mw * 0.45, 140), 12, true);
-            handleMesh.position.set(0, dy, md + 10);
+          } else if (mod.drawers > 0) {
+            const dh = bodyH / mod.drawers;
+            for (let i = 0; i < mod.drawers; i++) {
+              const dy = plinthH + (i * dh) + (dh / 2);
+              const handleMesh = this.createHandle3D(Math.min(mw * 0.45, 140), 12, true);
+              handleMesh.position.set(0, dy, md + 10);
+              group.add(handleMesh);
+            }
+          } else {
+            // Standard Single or Double Door (Kapaklar Kapalı)
+            const handleMesh = this.createHandle3D(12, 90, false);
+            handleMesh.position.set(mw / 2 - 25, plinthH + bodyH / 2, md + 10);
             group.add(handleMesh);
           }
-        } else {
-          // Standard Single or Double Door with Middle Shelf (Tek Raf)
-          const handleMesh = this.createHandle3D(12, 90, false);
-          handleMesh.position.set(mw / 2 - 25, plinthH + bodyH / 2, md + 10);
-          group.add(handleMesh);
-
-          // Middle Shelf (Tek Raf)
-          const shelfGeo = new THREE.BoxGeometry(mw - 36, 18, md - 40);
-          const shelfMesh = new THREE.Mesh(shelfGeo, this.matCache.woodOak);
-          shelfMesh.position.set(0, plinthH + bodyH / 2, md / 2 - 10);
-          group.add(shelfMesh);
         }
       }
 
@@ -1089,32 +1167,81 @@ class StudioCanvas3D {
         hMesh.position.set(vW/2 - 125, wallZ + wallH / 2, vD/2 - 125);
         hMesh.rotation.y = -Math.PI / 4;
         hMesh.translateZ(12);
-        group.add(hMesh);
+        // Automatic under-cabinet architectural LED for corner wall cabinet
+        const ledStripGeoCorner = new THREE.BoxGeometry(vW - 40, 4, 12);
+        const ledStripMeshCorner = new THREE.Mesh(ledStripGeoCorner, this.matCache.ledStripMat);
+        ledStripMeshCorner.position.set(0, wallZ - 2, vD / 2 - 100);
+        group.add(ledStripMeshCorner);
+
+        const ledDownLightCorner = new THREE.PointLight(0xffedd5, 0.45, 900, 2);
+        ledDownLightCorner.position.set(0, wallZ - 15, vD / 2 - 100);
+        group.add(ledDownLightCorner);
 
       } else {
-        const bodyGeo = new THREE.BoxGeometry(mw, wallH, md);
-        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-        bodyMesh.position.set(0, wallZ + wallH / 2, md / 2);
-        bodyMesh.castShadow = true;
-        bodyMesh.receiveShadow = true;
-        group.add(bodyMesh);
+        const isOpen = mod.isOpenShelf || mod.type?.includes('open_shelf');
+        if (isOpen) {
+          // OPEN SHELF WALL CABINET (Kapaksız Üst Dolap - İçi ve Rafları Görünür)
+          const t = 18;
+          const leftP = new THREE.Mesh(new THREE.BoxGeometry(t, wallH, md), bodyMat);
+          leftP.position.set(-mw / 2 + t / 2, wallZ + wallH / 2, md / 2);
+          group.add(leftP);
 
-        if (mod.type?.includes('glass')) {
-          const glassGeo = new THREE.BoxGeometry(mw * 0.8, wallH * 0.45, 8);
-          const glassMesh = new THREE.Mesh(glassGeo, this.matCache.frostedGlass);
-          glassMesh.position.set(0, wallZ + wallH / 2, md + 4);
-          group.add(glassMesh);
+          const rightP = new THREE.Mesh(new THREE.BoxGeometry(t, wallH, md), bodyMat);
+          rightP.position.set(mw / 2 - t / 2, wallZ + wallH / 2, md / 2);
+          group.add(rightP);
+
+          const topP = new THREE.Mesh(new THREE.BoxGeometry(mw - 2 * t, t, md), bodyMat);
+          topP.position.set(0, wallZ + wallH - t / 2, md / 2);
+          group.add(topP);
+
+          const botP = new THREE.Mesh(new THREE.BoxGeometry(mw - 2 * t, t, md), bodyMat);
+          botP.position.set(0, wallZ + t / 2, md / 2);
+          group.add(botP);
+
+          const backP = new THREE.Mesh(new THREE.BoxGeometry(mw - 2 * t, wallH - 2 * t, 8), bodyMat);
+          backP.position.set(0, wallZ + wallH / 2, 4);
+          group.add(backP);
+
+          const shelfCount = Math.max(1, Math.min(3, parseInt(mod.shelfCount) || 2));
+          const spacing = (wallH - 2 * t) / (shelfCount + 1);
+          for (let s = 1; s <= shelfCount; s++) {
+            const sY = wallZ + t + s * spacing;
+            const shelfMesh = new THREE.Mesh(new THREE.BoxGeometry(mw - 2 * t, 18, md - 10), this.matCache.woodOak);
+            shelfMesh.position.set(0, sY, md / 2);
+            group.add(shelfMesh);
+          }
+        } else {
+          // CLOSED WALL CABINET (Kapaklı Üst Dolap - İçi Kapalı, Dıştan Görünmez)
+          const bodyGeo = new THREE.BoxGeometry(mw, wallH, md);
+          const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+          bodyMesh.position.set(0, wallZ + wallH / 2, md / 2);
+          bodyMesh.castShadow = true;
+          bodyMesh.receiveShadow = true;
+          group.add(bodyMesh);
+
+          if (mod.type?.includes('glass')) {
+            const glassGeo = new THREE.BoxGeometry(mw * 0.8, wallH * 0.45, 8);
+            const glassMesh = new THREE.Mesh(glassGeo, this.matCache.frostedGlass);
+            glassMesh.position.set(0, wallZ + wallH / 2, md + 4);
+            group.add(glassMesh);
+          }
+
+          const handleMesh = this.createHandle3D(60, 10, true);
+          handleMesh.position.set(0, wallZ + 35, md + 10);
+          group.add(handleMesh);
         }
 
-        const handleMesh = this.createHandle3D(60, 10, true);
-        handleMesh.position.set(0, wallZ + 35, md + 10);
-        group.add(handleMesh);
+        // AUTOMATIC ARCHITECTURAL UNDER-CABINET LED LIGHTING
+        // Subtle recessed LED strip profile at the bottom of upper cabinet
+        const ledStripGeo = new THREE.BoxGeometry(mw - 24, 4, 12);
+        const ledStripMesh = new THREE.Mesh(ledStripGeo, this.matCache.ledStripMat);
+        ledStripMesh.position.set(0, wallZ - 2, md / 2);
+        group.add(ledStripMesh);
 
-        // Middle Shelf (Tek Raf)
-        const shelfGeo = new THREE.BoxGeometry(mw - 36, 18, md - 30);
-        const shelfMesh = new THREE.Mesh(shelfGeo, this.matCache.woodOak);
-        shelfMesh.position.set(0, wallZ + wallH / 2, md / 2 - 10);
-        group.add(shelfMesh);
+        // Soft warm downward projection onto countertop & backsplash
+        const ledDownLight = new THREE.PointLight(0xffedd5, 0.45, 900, 2);
+        ledDownLight.position.set(0, wallZ - 15, md / 2);
+        group.add(ledDownLight);
       }
 
     } else if (mod.category === 'tall') {
