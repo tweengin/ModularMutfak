@@ -1687,3 +1687,130 @@ canvas {
   outline: none;
 }
 
+/* ==========================================================================
+   3D RULER TOGGLE & FIRST-TIME INFO BUBBLE
+   ========================================================================== */
+.active-tool-btn {
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.25) !important;
+}
+
+.ruler-info-bubble {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 260px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 189, 248, 0.2);
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  animation: fadeInDown 0.25s ease-out;
+}
+
+.bubble-arrow {
+  position: absolute;
+  top: -6px;
+  left: 24px;
+  width: 10px;
+  height: 10px;
+  background: rgba(15, 23, 42, 0.96);
+  border-top: 1px solid rgba(56, 189, 248, 0.45);
+  border-left: 1px solid rgba(56, 189, 248, 0.45);
+  transform: rotate(45deg);
+}
+
+.bubble-ack-btn {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #fff;
+  border: none;
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bubble-ack-btn:hover {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   SMART CORNER GUIDANCE MODAL (L-KITCHEN)
+   ========================================================================== */
+.smart-corner-card {
+  max-width: 560px;
+  background: #0f172a;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.smart-corner-header {
+  background: rgba(30, 41, 59, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.corner-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.corner-option-item {
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid #334155;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.corner-option-item:hover {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.corner-select-btn {
+  margin-top: 0.75rem;
+  width: 100%;
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.corner-option-item:hover .corner-select-btn {
+  background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+

@@ -271,11 +271,175 @@ function navigateTo(viewId) {
     setTimeout(() => {
       renderActiveCanvas();
       updatePlacedModulesUI();
+      checkRulerBubbleInitialDisplay();
     }, 100);
   } else if (viewId === 'admin') {
     AdminPanel.init();
   }
 }
+
+// 3D RULER TOGGLE & FIRST-TIME INFO BUBBLE
+window.toggle3DRuler = function() {
+  if (canvas3D && canvas3D.toggleRulers) {
+    const isVisible = canvas3D.toggleRulers();
+    const btn = document.getElementById('btn-toggle-ruler');
+    const status = document.getElementById('ruler-toggle-status');
+    if (status) {
+      status.textContent = isVisible ? 'AÇIK' : 'KAPALI';
+      status.style.color = isVisible ? '#10b981' : '#94a3b8';
+    }
+    if (btn) {
+      if (isVisible) {
+        btn.classList.add('active-tool-btn');
+      } else {
+        btn.classList.remove('active-tool-btn');
+      }
+    }
+    showToast(`📏 3D Sahne Cetveli: ${isVisible ? 'AÇIK' : 'KAPALI'}`, 'info');
+  }
+};
+
+window.dismissRulerBubble = function() {
+  const bubble = document.getElementById('ruler-info-bubble');
+  if (bubble) {
+    bubble.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    bubble.style.opacity = '0';
+    bubble.style.transform = 'translateY(-6px)';
+    setTimeout(() => { bubble.style.display = 'none'; }, 260);
+  }
+  localStorage.setItem('has_seen_ruler_bubble', 'true');
+};
+
+function checkRulerBubbleInitialDisplay() {
+  const seen = localStorage.getItem('has_seen_ruler_bubble');
+  const bubble = document.getElementById('ruler-info-bubble');
+  if (!seen && bubble) {
+    bubble.style.display = 'block';
+    setTimeout(() => {
+      dismissRulerBubble();
+    }, 8000);
+  }
+}
+
+// SMART CORNER GUIDANCE CONTROLLERS (L-KITCHEN)
+window.CURRENT_PENDING_CORNER_MOD = null;
+
+function checkSmartCornerConflict(template, targetWall, targetX) {
+  const layout = window.CURRENT_DESIGN?.layout_type || 'single_wall';
+  const isLKitchen = layout.startsWith('l_');
+  if (!isLKitchen) return false;
+
+  const type = template.type || '';
+  const name = (template.name || '').toLowerCase();
+  const isCornerMod = (
+    type === 'base_corner_l' ||
+    type === 'wall_corner_l' ||
+    template.category === 'corner' ||
+    name.includes('köşe')
+  );
+  if (isCornerMod) return false;
+
+  const isUpper = (template.category === 'wall');
+  const cornerClearance = isUpper ? 650 : 900;
+
+  if (targetX < cornerClearance) {
+    const existingMods = window.CURRENT_DESIGN.modules || [];
+    const hasCornerMod = existingMods.some(m => 
+      (isUpper ? m.category === 'wall' : m.category !== 'wall') &&
+      (m.type === 'base_corner_l' || m.type === 'wall_corner_l' || (m.name && m.name.toLowerCase().includes('köşe'))) &&
+      ((m.x || 0) < 50)
+    );
+
+    if (!hasCornerMod) {
+      window.CURRENT_PENDING_CORNER_MOD = { template, targetWall, targetX, isUpper };
+      openSmartCornerModal(template, isUpper);
+      return true; // Block placement until user resolves
+    }
+  }
+
+  return false;
+}
+
+window.openSmartCornerModal = function(template, isUpper) {
+  const modal = document.getElementById('smart-corner-modal');
+  const grid = document.getElementById('smart-corner-options-grid');
+  const desc = document.getElementById('smart-corner-desc');
+  if (!modal || !grid) return;
+
+  if (isUpper) {
+    desc.innerHTML = `L-Mutfak dönüş köşesinde (0 - 65 cm) üst dolap kapaklarının birbirine çarpmasını engellemek için bu alana <strong>L-Köşe Üst Dolabı</strong> yerleştirilmelidir.`;
+    grid.innerHTML = `
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('wall_corner_l', 650)">
+        <div style="font-size:28px; margin-bottom:6px;">📐</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">65x65 cm L-Köşe Üst Dolabı</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">90° asma köşe modülü</span>
+        <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
+      </div>
+    `;
+  } else {
+    desc.innerHTML = `L-Mutfak dönüş köşesinde (0 - 90 cm) standart düz modül kullanılamaz. Kapak ve çekmecelerin birbirine çarpmasını önlemek ve tezgah dönüşünü sağlamak için bu alana <strong>Köşe Alt Modülü</strong> yerleştirilmelidir.`;
+    grid.innerHTML = `
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('base_corner_l', 900)">
+        <div style="font-size:28px; margin-bottom:6px;">📐</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">90x90 cm Kör Köşe Alt Dolabı</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">Döner sepet uyumlu L-dönüş</span>
+        <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
+      </div>
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('base_corner_l', 1050)">
+        <div style="font-size:28px; margin-bottom:6px;">🗄️</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">105 cm Kör Köşe Alt Dolabı</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">Fasulye sepet / geniş depolama</span>
+        <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
+      </div>
+    `;
+  }
+
+  modal.style.display = 'flex';
+};
+
+window.closeSmartCornerModal = function() {
+  const modal = document.getElementById('smart-corner-modal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.applyCornerModuleChoice = function(cornerType, width) {
+  const pending = window.CURRENT_PENDING_CORNER_MOD;
+  closeSmartCornerModal();
+  if (!pending) return;
+
+  const cornerTemplate = getModuleTemplate(cornerType) || {
+    type: cornerType,
+    name: width === 1050 ? '105 cm Kör Köşe Alt Dolap' : (width === 650 ? '65x65 cm L-Köşe Üst Dolabı' : '90x90 cm Kör Köşe Alt Dolap'),
+    category: pending.isUpper ? 'wall' : 'base',
+    w: width,
+    d: width,
+    h: 720
+  };
+  cornerTemplate.selected_w = width;
+
+  // 1. Place the corner module at x = 0
+  addModuleToDesign(cornerTemplate, 0, pending.targetWall);
+
+  // 2. Place user's intended module right after the corner module
+  const nextPos = width;
+  setTimeout(() => {
+    addModuleToDesign(pending.template, nextPos, pending.targetWall);
+    showToast(`✨ L-Köşe modülü (${width / 10} cm) ve ardından ${pending.template.name} yerleştirildi!`, 'success');
+  }, 150);
+
+  window.CURRENT_PENDING_CORNER_MOD = null;
+};
+
+window.applyCornerShiftChoice = function() {
+  const pending = window.CURRENT_PENDING_CORNER_MOD;
+  closeSmartCornerModal();
+  if (!pending) return;
+
+  const shiftPos = pending.isUpper ? 650 : 900;
+  addModuleToDesign(pending.template, shiftPos, pending.targetWall);
+  showToast(`➡️ Modül köşe payı bırakılarak ${shiftPos / 10} cm konumuna yerleştirildi.`, 'info');
+  window.CURRENT_PENDING_CORNER_MOD = null;
+};
 
 // CATEGORY SELECTION
 function selectCategory(catKey) {
@@ -718,6 +882,11 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
   let targetX = customPos;
   if (targetX === null || targetX === undefined) {
     targetX = currentEnd;
+  }
+
+  // L-KITCHEN SMART CORNER CONFLICT CHECK
+  if (checkSmartCornerConflict(template, wall, targetX)) {
+    return false;
   }
 
   // STRICT WALL BOUNDARY CHECK: DO NOT OVERFLOW WALL END!

@@ -565,6 +565,29 @@
               <button class="cam-btn" onclick="setCameraPreset('reset')" title="Kamera Açısını ve Yakınlaştırmayı Sıfırla">
                 🔍 Sıfırla
               </button>
+
+              <!-- 3D Dynamic Ruler Toggle & First-time Info Bubble -->
+              <div style="position: relative; display: inline-block;">
+                <button class="cam-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" title="3D Sahne Ölçü Cetvellerini Aç / Kapat">
+                  📏 Ölçüler: <span id="ruler-toggle-status" style="color:#10b981; font-weight:bold;">AÇIK</span>
+                </button>
+                <!-- Bilgilendirme Baloncuğu -->
+                <div id="ruler-info-bubble" class="ruler-info-bubble" style="display:none;">
+                  <div class="bubble-arrow"></div>
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                    <div>
+                      <strong style="color:#38bdf8; font-size:12px;">💡 Akıllı Ölçü Cetveli</strong>
+                      <p style="margin:4px 0 0 0; font-size:11px; line-height:1.4; color:#cbd5e1;">
+                        Modül ebatları ve kalan duvar boşlukları sahnede 3D olarak anlık gösterilir. Dilediğiniz zaman bu butondan cetveli kapatıp açabilirsiniz.
+                      </p>
+                    </div>
+                    <button onclick="dismissRulerBubble()" style="background:none; border:none; color:#94a3b8; font-size:14px; cursor:pointer; padding:0; line-height:1;">✕</button>
+                  </div>
+                  <div style="margin-top:8px; text-align:right;">
+                    <button onclick="dismissRulerBubble()" class="bubble-ack-btn">Anladım</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Accessibility / Low Depth Perception Toggle Badge -->
@@ -1086,6 +1109,43 @@
           <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.4rem;">Hızlı Test / Demo Erişimi:</div>
           <button class="btn btn-outline btn-sm" style="width:100%;" onclick="quickAdminLogin()">
             ⚡ Tek Tıkla Yönetici Olarak Doğrudan Aç
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMART CORNER GUIDANCE MODAL (L-KITCHEN) -->
+  <div id="smart-corner-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card smart-corner-card">
+      <div class="modal-header smart-corner-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:24px;">📐</span>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; color:#f8fafc;">Akıllı Köşe Yönlendirmesi (L-Mutfak)</h3>
+            <span style="font-size:0.75rem; color:#94a3b8;">Ergonomik Köşe Güvenlik Kilidi</span>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeSmartCornerModal()">✕</button>
+      </div>
+      
+      <div class="modal-body" style="padding:1.25rem;">
+        <div class="alert-box-info" style="margin-bottom:1rem; border-left:4px solid #38bdf8; background:rgba(56,189,248,0.1); padding:0.75rem 1rem; border-radius:6px;">
+          <p id="smart-corner-desc" style="margin:0; font-size:0.85rem; line-height:1.45; color:#e2e8f0;">
+            L-Mutfak dönüş köşesinde standart düz modül kullanılamaz. Kapak ve çekmecelerin birbirine çarpmasını önlemek ve tezgah dönüşünü sağlamak için bu alana <strong>Köşe Modülü</strong> yerleştirilmelidir.
+          </p>
+        </div>
+
+        <h4 style="margin:0 0 0.75rem 0; font-size:0.9rem; color:#cbd5e1;">Önerilen Köşe Çözümleri:</h4>
+        
+        <div id="smart-corner-options-grid" class="corner-options-grid">
+          <!-- Populated by openSmartCornerModal in app.js -->
+        </div>
+
+        <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:0.75rem; color:#94a3b8;">Veya modülü köşeden sonraya kaydırın:</span>
+          <button class="btn btn-secondary btn-sm" onclick="applyCornerShiftChoice()">
+            ⏭️ Köşe Payı Bırakarak Yerleştir
           </button>
         </div>
       </div>

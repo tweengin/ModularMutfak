@@ -118,13 +118,15 @@ class StudioCanvas3D {
     spot2.position.set(2400, 2300, 700);
     this.scene.add(spot2);
 
-    // Groups for dynamic geometry
     this.roomGroup = new THREE.Group();
     this.cabinetsGroup = new THREE.Group();
     this.helperGroup = new THREE.Group();
+    this.dimensionGroup = new THREE.Group();
     this.scene.add(this.roomGroup);
     this.scene.add(this.cabinetsGroup);
     this.scene.add(this.helperGroup);
+    this.scene.add(this.dimensionGroup);
+    this.showRulers = true;
 
     // Resize listener
     window.addEventListener('resize', () => this.onWindowResize());
@@ -500,6 +502,11 @@ class StudioCanvas3D {
     while (this.helperGroup.children.length > 0) {
       this.helperGroup.remove(this.helperGroup.children[0]);
     }
+    if (this.dimensionGroup) {
+      while (this.dimensionGroup.children.length > 0) {
+        this.dimensionGroup.remove(this.dimensionGroup.children[0]);
+      }
+    }
 
     // 3. Populate Cabinets
     this.modules.forEach(mod => {
@@ -515,6 +522,11 @@ class StudioCanvas3D {
         }
       }
     });
+
+    // 4. Render 3D Dimension Rulers
+    if (this.showRulers && this.renderDimensionRulers) {
+      this.renderDimensionRulers(rw, rd, rh);
+    }
   }
 
   /*
@@ -919,6 +931,177 @@ class StudioCanvas3D {
         }
       }
     }, 150);
+  }
+
+  /*
+   * 3D INTERACTIVE DIMENSION RULER SYSTEM (ADeko CAD Style)
+   * Displays dynamic dimension brackets, cabinet widths, wall gaps and remaining space.
+   */
+  toggleRulers() {
+    this.showRulers = !this.showRulers;
+    if (this.dimensionGroup) {
+      this.dimensionGroup.visible = this.showRulers;
+    }
+    return this.showRulers;
+  }
+
+  createDimensionSprite(text, isRemaining = false, isGap = false) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+
+    const bgColor = isRemaining ? 'rgba(6, 78, 59, 0.94)' : (isGap ? 'rgba(120, 53, 15, 0.94)' : 'rgba(15, 23, 42, 0.92)');
+    const borderColor = isRemaining ? '#10b981' : (isGap ? '#f59e0b' : '#38bdf8');
+    const textColor = isRemaining ? '#34d399' : (isGap ? '#fbbf24' : '#e0f2fe');
+
+    ctx.fillStyle = bgColor;
+    ctx.beginPath();
+    ctx.roundRect(4, 4, 248, 56, 14);
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = borderColor;
+    ctx.stroke();
+
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 22px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 128, 32);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    const spriteMat = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+    const sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(280, 70, 1);
+    return sprite;
+  }
+
+  renderDimensionRulers(rw, rd, rh) {
+    const walls = ['back', 'left'];
+
+    walls.forEach(wall => {
+      const isLeft = (wall === 'left');
+      const wallLen = isLeft ? rd : rw;
+
+      // Filter base/tall modules on this wall, sorted by position X
+      const mods = this.modules
+        .filter(m => (m.wall || 'back') === wall && m.category !== 'wall')
+        .sort((a, b) => (a.x || 0) - (b.x || 0));
+
+      if (mods.length === 0) return;
+
+      const rulerY = 960; // Just above 860mm countertop
+      const rulerDist = 700; // Directly in front of 600mm base cabinets
+
+      const lineMat = new THREE.LineBasicMaterial({
+        color: 0x38bdf8,
+        linewidth: 2,
+        depthTest: false
+      });
+      const gapLineMat = new THREE.LineBasicMaterial({
+        color: 0xf59e0b,
+        linewidth: 2,
+        depthTest: false
+      });
+      const remLineMat = new THREE.LineBasicMaterial({
+        color: 0x10b981,
+        linewidth: 2,
+        depthTest: false
+      });
+
+      // 1. Initial Wall Gap (if first module starts after x > 30)
+      const first = mods[0];
+      if ((first.x || 0) > 30) {
+        const gapW = first.x;
+        const pts = [];
+        if (isLeft) {
+          pts.push(new THREE.Vector3(rulerDist, rulerY, 0));
+          pts.push(new THREE.Vector3(rulerDist, rulerY, gapW));
+        } else {
+          pts.push(new THREE.Vector3(0, rulerY, rulerDist));
+          pts.push(new THREE.Vector3(gapW, rulerY, rulerDist));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        this.dimensionGroup.add(new THREE.Line(geo, gapLineMat));
+
+        const sp = this.createDimensionSprite(`📐 Boşluk: ${Math.round(gapW / 10)} cm`, false, true);
+        if (isLeft) sp.position.set(rulerDist, rulerY + 50, gapW / 2);
+        else sp.position.set(gapW / 2, rulerY + 50, rulerDist);
+        this.dimensionGroup.add(sp);
+      }
+
+      // 2. Each module's dimension bracket
+      mods.forEach((m, idx) => {
+        const mx = m.x || 0;
+        const mw = m.w || 600;
+        const mEnd = mx + mw;
+
+        // Module dimension line
+        const pts = [];
+        if (isLeft) {
+          pts.push(new THREE.Vector3(rulerDist, rulerY, mx));
+          pts.push(new THREE.Vector3(rulerDist, rulerY, mEnd));
+        } else {
+          pts.push(new THREE.Vector3(mx, rulerY, rulerDist));
+          pts.push(new THREE.Vector3(mEnd, rulerY, rulerDist));
+        }
+        const geo = new THREE.BufferGeometry().setFromPoints(pts);
+        this.dimensionGroup.add(new THREE.Line(geo, lineMat));
+
+        // Dimension text sprite
+        const sp = this.createDimensionSprite(`↔ ${Math.round(mw / 10)} cm`);
+        sp.scale.set(Math.min(mw * 0.75, 240), 60, 1);
+        if (isLeft) sp.position.set(rulerDist, rulerY + 45, mx + mw / 2);
+        else sp.position.set(mx + mw / 2, rulerY + 45, rulerDist);
+        this.dimensionGroup.add(sp);
+
+        // Gap between this module and next
+        if (idx < mods.length - 1) {
+          const next = mods[idx + 1];
+          const gap = (next.x || 0) - mEnd;
+          if (gap > 30) {
+            const gapPts = [];
+            if (isLeft) {
+              gapPts.push(new THREE.Vector3(rulerDist, rulerY, mEnd));
+              gapPts.push(new THREE.Vector3(rulerDist, rulerY, next.x));
+            } else {
+              gapPts.push(new THREE.Vector3(mEnd, rulerY, rulerDist));
+              gapPts.push(new THREE.Vector3(next.x, rulerY, rulerDist));
+            }
+            const gapGeo = new THREE.BufferGeometry().setFromPoints(gapPts);
+            this.dimensionGroup.add(new THREE.Line(gapGeo, gapLineMat));
+
+            const gapSp = this.createDimensionSprite(`↔ Boşluk: ${Math.round(gap / 10)} cm`, false, true);
+            if (isLeft) gapSp.position.set(rulerDist, rulerY + 50, mEnd + gap / 2);
+            else gapSp.position.set(mEnd + gap / 2, rulerY + 50, rulerDist);
+            this.dimensionGroup.add(gapSp);
+          }
+        }
+      });
+
+      // 3. Remaining space to wall end
+      const last = mods[mods.length - 1];
+      const lastEnd = (last.x || 0) + (last.w || 600);
+      const remaining = wallLen - lastEnd;
+      if (remaining > 30) {
+        const remPts = [];
+        if (isLeft) {
+          remPts.push(new THREE.Vector3(rulerDist, rulerY, lastEnd));
+          remPts.push(new THREE.Vector3(rulerDist, rulerY, wallLen));
+        } else {
+          remPts.push(new THREE.Vector3(lastEnd, rulerY, rulerDist));
+          remPts.push(new THREE.Vector3(wallLen, rulerY, rulerDist));
+        }
+        const remGeo = new THREE.BufferGeometry().setFromPoints(remPts);
+        this.dimensionGroup.add(new THREE.Line(remGeo, remLineMat));
+
+        const remSp = this.createDimensionSprite(`✅ Kalan: ${Math.round(remaining / 10)} cm`, true, false);
+        if (isLeft) remSp.position.set(rulerDist, rulerY + 50, lastEnd + remaining / 2);
+        else remSp.position.set(lastEnd + remaining / 2, rulerY + 50, rulerDist);
+        this.dimensionGroup.add(remSp);
+      }
+    });
   }
 }
 
