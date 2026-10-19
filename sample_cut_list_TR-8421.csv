@@ -1,0 +1,74 @@
+Proje_Referans;Parca_Kodu;Modul;Parca_Adi;Adet;Boy_mm;En_mm;Kalinlik_mm;Malzeme_Tipi;Kenar_Bandi_Boy1;Kenar_Bandi_Boy2;Kenar_Bandi_En1;Kenar_Bandi_En2;Mentese_Delik;Minifix_Delik;Raf_Delik;CNC_Program
+TR-8421;MOD-01-Y1;3 Çekmeceli Alt Dolap;Sol Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-01-Y1.DXF
+TR-8421;MOD-01-Y2;3 Çekmeceli Alt Dolap;Sağ Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-01-Y2.DXF
+TR-8421;MOD-01-AT;3 Çekmeceli Alt Dolap;Alt Tabla;1;564;600;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-01-AT.DXF
+TR-8421;MOD-01-K1;3 Çekmeceli Alt Dolap;Ön Üst Kuşak;1;564;100;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-01-K1.DXF
+TR-8421;MOD-01-K2;3 Çekmeceli Alt Dolap;Arka Üst Kuşak;1;564;100;18;body;-;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-01-K2.DXF
+TR-8421;MOD-01-ARK;3 Çekmeceli Alt Dolap;Arkalık Paneli;1;704;580;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-01-ARK.DXF
+TR-8421;MOD-01-CO1;3 Çekmeceli Alt Dolap;Çekmece Önü 1;1;596;229;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;YOK;YOK;YOK;CNC_MOD-01-CO1.DXF
+TR-8421;MOD-01-CY1;3 Çekmeceli Alt Dolap;Çekmece Kasası;2;450;120;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-01-CY1.DXF
+TR-8421;MOD-01-CO2;3 Çekmeceli Alt Dolap;Çekmece Önü 2;1;596;229;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;YOK;YOK;YOK;CNC_MOD-01-CO2.DXF
+TR-8421;MOD-01-CY2;3 Çekmeceli Alt Dolap;Çekmece Kasası;2;450;120;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-01-CY2.DXF
+TR-8421;MOD-01-CO3;3 Çekmeceli Alt Dolap;Çekmece Önü 3;1;596;229;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;YOK;YOK;YOK;CNC_MOD-01-CO3.DXF
+TR-8421;MOD-01-CY3;3 Çekmeceli Alt Dolap;Çekmece Kasası;2;450;120;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-01-CY3.DXF
+TR-8421;MOD-02-Y1;Ankastre Fırın Alt Modülü;Sol Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-02-Y1.DXF
+TR-8421;MOD-02-Y2;Ankastre Fırın Alt Modülü;Sağ Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-02-Y2.DXF
+TR-8421;MOD-02-AT;Ankastre Fırın Alt Modülü;Alt Tabla;1;564;600;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-02-AT.DXF
+TR-8421;MOD-02-K1;Ankastre Fırın Alt Modülü;Ön Üst Kuşak;1;564;100;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-02-K1.DXF
+TR-8421;MOD-02-K2;Ankastre Fırın Alt Modülü;Arka Üst Kuşak;1;564;100;18;body;-;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-02-K2.DXF
+TR-8421;MOD-02-RF;Ankastre Fırın Alt Modülü;Ayarlı Raf;1;562;580;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-02-RF.DXF
+TR-8421;MOD-02-ARK;Ankastre Fırın Alt Modülü;Arkalık Paneli;1;704;580;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-02-ARK.DXF
+TR-8421;MOD-02-CO1;Ankastre Fırın Alt Modülü;Çekmece Önü 1;1;596;696;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;YOK;YOK;YOK;CNC_MOD-02-CO1.DXF
+TR-8421;MOD-02-CY1;Ankastre Fırın Alt Modülü;Çekmece Kasası;2;450;120;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-02-CY1.DXF
+TR-8421;MOD-03-Y1;Bulaşık Makinesi Boşluğu;Sol Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-03-Y1.DXF
+TR-8421;MOD-03-Y2;Bulaşık Makinesi Boşluğu;Sağ Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-03-Y2.DXF
+TR-8421;MOD-03-AT;Bulaşık Makinesi Boşluğu;Alt Tabla;1;564;600;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-03-AT.DXF
+TR-8421;MOD-03-K1;Bulaşık Makinesi Boşluğu;Ön Üst Kuşak;1;564;100;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-03-K1.DXF
+TR-8421;MOD-03-K2;Bulaşık Makinesi Boşluğu;Arka Üst Kuşak;1;564;100;18;body;-;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-03-K2.DXF
+TR-8421;MOD-03-ARK;Bulaşık Makinesi Boşluğu;Arkalık Paneli;1;704;580;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-03-ARK.DXF
+TR-8421;MOD-04-Y1;Eviye Alt Dolabı (2 Kapak);Sol Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-04-Y1.DXF
+TR-8421;MOD-04-Y2;Eviye Alt Dolabı (2 Kapak);Sağ Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-04-Y2.DXF
+TR-8421;MOD-04-AT;Eviye Alt Dolabı (2 Kapak);Alt Tabla;1;864;600;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-04-AT.DXF
+TR-8421;MOD-04-K1;Eviye Alt Dolabı (2 Kapak);Ön Üst Kuşak;1;864;100;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-04-K1.DXF
+TR-8421;MOD-04-K2;Eviye Alt Dolabı (2 Kapak);Arka Üst Kuşak;1;864;100;18;body;-;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-04-K2.DXF
+TR-8421;MOD-04-RF;Eviye Alt Dolabı (2 Kapak);Ayarlı Raf;1;862;580;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-04-RF.DXF
+TR-8421;MOD-04-ARK;Eviye Alt Dolabı (2 Kapak);Arkalık Paneli;1;704;880;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-04-ARK.DXF
+TR-8421;MOD-04-KP1;Eviye Alt Dolabı (2 Kapak);Sol Kapak;1;716;447;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-04-KP1.DXF
+TR-8421;MOD-04-KP2;Eviye Alt Dolabı (2 Kapak);Sağ Kapak;1;716;447;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-04-KP2.DXF
+TR-8421;MOD-05-Y1;Standart Raf Alt Dolap (1 Kapak);Sol Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-05-Y1.DXF
+TR-8421;MOD-05-Y2;Standart Raf Alt Dolap (1 Kapak);Sağ Yan;1;720;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-05-Y2.DXF
+TR-8421;MOD-05-AT;Standart Raf Alt Dolap (1 Kapak);Alt Tabla;1;464;600;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-05-AT.DXF
+TR-8421;MOD-05-K1;Standart Raf Alt Dolap (1 Kapak);Ön Üst Kuşak;1;464;100;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-05-K1.DXF
+TR-8421;MOD-05-K2;Standart Raf Alt Dolap (1 Kapak);Arka Üst Kuşak;1;464;100;18;body;-;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-05-K2.DXF
+TR-8421;MOD-05-RF;Standart Raf Alt Dolap (1 Kapak);Ayarlı Raf;2;462;580;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-05-RF.DXF
+TR-8421;MOD-05-ARK;Standart Raf Alt Dolap (1 Kapak);Arkalık Paneli;1;704;480;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-05-ARK.DXF
+TR-8421;MOD-05-KP;Standart Raf Alt Dolap (1 Kapak);Kapak;1;716;496;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-05-KP.DXF
+TR-8421;MOD-06-Y1;Davlumbaz Üst Dolap Modülü;Sol Yan;1;720;350;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-06-Y1.DXF
+TR-8421;MOD-06-Y2;Davlumbaz Üst Dolap Modülü;Sağ Yan;1;720;350;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-06-Y2.DXF
+TR-8421;MOD-06-AT;Davlumbaz Üst Dolap Modülü;Alt Tabla;1;564;350;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-06-AT.DXF
+TR-8421;MOD-06-UT;Davlumbaz Üst Dolap Modülü;Üst Tabla;1;564;350;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-06-UT.DXF
+TR-8421;MOD-06-RF;Davlumbaz Üst Dolap Modülü;Ayarlı Raf;1;562;330;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-06-RF.DXF
+TR-8421;MOD-06-ARK;Davlumbaz Üst Dolap Modülü;Arkalık Paneli;1;704;580;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-06-ARK.DXF
+TR-8421;MOD-06-KP;Davlumbaz Üst Dolap Modülü;Kapak;1;716;596;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-06-KP.DXF
+TR-8421;MOD-07-Y1;Çift Kapaklı Üst Dolap;Sol Yan;1;720;350;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-07-Y1.DXF
+TR-8421;MOD-07-Y2;Çift Kapaklı Üst Dolap;Sağ Yan;1;720;350;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-07-Y2.DXF
+TR-8421;MOD-07-AT;Çift Kapaklı Üst Dolap;Alt Tabla;1;864;350;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-07-AT.DXF
+TR-8421;MOD-07-UT;Çift Kapaklı Üst Dolap;Üst Tabla;1;864;350;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-07-UT.DXF
+TR-8421;MOD-07-RF;Çift Kapaklı Üst Dolap;Ayarlı Raf;2;862;330;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-07-RF.DXF
+TR-8421;MOD-07-ARK;Çift Kapaklı Üst Dolap;Arkalık Paneli;1;704;880;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-07-ARK.DXF
+TR-8421;MOD-07-KP1;Çift Kapaklı Üst Dolap;Sol Kapak;1;716;447;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-07-KP1.DXF
+TR-8421;MOD-07-KP2;Çift Kapaklı Üst Dolap;Sağ Kapak;1;716;447;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-07-KP2.DXF
+TR-8421;MOD-08-Y1;Tek Kapaklı Üst Dolap;Sol Yan;1;720;350;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-08-Y1.DXF
+TR-8421;MOD-08-Y2;Tek Kapaklı Üst Dolap;Sağ Yan;1;720;350;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-08-Y2.DXF
+TR-8421;MOD-08-AT;Tek Kapaklı Üst Dolap;Alt Tabla;1;464;350;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-08-AT.DXF
+TR-8421;MOD-08-UT;Tek Kapaklı Üst Dolap;Üst Tabla;1;464;350;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-08-UT.DXF
+TR-8421;MOD-08-RF;Tek Kapaklı Üst Dolap;Ayarlı Raf;2;462;330;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-08-RF.DXF
+TR-8421;MOD-08-ARK;Tek Kapaklı Üst Dolap;Arkalık Paneli;1;704;480;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-08-ARK.DXF
+TR-8421;MOD-08-KP;Tek Kapaklı Üst Dolap;Kapak;1;716;496;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-08-KP.DXF
+TR-8421;MOD-09-Y1;Buzdolabı Üstü Kiler Dolabı;Sol Yan;1;2100;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-09-Y1.DXF
+TR-8421;MOD-09-Y2;Buzdolabı Üstü Kiler Dolabı;Sağ Yan;1;2100;600;18;body;PVC 0.8mm;PVC 0.8mm;PVC 0.8mm;-;EVET (35mm);EVET (15mm);EVET (5mm);CNC_MOD-09-Y2.DXF
+TR-8421;MOD-09-AT;Buzdolabı Üstü Kiler Dolabı;Alt Tabla;1;664;600;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-09-AT.DXF
+TR-8421;MOD-09-UT;Buzdolabı Üstü Kiler Dolabı;Üst Tabla;1;664;600;18;body;PVC 0.8mm;-;-;-;YOK;EVET (15mm);YOK;CNC_MOD-09-UT.DXF
+TR-8421;MOD-09-RF;Buzdolabı Üstü Kiler Dolabı;Ayarlı Raf;4;662;580;18;body;PVC 0.8mm;-;-;-;YOK;YOK;YOK;CNC_MOD-09-RF.DXF
+TR-8421;MOD-09-ARK;Buzdolabı Üstü Kiler Dolabı;Arkalık Paneli;1;2084;680;4;back;-;-;-;-;YOK;YOK;YOK;CNC_MOD-09-ARK.DXF
+TR-8421;MOD-09-KP;Buzdolabı Üstü Kiler Dolabı;Kapak;1;2096;696;18;door;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;PVC 2.0mm;EVET (35mm);YOK;YOK;CNC_MOD-09-KP.DXF
