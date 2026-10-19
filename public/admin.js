@@ -9,12 +9,16 @@
 const AdminPanel = {
   pricingMatrix: [],
   settings: {},
+  moduleTemplates: [],
   currentDesign: null,
   currentCostResult: null,
+  adminCanvas2D: null,
+  current2DMode: 'plan',
 
   async init() {
     await this.loadPricingMatrix();
     await this.loadSettings();
+    await this.loadModuleTemplates();
     await this.loadDesignsList();
   },
 
@@ -262,6 +266,8 @@ const AdminPanel = {
     if (offerInp) {
       offerInp.value = design.quote_price > 0 ? design.quote_price : fin.grand_total;
     }
+
+    this.renderAdmin2D();
   },
 
   async updateQuoteOffer() {
@@ -451,6 +457,126 @@ const AdminPanel = {
     if (!this.currentDesign) return;
     const ref = this.currentDesign.reference_code;
     window.location.href = `/api/admin/design/${ref}/export/csv`;
+  },
+
+  async loadModuleTemplates() {
+    try {
+      const res = await fetch('/api/admin/module-templates');
+      const data = await res.json();
+      this.moduleTemplates = data.module_templates || [];
+      this.renderModuleTemplatesList();
+    } catch (e) {
+      console.error("Error loading module templates:", e);
+    }
+  },
+
+  renderModuleTemplatesList() {
+    const container = document.getElementById('admin-module-templates-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    this.moduleTemplates.forEach(tpl => {
+      const card = document.createElement('div');
+      card.style = 'background:rgba(255,255,255,0.03); border:1px solid #334155; border-radius:6px; padding:0.75rem;';
+      const widthsStr = (tpl.allowed_widths || []).join(', ');
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+          <div style="display:flex; align-items:center; gap:0.4rem;">
+            <span style="font-size:1.2rem;">${tpl.icon || '🗄️'}</span>
+            <strong>${tpl.name}</strong>
+            <span class="badge badge-info" style="font-size:0.7rem;">${(tpl.group_key || 'base').toUpperCase()}</span>
+          </div>
+          <button class="btn btn-primary btn-sm" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="AdminPanel.saveModuleTemplate('${tpl.key}')">Kaydet 💾</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:0.5rem; font-size:0.8rem;">
+          <div>
+            <label style="color:#94a3b8; font-size:0.75rem;">Müşteriye İzin Verilen Ebatlar (mm - virgülle ayırın):</label>
+            <input type="text" id="tpl-widths-${tpl.key}" class="form-control" value="${widthsStr}" style="padding:0.25rem 0.5rem; font-size:0.8rem;">
+          </div>
+          <div>
+            <label style="color:#94a3b8; font-size:0.75rem;">Özel Ölçü Yetkisi:</label>
+            <select id="tpl-custom-${tpl.key}" class="form-control" style="padding:0.25rem 0.5rem; font-size:0.8rem;">
+              <option value="1" ${tpl.allow_custom_width ? 'selected' : ''}>Açık (Müşteri Yazabilir)</option>
+              <option value="0" ${!tpl.allow_custom_width ? 'selected' : ''}>Kapalı (Sadece Hazır Ebat)</option>
+            </select>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  },
+
+  async saveModuleTemplate(key) {
+    const widthsInput = document.getElementById(`tpl-widths-${key}`);
+    const customSelect = document.getElementById(`tpl-custom-${key}`);
+    if (!widthsInput || !customSelect) return;
+
+    const widths = widthsInput.value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+    const allowCustom = customSelect.value === '1';
+
+    try {
+      const token = localStorage.getItem('mc_token');
+      const res = await fetch('/api/admin/module-templates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          key,
+          allowed_widths: widths,
+          allow_custom_width: allowCustom
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Modül ölçü kuralları kaydedildi! Müşteri arayüzüne anında yansıyacaktır.");
+        await this.loadModuleTemplates();
+        if (window.loadCategoryModules) {
+          window.loadCategoryModules(window.CURRENT_CATEGORY || 'kitchen');
+        }
+      } else {
+        alert(data.error || "Güncelleme başarısız.");
+      }
+    } catch (e) {
+      alert("Hata oluştu.");
+    }
+  },
+
+  set2DView(mode) {
+    this.current2DMode = mode;
+    document.getElementById('admin-tab-plan')?.classList.toggle('active', mode === 'plan');
+    document.getElementById('admin-tab-elevation')?.classList.toggle('active', mode === 'elevation');
+
+    if (this.adminCanvas2D && this.currentDesign) {
+      this.adminCanvas2D.viewMode = mode;
+      this.adminCanvas2D.render(
+        this.currentDesign.room_config,
+        this.currentDesign.modules,
+        this.currentDesign.layout_type,
+        this.currentDesign.category
+      );
+    }
+  },
+
+  renderAdmin2D() {
+    const box = document.getElementById('admin-2d-canvas-box');
+    const canvas = document.getElementById('admin-canvas2d-viewport');
+    if (!box || !canvas || !this.currentDesign) return;
+
+    box.style.display = 'block';
+    if (!this.adminCanvas2D) {
+      this.adminCanvas2D = new StudioCanvas2D(canvas);
+    }
+    this.adminCanvas2D.viewMode = this.current2DMode || 'plan';
+    this.adminCanvas2D.render(
+      this.currentDesign.room_config,
+      this.currentDesign.modules,
+      this.currentDesign.layout_type,
+      this.currentDesign.category
+    );
   }
 };
 

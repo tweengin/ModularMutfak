@@ -326,13 +326,18 @@ class StudioCanvas3D {
           // STRICT CLAMP TO WALL BOUNDARY!
           // Cabinets can NEVER overflow the wall end!
           const mw = mod.w || 600;
+          const isAtBoundary = (snapped < 0 || snapped > wallLen - mw);
           mod.x = Math.max(0, Math.min(wallLen - mw, snapped));
 
           // Fast live re-render
           this.render(this.roomConfig, this.modules, this.roomConfig?.layout_type, this.materials);
 
           // Update floating coordinate badge
-          this.showDragPill(`↔ ${mod.id}: ${mod.name} | ${wall === 'left' ? 'Sol Duvar' : 'Arka Duvar'} Konumu: ${mod.x} mm`);
+          if (isAtBoundary) {
+            this.showDragPill(`⛔ ${mod.name}: Duvar sınırına ulaşıldı! (${mod.x} mm)`, true);
+          } else {
+            this.showDragPill(`↔ ${mod.id}: ${mod.name} | ${wall === 'left' ? 'Sol Duvar' : 'Arka Duvar'} Konumu: ${mod.x} mm`, false);
+          }
         }
       }
     } else {
@@ -363,18 +368,32 @@ class StudioCanvas3D {
     }
   }
 
-  showDragPill(text) {
+  showDragPill(text, isWarning = false) {
     const pill = document.getElementById('canvas-drag-pill');
     const txt = document.getElementById('canvas-drag-text');
     if (pill && txt) {
       txt.textContent = text;
       pill.style.display = 'flex';
+      if (isWarning) {
+        pill.style.background = '#ef4444';
+        pill.style.borderColor = '#b91c1c';
+        pill.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.4)';
+      } else {
+        pill.style.background = '';
+        pill.style.borderColor = '';
+        pill.style.boxShadow = '';
+      }
     }
   }
 
   hideDragPill() {
     const pill = document.getElementById('canvas-drag-pill');
-    if (pill) pill.style.display = 'none';
+    if (pill) {
+      pill.style.display = 'none';
+      pill.style.background = '';
+      pill.style.borderColor = '';
+      pill.style.boxShadow = '';
+    }
   }
 
   updateAngleDisplay() {
@@ -442,6 +461,10 @@ class StudioCanvas3D {
     ]);
     const lwEndLine = new THREE.Line(lwEndGeo, this.matCache.wallBorderMat);
     this.roomGroup.add(lwEndLine);
+    this.backWallMesh = backWallMesh;
+    this.leftWallMesh = leftWallMesh;
+    this.bwEndLine = bwEndLine;
+    this.lwEndLine = lwEndLine;
 
     // 4. Baseboards (Süpürgelikler)
     const baseboardGeoBack = new THREE.BoxGeometry(rw, 80, 15);
@@ -845,6 +868,57 @@ class StudioCanvas3D {
       this.controls.autoRotate = !this.controls.autoRotate;
     }
     this.controls.update();
+  }
+
+  /*
+   * VISUAL BOUNDARY WARNING
+   * Flashes the active wall with glowing red warning mesh and canvas red border pulse
+   */
+  flashBoundaryWarning(wall) {
+    const rw = this.roomConfig?.room_width || 3600;
+    const rd = this.roomConfig?.room_depth || 2600;
+    const rh = this.roomConfig?.room_height || 2600;
+
+    const isLeft = (wall === 'left');
+    const warningGeo = isLeft
+      ? new THREE.PlaneGeometry(rd, rh)
+      : new THREE.PlaneGeometry(rw, rh);
+    const warningMat = new THREE.MeshBasicMaterial({
+      color: 0xef4444,
+      transparent: true,
+      opacity: 0.35,
+      side: THREE.DoubleSide
+    });
+    const warningMesh = new THREE.Mesh(warningGeo, warningMat);
+    if (isLeft) {
+      warningMesh.rotation.y = Math.PI / 2;
+      warningMesh.position.set(2, rh / 2, rd / 2);
+    } else {
+      warningMesh.position.set(rw / 2, rh / 2, 2);
+    }
+    this.scene.add(warningMesh);
+
+    if (this.canvas) {
+      this.canvas.style.transition = 'box-shadow 0.15s ease, outline 0.15s ease';
+      this.canvas.style.outline = '4px solid #ef4444';
+      this.canvas.style.boxShadow = '0 0 25px rgba(239, 68, 68, 0.7)';
+    }
+
+    let count = 0;
+    const flashTimer = setInterval(() => {
+      count++;
+      warningMesh.visible = !warningMesh.visible;
+      if (count >= 6) {
+        clearInterval(flashTimer);
+        this.scene.remove(warningMesh);
+        warningGeo.dispose();
+        warningMat.dispose();
+        if (this.canvas) {
+          this.canvas.style.outline = '';
+          this.canvas.style.boxShadow = '';
+        }
+      }
+    }, 150);
   }
 }
 

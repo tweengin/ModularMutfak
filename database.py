@@ -164,7 +164,27 @@ def init_db():
     );
     """)
 
+    # Module Templates Table (Admin-managed module catalog and allowed dimensions)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS module_templates (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT UNIQUE NOT NULL,
+        category TEXT NOT NULL DEFAULT 'kitchen',
+        group_key TEXT NOT NULL DEFAULT 'base',
+        name TEXT NOT NULL,
+        icon TEXT NOT NULL DEFAULT '🗄️',
+        default_w INTEGER NOT NULL,
+        default_d INTEGER NOT NULL,
+        default_h INTEGER NOT NULL,
+        allowed_widths_json TEXT NOT NULL,
+        allow_custom_width INTEGER NOT NULL DEFAULT 1,
+        description TEXT,
+        sort_order INTEGER DEFAULT 0
+    );
+    """)
+
     conn.commit()
+    seed_module_templates(conn)
 
     # Seed Default Admin & Users
     c.execute("SELECT COUNT(*) FROM users")
@@ -402,7 +422,42 @@ def init_db():
 
         conn.commit()
 
-    conn.close()
+def seed_module_templates(conn):
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM module_templates")
+    if c.fetchone()[0] == 0:
+        templates = [
+            # Kitchen - Base
+            ('base_standard', 'kitchen', 'base', 'Standart Tek Kapak Alt Dolap', '🚪', 500, 600, 720, json.dumps([300, 400, 450, 500, 600]), 1, '1 ayarlı raflı tek kapak', 1),
+            ('base_double', 'kitchen', 'base', 'Çift Kapaklı Geniş Alt Dolap', '🚪', 800, 600, 720, json.dumps([600, 800, 900, 1000]), 1, 'Geniş tencere depolama', 2),
+            ('base_drawer_3', 'kitchen', 'base', '3 Çekmeceli Alt Dolap', '🗄️', 600, 600, 720, json.dumps([400, 450, 600, 800, 900]), 0, 'Frenli tandem raylı 3 çekmece', 3),
+            ('base_sink', 'kitchen', 'base', 'Eviye Alt Dolabı (2 Kapak)', '💧', 900, 600, 720, json.dumps([600, 800, 900, 1000]), 0, 'Paslanmaz/granit eviye altı', 4),
+            ('base_oven', 'kitchen', 'base', 'Ankastre Fırın & Ocak Modülü', '♨️', 600, 600, 720, json.dumps([600, 900]), 0, 'Fırın boşluğu ve alt çekmece', 5),
+            ('base_dishwasher', 'kitchen', 'base', 'Bulaşık Makinesi Paneli', '🍽️', 600, 600, 720, json.dumps([450, 600]), 0, 'Tam ankastre bulaşık makinesi kapağı', 6),
+            ('base_corner_l', 'kitchen', 'base', 'L-Mutfak Kör Köşe Modülü', '📐', 900, 900, 720, json.dumps([900, 1050]), 0, '90° köşe dönüş modülü', 7),
+            
+            # Kitchen - Wall
+            ('wall_single', 'kitchen', 'wall', 'Tek Kapaklı Üst Dolap', '📦', 500, 350, 720, json.dumps([300, 400, 500, 600]), 1, 'Dar alan üst depolama', 10),
+            ('wall_double', 'kitchen', 'wall', 'Çift Kapaklı Üst Dolap', '📦', 800, 350, 720, json.dumps([600, 800, 900, 1000]), 1, '2 ayarlı raflı standart üst dolap', 11),
+            ('wall_glass', 'kitchen', 'wall', 'Camlı Yatay Kalkar Dolap', '🪟', 900, 350, 720, json.dumps([600, 800, 900, 1000]), 0, 'Buzlu cam insets & Aventos mekanizma', 12),
+            ('wall_hood', 'kitchen', 'wall', 'Davlumbaz Üstü Aspiratör Dolabı', '💨', 600, 350, 720, json.dumps([600, 900]), 0, 'Karbon filtreli gömme aspiratör kabini', 13),
+            ('wall_corner_l', 'kitchen', 'wall', 'L-Mutfak Köşe Üst Dolabı', '📐', 650, 650, 720, json.dumps([650]), 0, '90° köşe üst asma', 14),
+
+            # Kitchen - Tall
+            ('tall_pantry_2d', 'kitchen', 'tall', '2 Kapaklı Erzak Boy Kileri', '🚪', 600, 600, 2100, json.dumps([450, 600]), 1, '5 raflı tam boy kiler', 20),
+            ('tall_oven_pantry', 'kitchen', 'tall', 'Ankastre Fırın & Mikrodalga Boy', '♨️', 600, 600, 2100, json.dumps([600]), 0, 'Göz hizası fırın boy ünitesi', 21),
+            ('tall_fridge', 'kitchen', 'tall', 'No-Frost Buzdolabı Kabini', '🧊', 700, 600, 2100, json.dumps([700, 750, 900]), 1, 'Buzdolabı üstü kiler dolabı', 22),
+
+            # Portmanto
+            ('hall_shoe_bench', 'portmanto', 'base', 'Oturmalı Minderli Ayakkabılık', '👞', 1000, 450, 500, json.dumps([800, 1000, 1200]), 1, 'Minderli oturma alanı ve ayakkabılık', 30),
+            ('hall_mirror_cabinet', 'portmanto', 'tall', 'Boy Aynalı Gizli Dolap', '🪞', 600, 450, 2200, json.dumps([500, 600, 800]), 1, 'Dış yüzeyi tam boy ayna kaplı saklama alanı', 31),
+            ('hall_coat_wardrobe', 'portmanto', 'tall', '2 Kapaklı Askılıklı Portmanto', '🧥', 1000, 600, 2200, json.dumps([800, 1000, 1200]), 1, 'Askılık borusu ve şapkalık raflı', 32)
+        ]
+        c.executemany("""
+        INSERT OR IGNORE INTO module_templates (key, category, group_key, name, icon, default_w, default_d, default_h, allowed_widths_json, allow_custom_width, description, sort_order)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, templates)
+        conn.commit()
 
 if __name__ == '__main__':
     init_db()

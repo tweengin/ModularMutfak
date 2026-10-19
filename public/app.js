@@ -305,15 +305,125 @@ function selectCategory(catKey) {
   navigateTo('wizard');
 }
 
-// ADeko Accordion Module Palette Generator
-function loadCategoryModules(catKey) {
-  const groups = ADEKO_MODULE_GROUPS[catKey] || ADEKO_MODULE_GROUPS.kitchen;
+window.CURRENT_CATALOG_GROUPS = null;
+
+function getModuleTemplate(type) {
+  if (window.CURRENT_CATALOG_GROUPS) {
+    for (let grp of window.CURRENT_CATALOG_GROUPS) {
+      const found = grp.items.find(it => it.type === type);
+      if (found) return found;
+    }
+  }
+  const defaultGroups = ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
+  for (let grp of defaultGroups) {
+    const found = grp.items.find(it => it.type === type);
+    if (found) return found;
+  }
+  return null;
+}
+
+window.selectModuleWidth = function(type, w) {
+  const m = getModuleTemplate(type);
+  if (!m) return;
+  m.selected_w = w;
+  m.w = w;
+
+  // If a module of this type is currently selected in the 3D scene, resize it directly!
+  if (window.SELECTED_MODULE && window.SELECTED_MODULE.type === type) {
+    const wall = window.SELECTED_MODULE.wall || 'back';
+    const cap = getWallCapacity(wall);
+    const oldW = window.SELECTED_MODULE.w || 600;
+    const availableForThis = (window.SELECTED_MODULE.category === 'wall' ? cap.wallRemaining : cap.baseRemaining) + oldW;
+
+    if (w <= availableForThis) {
+      window.SELECTED_MODULE.w = w;
+      renderActiveCanvas();
+      updatePlacedModulesUI();
+      updateCatalogDimensionPills();
+      showToast(`📏 Modül Genişliği ${Math.round(w / 10)} cm olarak güncellendi.`);
+      return;
+    } else {
+      showToast(`⚠️ Seçilen genişlik (${Math.round(w / 10)} cm) duvara sığmıyor!`, 'error');
+    }
+  }
+
+  // Update pills UI
+  updateCatalogDimensionPills();
+};
+
+window.handleCustomWidthChange = function(type, valCm) {
+  const m = getModuleTemplate(type);
+  if (!m) return;
+  const wMm = Math.round(parseFloat(valCm) * 10);
+  const cap = getWallCapacity(window.CURRENT_ACTIVE_WALL || 'back');
+  const remSpace = m.category === 'wall' ? cap.wallRemaining : cap.baseRemaining;
+
+  if (wMm > remSpace) {
+    showToast(`⚠️ Girilen ölçü (${valCm} cm) kalan boşluktan (${Math.floor(remSpace / 10)} cm) büyük olamaz!`, 'error');
+    const input = document.getElementById(`custom-w-${type}`);
+    if (input) input.value = Math.floor(remSpace / 10);
+    return;
+  }
+
+  if (wMm >= 150) {
+    m.selected_w = wMm;
+    m.w = wMm;
+    updateCatalogDimensionPills();
+  }
+};
+
+// ADeko Accordion Module Palette Generator with Smart Dimension Pills (Seçenek 1)
+async function loadCategoryModules(catKey) {
+  const container = document.getElementById('studio-module-catalog');
+  if (!container) return;
+
+  let groups = null;
+  try {
+    const res = await fetch(`/api/catalog/modules?category=${catKey}`);
+    const data = await res.json();
+    if (data.groups && data.groups.length > 0) {
+      groups = data.groups;
+    }
+  } catch (err) {
+    console.warn("Could not fetch catalog modules, using defaults:", err);
+  }
+
+  if (!groups) {
+    groups = ADEKO_MODULE_GROUPS[catKey] || ADEKO_MODULE_GROUPS.kitchen;
+  }
+
+  // Ensure default width options for all modules
+  groups.forEach(grp => {
+    grp.items.forEach(m => {
+      if (!m.allowed_widths) {
+        if (m.type === 'base_standard' || m.type === 'wall_single') m.allowed_widths = [300, 400, 450, 500, 600];
+        else if (m.type === 'base_double' || m.type === 'wall_double') m.allowed_widths = [600, 800, 900, 1000];
+        else if (m.type === 'base_drawer_3') m.allowed_widths = [400, 450, 600, 800, 900];
+        else if (m.type === 'base_sink' || m.type === 'wall_glass') m.allowed_widths = [600, 800, 900, 1000];
+        else if (m.type === 'tall_pantry_2d') m.allowed_widths = [450, 600];
+        else m.allowed_widths = [m.w || 600];
+      }
+      if (m.allow_custom_width === undefined) {
+        m.allow_custom_width = !['base_drawer_3', 'base_oven', 'base_dishwasher'].includes(m.type);
+      }
+      m.selected_w = m.selected_w || m.w || m.allowed_widths[0];
+      m.w = m.selected_w;
+    });
+  });
+
+  window.CURRENT_CATALOG_GROUPS = groups;
+  renderCatalogModulesDOM(groups);
+  updateCatalogDimensionPills();
+}
+
+function renderCatalogModulesDOM(groups) {
   const container = document.getElementById('studio-module-catalog');
   if (!container) return;
 
   container.innerHTML = '';
+  const cap = getWallCapacity(window.CURRENT_ACTIVE_WALL || 'back');
 
-  groups.forEach((grp, idx) => {
+  groups.forEach((grp) => {
     const accGroup = document.createElement('div');
     accGroup.className = `adeko-accordion-group ${grp.open ? 'open' : ''}`;
     accGroup.id = `acc-group-${grp.groupKey}`;
@@ -338,8 +448,9 @@ function loadCategoryModules(catKey) {
     grp.items.forEach(m => {
       const item = document.createElement('div');
       item.className = 'module-catalog-item';
+      item.id = `catalog-card-${m.type}`;
       item.draggable = true;
-      item.title = "Tuvale sürükleyip bırakın (canlı 3D kılavuz gölge çıkar)";
+      item.title = "Tuvale sürükleyip bırakın veya + Ekle butonuna basın";
 
       item.addEventListener('dragstart', (e) => {
         item.classList.add('dragging');
@@ -354,21 +465,142 @@ function loadCategoryModules(catKey) {
         document.getElementById('canvas-drop-wrapper')?.classList.remove('drag-over');
       });
 
-      item.onclick = () => addModuleToDesign(m);
-
-      item.innerHTML = `
-        <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
-          <span class="drag-grip-icon" title="Tutup Tuvale Sürükleyin">⋮⋮</span>
-          <span style="font-size:1.3rem;">${m.icon}</span>
-          <div class="module-info">
-            <h4 style="font-size:0.85rem; color:#fff;">${m.name}</h4>
-            <span style="font-size:0.75rem; color:#94a3b8;">${m.w}x${m.d}x${m.h} mm | ${m.desc || ''}</span>
-          </div>
-        </div>
-        <button class="btn btn-outline btn-sm" style="padding:0.25rem 0.6rem; font-size:0.75rem;">+ Ekle</button>
-      `;
+      const remSpace = m.category === 'wall' ? cap.wallRemaining : cap.baseRemaining;
+      item.innerHTML = renderModuleCardInner(m, remSpace);
 
       contentDiv.appendChild(item);
+    });
+  });
+}
+
+function renderModuleCardInner(m, remSpace) {
+  const remCm = Math.floor(remSpace / 10);
+  const widths = m.allowed_widths || [m.w || 600];
+  const curW = m.selected_w || m.w || widths[0];
+
+  let pillsHtml = '';
+  widths.forEach(w => {
+    const wCm = Math.round(w / 10);
+    const fits = w <= remSpace;
+    const isSelected = w === curW;
+    pillsHtml += `
+      <button type="button" 
+        class="dim-pill ${isSelected ? 'active-pill' : ''} ${fits ? '' : 'disabled-pill'}" 
+        data-mod-type="${m.type}" 
+        data-w="${w}"
+        ${fits ? '' : 'disabled'}
+        title="${fits ? wCm + ' cm seç' : 'Duvarda ' + remCm + ' cm yer kaldı, sığmaz!'}"
+        onclick="event.stopPropagation(); selectModuleWidth('${m.type}', ${w})">
+        ${wCm} cm
+      </button>
+    `;
+  });
+
+  let customHtml = '';
+  if (m.allow_custom_width) {
+    const fitsAny = remSpace >= 150;
+    customHtml = `
+      <div class="custom-width-row" onclick="event.stopPropagation()">
+        <span>✏️ Özel Ebat:</span>
+        <div style="display:flex; align-items:center; gap:2px;">
+          <input type="number" 
+            class="custom-width-input" 
+            id="custom-w-${m.type}" 
+            min="20" 
+            max="${remCm}" 
+            value="${Math.round(curW / 10)}" 
+            ${fitsAny ? '' : 'disabled'}
+            onchange="handleCustomWidthChange('${m.type}', this.value)"
+            onkeydown="if(event.key==='Enter'){handleCustomWidthChange('${m.type}', this.value); addModuleToDesign(getModuleTemplate('${m.type}'));}">
+          <span style="font-size:0.75rem; color:#94a3b8;">cm</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span class="drag-grip-icon" title="Tutup Tuvale Sürükleyin">⋮⋮</span>
+        <span style="font-size:1.3rem;">${m.icon}</span>
+        <div class="module-info">
+          <h4 style="font-size:0.85rem; color:#fff; margin:0;">${m.name}</h4>
+          <span style="font-size:0.75rem; color:#94a3b8;">D: ${m.d}mm | Y: ${m.h}mm</span>
+        </div>
+      </div>
+      <button class="btn btn-outline btn-sm" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="event.stopPropagation(); addModuleToDesign(getModuleTemplate('${m.type}'))">
+        ➕ Ekle
+      </button>
+    </div>
+
+    <div class="module-pills-wrapper" onclick="event.stopPropagation()">
+      <div class="pills-header">
+        <span>Genişlik:</span>
+        <span class="rem-space ${remSpace <= 0 ? 'full' : ''}" id="rem-badge-${m.type}">Kalan: ${remCm} cm</span>
+      </div>
+      <div class="dimension-pills-row">
+        ${pillsHtml}
+      </div>
+      ${customHtml}
+    </div>
+  `;
+}
+
+function updateCatalogDimensionPills() {
+  const cap = getWallCapacity(window.CURRENT_ACTIVE_WALL || 'back');
+
+  // Update wall selector badges
+  const capBack = getWallCapacity('back');
+  const capLeft = getWallCapacity('left');
+  const bBadge = document.getElementById('wall-cap-back');
+  const lBadge = document.getElementById('wall-cap-left');
+  if (bBadge) bBadge.textContent = `${Math.floor(capBack.baseRemaining / 10)} cm boş`;
+  if (lBadge) lBadge.textContent = `${Math.floor(capLeft.baseRemaining / 10)} cm boş`;
+
+  if (!window.CURRENT_CATALOG_GROUPS) return;
+
+  window.CURRENT_CATALOG_GROUPS.forEach(grp => {
+    grp.items.forEach(m => {
+      const remSpace = m.category === 'wall' ? cap.wallRemaining : cap.baseRemaining;
+      const remCm = Math.floor(remSpace / 10);
+
+      // Update remaining badge
+      const remElem = document.getElementById(`rem-badge-${m.type}`);
+      if (remElem) {
+        remElem.textContent = `Kalan: ${remCm} cm`;
+        remElem.className = `rem-space ${remSpace <= 0 ? 'full' : ''}`;
+      }
+
+      // Update pill buttons
+      const card = document.getElementById(`catalog-card-${m.type}`);
+      if (card) {
+        const curW = m.selected_w || m.w || (m.allowed_widths ? m.allowed_widths[0] : 600);
+        const pills = card.querySelectorAll('.dim-pill');
+        pills.forEach(p => {
+          const w = parseInt(p.getAttribute('data-w'));
+          const fits = w <= remSpace;
+          const isSelected = w === curW;
+
+          p.className = `dim-pill ${isSelected ? 'active-pill' : ''} ${fits ? '' : 'disabled-pill'}`;
+          p.title = fits ? `${Math.round(w / 10)} cm seç` : `Duvarda ${remCm} cm yer kaldı, sığmaz!`;
+          if (fits) {
+            p.removeAttribute('disabled');
+          } else {
+            p.setAttribute('disabled', 'true');
+          }
+        });
+
+        // Update custom input max
+        const custInp = card.querySelector('.custom-width-input');
+        if (custInp) {
+          custInp.max = remCm;
+          if (remSpace < 150) {
+            custInp.setAttribute('disabled', 'true');
+          } else {
+            custInp.removeAttribute('disabled');
+          }
+        }
+      }
     });
   });
 }
@@ -475,6 +707,8 @@ function getWallCapacity(wall = 'back') {
 
 // ADD MODULE WITH STRICT WALL BOUNDARY ENFORCEMENT & MULTI-WALL WRAP
 function addModuleToDesign(template, customPos = null, targetWall = null) {
+  if (!template) return false;
+  const modWidth = template.selected_w || template.w || 600;
   const wall = targetWall || window.CURRENT_ACTIVE_WALL || 'back';
   const cap = getWallCapacity(wall);
   const isUpper = template.category === 'wall';
@@ -487,16 +721,16 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
   }
 
   // STRICT WALL BOUNDARY CHECK: DO NOT OVERFLOW WALL END!
-  if (targetX + template.w > cap.wallLength) {
+  if (targetX + modWidth > cap.wallLength) {
     // Check if the other wall (e.g. Left Wall in L-Kitchen) has room
     const otherWall = (wall === 'back') ? 'left' : 'back';
     const otherCap = getWallCapacity(otherWall);
     const otherRemaining = isUpper ? otherCap.wallRemaining : otherCap.baseRemaining;
 
-    if (otherRemaining >= template.w) {
+    if (otherRemaining >= modWidth) {
       const wallNameCur = (wall === 'back') ? 'Arka Duvar' : 'Sol Duvar';
       const wallNameOth = (otherWall === 'back') ? 'Arka Duvara' : 'Sol Duvara';
-      const switchOk = confirm(`⚠️ ${wallNameCur.toUpperCase()} SINIRI DOLDU!\n${wallNameCur}da sadece ${remaining}mm boş yer kaldı (${template.w}mm modül sığmıyor).\n\nModülü ${wallNameOth} yerleştirmek ister misiniz? (${wallNameOth}da ${otherRemaining}mm boşluk mevcut)`);
+      const switchOk = confirm(`⚠️ ${wallNameCur.toUpperCase()} SINIRI DOLDU!\n${wallNameCur}da sadece ${remaining}mm boş yer kaldı (${modWidth}mm modül sığmıyor).\n\nModülü ${wallNameOth} yerleştirmek ister misiniz? (${wallNameOth}da ${otherRemaining}mm boşluk mevcut)`);
       if (switchOk) {
         setActiveWall(otherWall);
         return addModuleToDesign(template, null, otherWall);
@@ -504,11 +738,14 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
     }
 
     showToast(`⚠️ DUVAR KAPASİTESİ DOLDU: ${wall === 'left' ? 'Sol Duvar' : 'Arka Duvar'} (${cap.wallLength}mm) doldu! Kalan boşluk (${remaining}mm) yetersiz.`, 'error');
+    if (canvas3D && canvas3D.flashBoundaryWarning) {
+      canvas3D.flashBoundaryWarning(wall);
+    }
     return false;
   }
 
   // Strictly clamp inside wall boundaries
-  targetX = Math.max(0, Math.min(cap.wallLength - template.w, targetX));
+  targetX = Math.max(0, Math.min(cap.wallLength - modWidth, targetX));
 
   const currentMods = window.CURRENT_DESIGN.modules;
   const count = currentMods.length + 1;
@@ -519,9 +756,9 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
     type: template.type,
     name: template.name,
     category: template.category,
-    w: template.w,
-    d: template.d,
-    h: template.h,
+    w: modWidth,
+    d: template.d || 600,
+    h: template.h || 720,
     wall: wall,
     x: targetX,
     drawers: template.drawers || 0,
@@ -530,8 +767,9 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
   };
 
   currentMods.push(newMod);
-  showToast(`✅ ${template.name} (${wall === 'left' ? 'Sol Duvar' : 'Arka Duvar'} | ${targetX}mm) yerleştirildi!`);
+  showToast(`✅ ${template.name} (${Math.round(modWidth / 10)} cm | ${wall === 'left' ? 'Sol' : 'Arka'} Duvar) eklendi!`);
   updatePlacedModulesUI();
+  updateCatalogDimensionPills();
   renderActiveCanvas();
   return true;
 }
@@ -540,6 +778,7 @@ function removeModule(modId) {
   window.CURRENT_DESIGN.modules = window.CURRENT_DESIGN.modules.filter(m => m.id !== modId);
   hideSelectedModuleGizmo();
   updatePlacedModulesUI();
+  updateCatalogDimensionPills();
   renderActiveCanvas();
 }
 

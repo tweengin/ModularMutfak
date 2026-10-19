@@ -526,17 +526,11 @@
         <!-- Center Viewport: Synchronized 2D/3D Canvas -->
         <div class="viewport-center">
           <div class="viewport-toolbar">
-            <!-- View Mode Switcher -->
+            <!-- View Mode Switcher: 3D Showroom only for customer -->
             <div class="view-mode-tabs">
-              <button class="view-tab active" id="tab-3d" onclick="setCanvasMode('3d')">
-                🌟 3D Showroom (360°)
-              </button>
-              <button class="view-tab" id="tab-elevation" onclick="setCanvasMode('elevation')">
-                🏛️ 2D Ön Görünüş
-              </button>
-              <button class="view-tab" id="tab-plan" onclick="setCanvasMode('plan')">
-                📐 2D Mimari Plan
-              </button>
+              <span class="view-tab active" id="tab-3d" style="cursor:default; pointer-events:none; font-weight:800; color:#38bdf8; background:rgba(56, 189, 248, 0.1); border-color:#38bdf8;">
+                🌟 3D Showroom (360° Akıllı Tuval)
+              </span>
             </div>
 
             <!-- Active Wall Selector (Arka Duvar / Sol Duvar) -->
@@ -747,6 +741,21 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Admin Module Templates & Sizing Rules -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-dark); border-radius:var(--radius-md); padding:1.25rem; margin-top:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <h3 style="font-size:1.05rem;">📐 Modül Tanımlama & Ebat Yetkileri</h3>
+              <span class="badge badge-info" style="font-size:0.75rem;">Müşteri Ebat Kısıtlamaları</span>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:1rem;">
+              Her modülde müşterinin seçebileceği standart genişlikleri (mm) belirleyin. Manuel ölçü iznini açarak/kapatıp kontrol edebilirsiniz.
+            </p>
+
+            <div id="admin-module-templates-list" style="display:flex; flex-direction:column; gap:0.75rem; max-height:420px; overflow-y:auto; padding-right:4px;">
+              <!-- Rendered by AdminPanel -->
+            </div>
+          </div>
         </div>
 
         <!-- Right: Incoming Designs, Cost Breakdown & CNC Nesting Center -->
@@ -790,6 +799,21 @@
 
             <div style="background:rgba(255, 255, 255, 0.02); padding:0.75rem; border-radius:4px; font-size:0.85rem; margin-bottom:1rem;">
               <strong>Müşteri Notu:</strong> <span id="inspect-notes"></span>
+            </div>
+
+            <!-- 2D Architectural Plan & Elevation Viewer (Admin Only) -->
+            <div id="admin-2d-canvas-box" style="background:#0b1120; border:1px solid #334155; border-radius:var(--radius-sm); padding:1rem; margin-bottom:1.25rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <div>
+                  <strong style="color:#38bdf8; font-size:0.95rem;">📐 2D Mimari Plan & Cephe Görünüşü (Teknik Çizim)</strong>
+                  <div style="font-size:0.75rem; color:#94a3b8;">Müşteriye kapalı olan milimetrik duvar mesafeleri, dolap sınırları ve kapak açılış yayları</div>
+                </div>
+                <div class="view-mode-tabs" style="display:flex; gap:0.4rem;">
+                  <button class="view-tab active" id="admin-tab-plan" onclick="AdminPanel.set2DView('plan')">📐 Kuşbakışı Plan</button>
+                  <button class="view-tab" id="admin-tab-elevation" onclick="AdminPanel.set2DView('elevation')">🏛️ Ön Görünüş</button>
+                </div>
+              </div>
+              <canvas id="admin-canvas2d-viewport" width="850" height="400" style="width:100%; height:400px; background:#020617; border-radius:6px; border:1px solid #1e293b; display:block;"></canvas>
             </div>
 
             <!-- Itemized BOM Table -->

@@ -213,6 +213,54 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
                 ]
             })
 
+        elif path == '/api/catalog/modules':
+            cat = query.get('category', ['kitchen'])[0]
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM module_templates WHERE category = ? ORDER BY sort_order, id", (cat,))
+            rows = c.fetchall()
+            conn.close()
+
+            groups_map = {
+                'base': {'groupKey': 'base', 'title': 'Alt Dolaplar (Base)', 'icon': '🗄️', 'open': True, 'items': []},
+                'wall': {'groupKey': 'wall', 'title': 'Üst Dolaplar (Wall)', 'icon': '📦', 'open': True, 'items': []},
+                'tall': {'groupKey': 'tall', 'title': 'Boy Dolaplar & Kiler (Tall)', 'icon': '🧊', 'open': False, 'items': []},
+                'appliance': {'groupKey': 'appliance', 'title': 'Ankastre Cihazlar', 'icon': '🔌', 'open': False, 'items': []}
+            }
+            for r in rows:
+                gk = r['group_key']
+                if gk not in groups_map:
+                    groups_map[gk] = {'groupKey': gk, 'title': gk.capitalize(), 'icon': '📁', 'open': False, 'items': []}
+
+                item = {
+                    'type': r['key'],
+                    'name': r['name'],
+                    'category': r['group_key'],
+                    'icon': r['icon'],
+                    'w': r['default_w'],
+                    'd': r['default_d'],
+                    'h': r['default_h'],
+                    'allowed_widths': json.loads(r['allowed_widths_json']),
+                    'allow_custom_width': bool(r['allow_custom_width']),
+                    'desc': r['description'] or ''
+                }
+                groups_map[gk]['items'].append(item)
+
+            res_groups = [g for g in groups_map.values() if len(g['items']) > 0]
+            return self.send_json({"groups": res_groups})
+
+        elif path == '/api/admin/module-templates':
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM module_templates ORDER BY category, sort_order, id")
+            items = []
+            for r in c.fetchall():
+                it = dict(r)
+                it['allowed_widths'] = json.loads(r['allowed_widths_json'])
+                items.append(it)
+            conn.close()
+            return self.send_json({"module_templates": items})
+
         elif path.startswith('/api/designs/reference/'):
             ref_code = path.split('/')[-1].upper()
             conn = get_db()
@@ -640,6 +688,49 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             return self.send_json({"success": True, "message": "Sistem ayarları güncellendi."})
+
+        # Admin: Update Module Template Dimensions and Permissions
+        elif path == '/api/admin/module-templates':
+            user = self.get_auth_user()
+            if not user or user.get('role') != 'admin':
+                return self.send_json({"error": "Yönetici yetkisi gereklidir."}, 403)
+
+            key = body.get('key')
+            if not key:
+                return self.send_json({"error": "Modül anahtarı gereklidir."}, 400)
+
+            allowed_widths = body.get('allowed_widths')
+            allow_custom_width = 1 if body.get('allow_custom_width') else 0
+            name = body.get('name')
+            default_w = body.get('default_w')
+            default_d = body.get('default_d')
+            default_h = body.get('default_h')
+
+            conn = get_db()
+            c = conn.cursor()
+            if allowed_widths is not None:
+                c.execute("""
+                UPDATE module_templates 
+                SET allowed_widths_json = ?, allow_custom_width = ?,
+                    name = COALESCE(?, name),
+                    default_w = COALESCE(?, default_w),
+                    default_d = COALESCE(?, default_d),
+                    default_h = COALESCE(?, default_h)
+                WHERE key = ?
+                """, (json.dumps(allowed_widths), allow_custom_width, name, default_w, default_d, default_h, key))
+            else:
+                c.execute("""
+                UPDATE module_templates 
+                SET allow_custom_width = ?,
+                    name = COALESCE(?, name),
+                    default_w = COALESCE(?, default_w),
+                    default_d = COALESCE(?, default_d),
+                    default_h = COALESCE(?, default_h)
+                WHERE key = ?
+                """, (allow_custom_width, name, default_w, default_d, default_h, key))
+            conn.commit()
+            conn.close()
+            return self.send_json({"success": True, "message": "Modül şablonu ve ölçü kısıtlamaları kaydedildi."})
 
         return self.send_json({"error": "Endpoint not found"}, 404)
 
