@@ -145,6 +145,7 @@ let canvas3D = null;
 document.addEventListener('DOMContentLoaded', async () => {
   initCanvases();
   await checkAuthSession();
+  await loadActiveCatalogMaterials();
   setupEventListeners();
   loadCategoryModules(window.CURRENT_CATEGORY);
   navigateTo('landing'); // Start on the landing page showcase website!
@@ -1523,6 +1524,15 @@ function applyWizardSettings() {
     sponsor: floorType.includes('Bien') ? 'Bien Seramik Sponsoru' : 'AGT Parke Sistemleri'
   };
 
+  const matCountertop = document.getElementById('wizard-mat-countertop')?.value || 'cimstone';
+  const matDoor = document.getElementById('wizard-mat-door')?.value || 'mdflam';
+  window.CURRENT_DESIGN.materials.countertop_material = matCountertop;
+  window.CURRENT_DESIGN.materials.door_material = matDoor;
+  const studioCt = document.getElementById('mat-countertop');
+  if (studioCt) studioCt.value = matCountertop;
+  const studioDoor = document.getElementById('mat-door');
+  if (studioDoor) studioDoor.value = matDoor;
+
   const apps = [];
   if (document.getElementById('app-fridge')?.checked) apps.push({ key: 'buzdolabi_kombi', name: 'Buzdolabı', qty: 1 });
   if (document.getElementById('app-oven')?.checked) apps.push({ key: 'firin_ankastre', name: 'Ankastre Fırın', qty: 1 });
@@ -1823,6 +1833,69 @@ function showToast(msg) {
   }, 3500);
 }
 
+// ACTIVE CATALOG MATERIALS
+window.ACTIVE_CATALOG_MATERIALS = { countertop: [], cabinet: [] };
+
+async function loadActiveCatalogMaterials() {
+  try {
+    const res = await fetch('/api/catalog/materials');
+    const data = await res.json();
+    if (data.materials) {
+      window.ACTIVE_CATALOG_MATERIALS = data.materials;
+      populateMaterialDropdowns();
+    }
+  } catch (e) {
+    console.error("Error loading active catalog materials:", e);
+  }
+}
+
+function populateMaterialDropdowns() {
+  const wizardCt = document.getElementById('wizard-mat-countertop');
+  const wizardDoor = document.getElementById('wizard-mat-door');
+  const studioCt = document.getElementById('mat-countertop');
+  const studioDoor = document.getElementById('mat-door');
+
+  const countertops = window.ACTIVE_CATALOG_MATERIALS?.countertop || [];
+  const cabinets = window.ACTIVE_CATALOG_MATERIALS?.cabinet || [];
+
+  if (wizardCt && countertops.length > 0) {
+    wizardCt.innerHTML = countertops.map(m => 
+      `<option value="${m.key}">${m.name}</option>`
+    ).join('');
+    if (window.CURRENT_DESIGN?.materials?.countertop_material) {
+      wizardCt.value = window.CURRENT_DESIGN.materials.countertop_material;
+    }
+  }
+
+  if (wizardDoor && cabinets.length > 0) {
+    wizardDoor.innerHTML = cabinets.map(m => 
+      `<option value="${m.key}">${m.name}</option>`
+    ).join('');
+    if (window.CURRENT_DESIGN?.materials?.door_material) {
+      wizardDoor.value = window.CURRENT_DESIGN.materials.door_material;
+    }
+  }
+
+  if (studioCt && countertops.length > 0) {
+    studioCt.innerHTML = countertops.map(m => 
+      `<option value="${m.key}">${m.name}</option>`
+    ).join('');
+    if (window.CURRENT_DESIGN?.materials?.countertop_material) {
+      studioCt.value = window.CURRENT_DESIGN.materials.countertop_material;
+    }
+  }
+
+  if (studioDoor && cabinets.length > 0) {
+    studioDoor.innerHTML = cabinets.map(m => 
+      `<option value="${m.key}">${m.name}</option>`
+    ).join('');
+    if (window.CURRENT_DESIGN?.materials?.door_material) {
+      studioDoor.value = window.CURRENT_DESIGN.materials.door_material;
+    }
+  }
+}
+window.loadActiveCatalogMaterials = loadActiveCatalogMaterials;
+
 function setupEventListeners() {
   document.getElementById('mat-body')?.addEventListener('change', (e) => {
     window.CURRENT_DESIGN.materials.body_material = e.target.value;
@@ -1830,10 +1903,24 @@ function setupEventListeners() {
   });
   document.getElementById('mat-door')?.addEventListener('change', (e) => {
     window.CURRENT_DESIGN.materials.door_material = e.target.value;
+    const wizDoor = document.getElementById('wizard-mat-door');
+    if (wizDoor) wizDoor.value = e.target.value;
     renderActiveCanvas();
   });
   document.getElementById('mat-countertop')?.addEventListener('change', (e) => {
     window.CURRENT_DESIGN.materials.countertop_material = e.target.value;
+    const wizCt = document.getElementById('wizard-mat-countertop');
+    if (wizCt) wizCt.value = e.target.value;
     renderActiveCanvas();
+  });
+  document.getElementById('wizard-mat-countertop')?.addEventListener('change', (e) => {
+    window.CURRENT_DESIGN.materials.countertop_material = e.target.value;
+    const studioCt = document.getElementById('mat-countertop');
+    if (studioCt) studioCt.value = e.target.value;
+  });
+  document.getElementById('wizard-mat-door')?.addEventListener('change', (e) => {
+    window.CURRENT_DESIGN.materials.door_material = e.target.value;
+    const studioDoor = document.getElementById('mat-door');
+    if (studioDoor) studioDoor.value = e.target.value;
   });
 }

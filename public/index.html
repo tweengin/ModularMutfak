@@ -462,7 +462,7 @@
             Zemin kaplamasını belirleyin ve mutfağınızı nasıl oluşturmak istediğinizi seçin.
           </p>
 
-          <div class="form-group" style="margin-bottom:1.5rem;">
+          <div class="form-group" style="margin-bottom:1.25rem;">
             <label>Zemin Türü (Sponsor Entegreli)</label>
             <select id="wizard-flooring" class="form-control">
               <option value="AGT Parke Doğal Meşe (Sponsor: AGT)" selected>AGT Parke Doğal Meşe (Sponsor: AGT Zemin)</option>
@@ -470,6 +470,27 @@
               <option value="Bien Seramik Antrasit Granit Zemin (Sponsor: Bien)">Bien Seramik Antrasit Granit Zemin (Sponsor: Bien)</option>
               <option value="Kütahya Porselen Mat Mermer Doku (Sponsor: Kütahya)">Kütahya Porselen Mat Mermer Doku (Sponsor: Kütahya)</option>
             </select>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+            <div class="form-group">
+              <label>Tezgah Malzemesi</label>
+              <select id="wizard-mat-countertop" class="form-control">
+                <!-- Dynamically loaded from database -->
+                <option value="cimstone" selected>Çimstone Tezgah</option>
+                <option value="granite">Granit Tezgah</option>
+                <option value="porcelain">Porselen Tezgah</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Modül / Kapak Malzemesi</label>
+              <select id="wizard-mat-door" class="form-control">
+                <!-- Dynamically loaded from database -->
+                <option value="mdflam" selected>MDFlam Kapak & Gövde</option>
+                <option value="acrylic">Akrilik Parlak Kapak</option>
+              </select>
+            </div>
           </div>
 
           <label style="font-size:0.95rem; font-weight:700; margin-bottom:0.75rem; display:block; color:#f8fafc;">
@@ -928,6 +949,21 @@
               <!-- Rendered by AdminPanel -->
             </div>
           </div>
+
+          <!-- Admin Wizard Materials Management (Tezgah & Kapak Yönetimi) -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-dark); border-radius:var(--radius-md); padding:1.25rem; margin-top:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <h3 style="font-size:1.05rem;">🎨 Sihirbaz Malzeme Ayarları</h3>
+              <button class="btn btn-primary btn-sm" onclick="AdminPanel.openNewMaterialModal()">➕ Yeni Malzeme Ekle</button>
+            </div>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:1rem;">
+              Sihirbazda ve 3D stüdyoda müşterinin seçebileceği tezgah ve modül malzemelerini yönetin. Yeni malzeme ekleyebilir veya mevcutları düzenleyebilirsiniz.
+            </p>
+
+            <div id="admin-materials-list" style="display:flex; flex-direction:column; gap:0.75rem; max-height:420px; overflow-y:auto; padding-right:4px;">
+              <!-- Rendered by AdminPanel.renderMaterialsTable() -->
+            </div>
+          </div>
         </div>
 
         <!-- Right: Incoming Designs, Cost Breakdown & CNC Nesting Center -->
@@ -1296,6 +1332,75 @@
           <button class="btn btn-secondary btn-sm" onclick="applyCornerShiftChoice()">
             ⏭️ Köşe Payı Bırakarak Yerleştir
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN MATERIAL EDIT/CREATE MODAL -->
+  <div id="admin-material-modal" class="modal-backdrop" style="display:none;">
+    <div class="modal-card" style="max-width:520px; background:#0f172a; border:1px solid #38bdf8; border-radius:12px; padding:1.5rem; box-shadow:0 20px 40px rgba(0,0,0,0.8);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #334155; padding-bottom:0.6rem;">
+        <h3 id="admin-mat-modal-title" style="margin:0; font-size:1.15rem; color:#f8fafc;">🎨 Malzeme Ekle / Düzenle</h3>
+        <button class="modal-close-btn" onclick="AdminPanel.closeMaterialModal()">✕</button>
+      </div>
+
+      <input type="hidden" id="mat-modal-id">
+      
+      <div class="form-group" style="margin-bottom:0.85rem;">
+        <label>Malzeme Kategorisi</label>
+        <select id="mat-modal-category" class="form-control">
+          <option value="countertop">Tezgah Malzemesi (Çimstone, Granit, Porselen vb.)</option>
+          <option value="cabinet">Modül Kapak & Gövde Malzemesi (MDFlam, Akrilik vb.)</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.85rem;">
+        <label>Malzeme Adı</label>
+        <input type="text" id="mat-modal-name" class="form-control" placeholder="örn: Belenco Kuvars Tezgah">
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.85rem;">
+        <label>Sistem Anahtarı (Key - Benzersiz)</label>
+        <input type="text" id="mat-modal-key" class="form-control" placeholder="örn: belenco_quartz (boş bırakılırsa otomatik üretilir)">
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.85rem;">
+        <div class="form-group">
+          <label>Görünüm Rengi</label>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="color" id="mat-modal-color" value="#f8fafc" style="width:45px; height:36px; padding:0; border:none; background:none; cursor:pointer;" onchange="document.getElementById('mat-modal-color-hex').value=this.value">
+            <input type="text" id="mat-modal-color-hex" class="form-control" value="#f8fafc" oninput="document.getElementById('mat-modal-color').value=this.value">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Doku / Yüzey Tipi</label>
+          <select id="mat-modal-texture" class="form-control">
+            <option value="stone">Taş / Kuvars Dokusu</option>
+            <option value="marble">Porselen / Mermer Dokusu</option>
+            <option value="wood">Doğal Ahşap Dokusu</option>
+            <option value="acrylic">Parlak Akrilik / Lake</option>
+            <option value="matte">Mat / Melamin</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.85rem;">
+        <label>Açıklama</label>
+        <input type="text" id="mat-modal-desc" class="form-control" placeholder="Kısa ürün detayı">
+      </div>
+
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1.25rem;">
+        <input type="checkbox" id="mat-modal-active" checked>
+        <label for="mat-modal-active" style="cursor:pointer; font-size:0.85rem; color:#cbd5e1;">Müşteri Ekranında ve Sihirbazda Aktif Olarak Göster</label>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button id="mat-modal-delete-btn" class="btn btn-danger btn-sm" style="display:none;" onclick="AdminPanel.deleteMaterialFromModal()">🗑️ Sil</button>
+        <div style="display:flex; gap:0.5rem; margin-left:auto;">
+          <button class="btn btn-outline btn-sm" onclick="AdminPanel.closeMaterialModal()">İptal</button>
+          <button class="btn btn-primary btn-sm" onclick="AdminPanel.saveMaterialModal()">💾 Malzemeyi Kaydet</button>
         </div>
       </div>
     </div>

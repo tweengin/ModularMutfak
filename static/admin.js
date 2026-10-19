@@ -10,6 +10,7 @@ const AdminPanel = {
   pricingMatrix: [],
   settings: {},
   moduleTemplates: [],
+  materials: [],
   currentDesign: null,
   currentCostResult: null,
   adminCanvas2D: null,
@@ -19,6 +20,7 @@ const AdminPanel = {
     await this.loadPricingMatrix();
     await this.loadSettings();
     await this.loadModuleTemplates();
+    await this.loadMaterials();
     await this.loadDesignsList();
   },
 
@@ -577,6 +579,193 @@ const AdminPanel = {
       this.currentDesign.layout_type,
       this.currentDesign.category
     );
+  },
+
+  /*
+   * DYNAMIC WIZARD MATERIALS MANAGEMENT (Countertops & Cabinet Finishes)
+   */
+  async loadMaterials() {
+    try {
+      const res = await fetch('/api/admin/materials');
+      const data = await res.json();
+      this.materials = data.materials || [];
+      this.renderMaterialsTable();
+    } catch (e) {
+      console.error("Error loading materials:", e);
+    }
+  },
+
+  renderMaterialsTable() {
+    const list = document.getElementById('admin-materials-list');
+    if (!list) return;
+
+    list.innerHTML = '';
+    const countertops = this.materials.filter(m => m.category === 'countertop');
+    const cabinets = this.materials.filter(m => m.category === 'cabinet');
+
+    const renderGroup = (title, icon, items) => {
+      const groupEl = document.createElement('div');
+      groupEl.style.marginBottom = '1rem';
+      groupEl.innerHTML = `
+        <div style="font-size:0.85rem; font-weight:700; color:#cbd5e1; margin-bottom:0.4rem; display:flex; align-items:center; gap:6px;">
+          <span>${icon}</span> <span>${title}</span> (${items.length})
+        </div>
+      `;
+      items.forEach(m => {
+        const itemEl = document.createElement('div');
+        itemEl.style.background = '#1e293b';
+        itemEl.style.border = '1px solid #334155';
+        itemEl.style.borderRadius = '6px';
+        itemEl.style.padding = '0.6rem 0.85rem';
+        itemEl.style.display = 'flex';
+        itemEl.style.justifyContent = 'space-between';
+        itemEl.style.alignItems = 'center';
+        itemEl.style.marginBottom = '0.4rem';
+
+        itemEl.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="width:24px; height:24px; border-radius:50%; background:${m.color_hex}; border:2px solid #475569; box-shadow:0 0 6px rgba(0,0,0,0.5);"></div>
+            <div>
+              <strong style="font-size:0.85rem; color:#f8fafc;">${m.name}</strong>
+              <div style="font-size:0.7rem; color:#94a3b8;">${m.key} | Doku: ${m.texture_type} | ${m.is_active ? '<span style="color:#10b981;">● Aktif</span>' : '<span style="color:#ef4444;">○ Pasif</span>'}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-outline btn-sm" onclick="AdminPanel.openEditMaterialModal(${m.id})">✏️ Düzenle</button>
+            <button class="btn btn-danger btn-sm" onclick="AdminPanel.deleteMaterial(${m.id})">🗑️</button>
+          </div>
+        `;
+        groupEl.appendChild(itemEl);
+      });
+      list.appendChild(groupEl);
+    };
+
+    renderGroup('Tezgah Malzemeleri', '🪨', countertops);
+    renderGroup('Modül / Kapak Malzemeleri', '🚪', cabinets);
+  },
+
+  openNewMaterialModal() {
+    document.getElementById('admin-mat-modal-title').textContent = '➕ Yeni Malzeme Ekle';
+    document.getElementById('mat-modal-id').value = '';
+    document.getElementById('mat-modal-category').value = 'countertop';
+    document.getElementById('mat-modal-name').value = '';
+    document.getElementById('mat-modal-key').value = '';
+    document.getElementById('mat-modal-color').value = '#f8fafc';
+    document.getElementById('mat-modal-color-hex').value = '#f8fafc';
+    document.getElementById('mat-modal-texture').value = 'stone';
+    document.getElementById('mat-modal-desc').value = '';
+    document.getElementById('mat-modal-active').checked = true;
+    document.getElementById('mat-modal-delete-btn').style.display = 'none';
+
+    document.getElementById('admin-material-modal').style.display = 'flex';
+  },
+
+  openEditMaterialModal(matId) {
+    const mat = this.materials.find(m => m.id === matId);
+    if (!mat) return;
+
+    document.getElementById('admin-mat-modal-title').textContent = '✏️ Malzemeyi Düzenle';
+    document.getElementById('mat-modal-id').value = mat.id;
+    document.getElementById('mat-modal-category').value = mat.category;
+    document.getElementById('mat-modal-name').value = mat.name;
+    document.getElementById('mat-modal-key').value = mat.key;
+    document.getElementById('mat-modal-color').value = mat.color_hex;
+    document.getElementById('mat-modal-color-hex').value = mat.color_hex;
+    document.getElementById('mat-modal-texture').value = mat.texture_type;
+    document.getElementById('mat-modal-desc').value = mat.description || '';
+    document.getElementById('mat-modal-active').checked = Boolean(mat.is_active);
+    document.getElementById('mat-modal-delete-btn').style.display = 'block';
+
+    document.getElementById('admin-material-modal').style.display = 'flex';
+  },
+
+  closeMaterialModal() {
+    document.getElementById('admin-material-modal').style.display = 'none';
+  },
+
+  async saveMaterialModal() {
+    const token = localStorage.getItem('mc_token');
+    const id = document.getElementById('mat-modal-id').value;
+    const category = document.getElementById('mat-modal-category').value;
+    const name = document.getElementById('mat-modal-name').value.trim();
+    const key = document.getElementById('mat-modal-key').value.trim();
+    const color_hex = document.getElementById('mat-modal-color').value;
+    const texture_type = document.getElementById('mat-modal-texture').value;
+    const description = document.getElementById('mat-modal-desc').value.trim();
+    const is_active = document.getElementById('mat-modal-active').checked ? 1 : 0;
+
+    if (!name) {
+      alert("Lütfen malzeme adını giriniz.");
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin/materials', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          id: id ? parseInt(id) : null,
+          category,
+          name,
+          key,
+          color_hex,
+          texture_type,
+          description,
+          is_active
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Malzeme başarıyla kaydedildi!");
+        this.closeMaterialModal();
+        await this.loadMaterials();
+        if (window.loadActiveCatalogMaterials) {
+          window.loadActiveCatalogMaterials();
+        }
+      } else {
+        alert(data.error || "Hata oluştu.");
+      }
+    } catch (e) {
+      alert("Sunucu hatası.");
+    }
+  },
+
+  async deleteMaterialFromModal() {
+    const id = document.getElementById('mat-modal-id').value;
+    if (id) {
+      await this.deleteMaterial(parseInt(id));
+      this.closeMaterialModal();
+    }
+  },
+
+  async deleteMaterial(matId) {
+    if (!confirm("Bu malzemeyi silmek istediğinize emin misiniz?")) return;
+    const token = localStorage.getItem('mc_token');
+    try {
+      const res = await fetch('/api/admin/materials/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ id: matId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("Malzeme silindi.");
+        await this.loadMaterials();
+        if (window.loadActiveCatalogMaterials) {
+          window.loadActiveCatalogMaterials();
+        }
+      } else {
+        alert(data.error || "Silinemedi.");
+      }
+    } catch (e) {
+      alert("Hata oluştu.");
+    }
   }
 };
 

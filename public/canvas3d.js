@@ -172,10 +172,33 @@ class StudioCanvas3D {
     tileTex.wrapT = THREE.RepeatWrapping;
     tileTex.repeat.set(6, 4);
 
+    // 3. Speckled Natural Granite Texture
+    const gCanvas = document.createElement('canvas');
+    gCanvas.width = 256;
+    gCanvas.height = 256;
+    const gctx = gCanvas.getContext('2d');
+    gctx.fillStyle = "#27272a";
+    gctx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 900; i++) {
+      const shade = Math.random() > 0.5 ? 210 : 80;
+      gctx.fillStyle = `rgba(${shade}, ${shade}, ${shade}, ${0.15 + Math.random() * 0.35})`;
+      gctx.fillRect(Math.random() * 256, Math.random() * 256, 2 + Math.random() * 3, 2 + Math.random() * 3);
+    }
+    const graniteTex = new THREE.CanvasTexture(gCanvas);
+    graniteTex.wrapS = THREE.RepeatWrapping;
+    graniteTex.wrapT = THREE.RepeatWrapping;
+    graniteTex.repeat.set(4, 4);
+    this.woodTex = woodTex;
+    this.graniteTex = graniteTex;
+
     // Common Materials
     this.matCache = {
       woodOak: new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.35, metalness: 0.05 }),
-      countertopQuartz: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.15, metalness: 0.05 }),
+      acrylicGloss: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.06, metalness: 0.15 }),
+      countertopQuartz: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.18, metalness: 0.05 }),
+      countertopCimstone: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.18, metalness: 0.05 }),
+      countertopGranite: new THREE.MeshStandardMaterial({ map: graniteTex, roughness: 0.28, metalness: 0.12 }),
+      countertopPorcelain: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.14, metalness: 0.02 }),
       plinthAlu: new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.4, metalness: 0.6 }),
       frostedGlass: new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.2, transparent: true, opacity: 0.65 }),
       handleChrome: new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.15, metalness: 0.9 }),
@@ -192,6 +215,59 @@ class StudioCanvas3D {
       ghostWireInvalidMat: new THREE.LineBasicMaterial({ color: 0xf87171, linewidth: 2 }),
       selectedMat: new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: 0.3, metalness: 0.1 })
     };
+  }
+
+  getDoorMaterial(isSelected = false) {
+    if (isSelected) return this.matCache.selectedMat;
+    const key = (this.materials?.door_material || this.materials?.cabinet_material || 'mdflam').toLowerCase();
+    if (this.matCache['door_' + key]) return this.matCache['door_' + key];
+
+    const catalog = window.ACTIVE_CATALOG_MATERIALS?.cabinet || [];
+    const found = catalog.find(m => (m.key || '').toLowerCase() === key);
+    if (found) {
+      const mat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(found.color_hex || '#c89a68'),
+        roughness: typeof found.roughness === 'number' ? found.roughness : 0.35,
+        metalness: typeof found.metalness === 'number' ? found.metalness : 0.05
+      });
+      if (found.texture_type === 'wood' && this.woodTex) {
+        mat.map = this.woodTex;
+      }
+      this.matCache['door_' + key] = mat;
+      return mat;
+    }
+
+    if (key.includes('acrylic') || key.includes('akrilik')) {
+      return this.matCache.acrylicGloss;
+    }
+    return this.matCache.woodOak;
+  }
+
+  getCountertopMaterial() {
+    const key = (this.materials?.countertop_material || 'cimstone').toLowerCase();
+    if (this.matCache['ct_' + key]) return this.matCache['ct_' + key];
+
+    const catalog = window.ACTIVE_CATALOG_MATERIALS?.countertop || [];
+    const found = catalog.find(m => (m.key || '').toLowerCase() === key);
+    if (found) {
+      const mat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(found.color_hex || '#f8fafc'),
+        roughness: typeof found.roughness === 'number' ? found.roughness : 0.2,
+        metalness: typeof found.metalness === 'number' ? found.metalness : 0.05
+      });
+      if (found.texture_type === 'stone' && this.graniteTex) {
+        mat.map = this.graniteTex;
+      }
+      this.matCache['ct_' + key] = mat;
+      return mat;
+    }
+
+    if (key.includes('granite') || key.includes('granit')) {
+      return this.matCache.countertopGranite;
+    } else if (key.includes('porcelain') || key.includes('porselen')) {
+      return this.matCache.countertopPorcelain;
+    }
+    return this.matCache.countertopCimstone;
   }
 
   onWindowResize() {
@@ -539,9 +615,7 @@ class StudioCanvas3D {
     const md = mod.d || 600;
     const mh = mod.h || 720;
     const wall = mod.wall || 'back';
-    const isSelected = this.selectedModuleId === mod.id;
-
-    const bodyMat = isSelected ? this.matCache.selectedMat : this.matCache.woodOak;
+    const bodyMat = this.getDoorMaterial(isSelected);
 
     if (mod.category === 'base') {
       // BASE CABINET (Depth: 600mm)
@@ -562,11 +636,11 @@ class StudioCanvas3D {
       bodyMesh.receiveShadow = true;
       group.add(bodyMesh);
 
-      // White Quartz Countertop (Thickness: 40mm, Depth: 620mm with 20mm front overhang!)
+      // Dynamic Countertop (Thickness: 40mm, Depth: 620mm with 20mm front overhang!)
       const ctThick = 40;
       const ctDepth = md + 20;
       const ctGeo = new THREE.BoxGeometry(mw + 4, ctThick, ctDepth);
-      const ctMesh = new THREE.Mesh(ctGeo, this.matCache.countertopQuartz);
+      const ctMesh = new THREE.Mesh(ctGeo, this.getCountertopMaterial());
       ctMesh.position.set(0, plinthH + bodyH + ctThick / 2, ctDepth / 2);
       ctMesh.castShadow = true;
       ctMesh.receiveShadow = true;

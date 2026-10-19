@@ -183,8 +183,26 @@ def init_db():
     );
     """)
 
+    # Wizard Materials Table (Countertops & Cabinet Finishes managed by Admin)
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS wizard_materials (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT NOT NULL, -- 'countertop' or 'cabinet'
+        key TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        color_hex TEXT NOT NULL DEFAULT '#ffffff',
+        texture_type TEXT NOT NULL DEFAULT 'matte', -- 'stone', 'marble', 'wood', 'acrylic', 'matte', 'glossy'
+        roughness REAL NOT NULL DEFAULT 0.3,
+        metalness REAL NOT NULL DEFAULT 0.05,
+        description TEXT,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        sort_order INTEGER DEFAULT 0
+    );
+    """)
+
     conn.commit()
     seed_module_templates(conn)
+    seed_wizard_materials(conn)
 
     # Seed Default Admin & Users
     c.execute("SELECT COUNT(*) FROM users")
@@ -457,6 +475,26 @@ def seed_module_templates(conn):
         INSERT OR IGNORE INTO module_templates (key, category, group_key, name, icon, default_w, default_d, default_h, allowed_widths_json, allow_custom_width, description, sort_order)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, templates)
+        conn.commit()
+
+def seed_wizard_materials(conn):
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM wizard_materials")
+    if c.fetchone()[0] == 0:
+        materials = [
+            # Countertops (Tezgah)
+            ('countertop', 'cimstone', 'Çimstone Tezgah', '#f8fafc', 'stone', 0.18, 0.05, 'Kuvars esaslı leke tutmaz pürüzsüz açık renk kompozit tezgah', 1, 1),
+            ('countertop', 'granite', 'Granit Tezgah', '#334155', 'stone', 0.25, 0.10, 'Doğal taş yüksek ısı dayanımlı benekli antrasit/siyah granit tezgah', 1, 2),
+            ('countertop', 'porcelain', 'Porselen Tezgah', '#e2e8f0', 'marble', 0.15, 0.02, 'Ultra kompakt çizilmez ve yanmaz geniş porselen levha tezgah', 1, 3),
+
+            # Cabinets (Modül Kapak & Gövde)
+            ('cabinet', 'mdflam', 'MDFlam Kapak & Gövde', '#c89a68', 'wood', 0.40, 0.0, 'Doğal mat ahşap dokulu dayanıklı melamin yüzey', 1, 1),
+            ('cabinet', 'acrylic', 'Akrilik Parlak Kapak', '#ffffff', 'acrylic', 0.08, 0.15, 'Yüksek parlaklıklı çizilmez akrilik lake yüzey', 1, 2)
+        ]
+        c.executemany("""
+        INSERT OR IGNORE INTO wizard_materials (category, key, name, color_hex, texture_type, roughness, metalness, description, is_active, sort_order)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, materials)
         conn.commit()
 
 if __name__ == '__main__':

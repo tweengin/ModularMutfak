@@ -261,6 +261,30 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             conn.close()
             return self.send_json({"module_templates": items})
 
+        elif path == '/api/catalog/materials':
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM wizard_materials WHERE is_active = 1 ORDER BY category, sort_order, id")
+            rows = [dict(r) for r in c.fetchall()]
+            conn.close()
+
+            countertops = [r for r in rows if r['category'] == 'countertop']
+            cabinets = [r for r in rows if r['category'] == 'cabinet']
+            return self.send_json({
+                "materials": {
+                    "countertop": countertops,
+                    "cabinet": cabinets
+                }
+            })
+
+        elif path == '/api/admin/materials':
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("SELECT * FROM wizard_materials ORDER BY category, sort_order, id")
+            items = [dict(r) for r in c.fetchall()]
+            conn.close()
+            return self.send_json({"materials": items})
+
         elif path.startswith('/api/designs/reference/'):
             ref_code = path.split('/')[-1].upper()
             conn = get_db()
@@ -731,6 +755,68 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             return self.send_json({"success": True, "message": "Modül şablonu ve ölçü kısıtlamaları kaydedildi."})
+
+        # Admin: Save or Update Wizard Material
+        elif path == '/api/admin/materials':
+            user = self.get_auth_user()
+            if not user or user.get('role') != 'admin':
+                return self.send_json({"error": "Yönetici yetkisi gereklidir."}, 403)
+
+            mat_id = body.get('id')
+            category = body.get('category', 'countertop')
+            key = body.get('key', '').strip().lower()
+            name = body.get('name', '').strip()
+            color_hex = body.get('color_hex', '#ffffff')
+            texture_type = body.get('texture_type', 'stone')
+            roughness = float(body.get('roughness', 0.25))
+            metalness = float(body.get('metalness', 0.05))
+            description = body.get('description', '')
+            is_active = 1 if body.get('is_active', True) else 0
+            sort_order = int(body.get('sort_order', 0))
+
+            if not name:
+                return self.send_json({"error": "Malzeme adı gereklidir."}, 400)
+
+            if not key:
+                import re
+                key = re.sub(r'[^a-z0-9_]', '_', name.lower())
+
+            conn = get_db()
+            c = conn.cursor()
+            if mat_id:
+                c.execute("""
+                UPDATE wizard_materials
+                SET category = ?, key = ?, name = ?, color_hex = ?, texture_type = ?,
+                    roughness = ?, metalness = ?, description = ?, is_active = ?, sort_order = ?
+                WHERE id = ?
+                """, (category, key, name, color_hex, texture_type, roughness, metalness, description, is_active, sort_order, mat_id))
+            else:
+                c.execute("""
+                INSERT OR REPLACE INTO wizard_materials
+                (category, key, name, color_hex, texture_type, roughness, metalness, description, is_active, sort_order)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (category, key, name, color_hex, texture_type, roughness, metalness, description, is_active, sort_order))
+
+            conn.commit()
+            conn.close()
+            return self.send_json({"success": True, "message": "Malzeme başarıyla kaydedildi."})
+
+        # Admin: Delete Wizard Material
+        elif path == '/api/admin/materials/delete':
+            user = self.get_auth_user()
+            if not user or user.get('role') != 'admin':
+                return self.send_json({"error": "Yönetici yetkisi gereklidir."}, 403)
+
+            mat_id = body.get('id')
+            if not mat_id:
+                return self.send_json({"error": "Malzeme ID gereklidir."}, 400)
+
+            conn = get_db()
+            c = conn.cursor()
+            c.execute("DELETE FROM wizard_materials WHERE id = ?", (mat_id,))
+            conn.commit()
+            conn.close()
+            return self.send_json({"success": True, "message": "Malzeme başarıyla silindi."})
 
         return self.send_json({"error": "Endpoint not found"}, 404)
 
