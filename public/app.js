@@ -1113,6 +1113,35 @@ window.toggleBacksplashTone = function() {
   showToast(`🎨 Tezgah Arası: ${newTone === 'dark' ? 'Koyu Füme/Antrasit Taş' : 'Açık Porselen Seramik'} tonuna ayarlandı.`, 'info');
 };
 
+window.toggleLeftSidebar = function(forceState) {
+  const sidebar = document.getElementById('studio-left-sidebar');
+  const arrow = document.getElementById('left-sidebar-arrow');
+  if (!sidebar) return;
+  const isCollapsed = typeof forceState === 'boolean' ? !forceState : sidebar.classList.contains('collapsed');
+  if (isCollapsed) {
+    sidebar.classList.remove('collapsed');
+    if (arrow) arrow.textContent = '◀';
+  } else {
+    sidebar.classList.add('collapsed');
+    if (arrow) arrow.textContent = '▶';
+  }
+  setTimeout(() => {
+    if (canvas3D) canvas3D.onWindowResize();
+    if (canvas2D) renderActiveCanvas();
+  }, 280);
+};
+
+window.toggleRightDrawer = function(forceOpen) {
+  const drawer = document.getElementById('studio-right-drawer');
+  if (!drawer) return;
+  const isOpen = typeof forceOpen === 'boolean' ? forceOpen : !drawer.classList.contains('open');
+  if (isOpen) {
+    drawer.classList.add('open');
+  } else {
+    drawer.classList.remove('open');
+  }
+};
+
 window.hideSelectedModuleGizmo = function() {
   const bar = document.getElementById('selected-module-toolbar');
   if (bar) bar.style.display = 'none';

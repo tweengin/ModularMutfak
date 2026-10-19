@@ -141,8 +141,12 @@ class StudioCanvas3D {
     this.scene.add(this.dimensionGroup);
     this.showRulers = true;
 
-    // Resize listener
+    // Resize listeners: window and container ResizeObserver
     window.addEventListener('resize', () => this.onWindowResize());
+    if (typeof ResizeObserver !== 'undefined' && this.container) {
+      this.resizeObserver = new ResizeObserver(() => this.onWindowResize());
+      this.resizeObserver.observe(this.container);
+    }
   }
 
   setupProceduralTextures() {
@@ -498,9 +502,14 @@ class StudioCanvas3D {
     if (!this.container) return;
     const w = this.container.clientWidth;
     const h = this.container.clientHeight;
+    if (w <= 0 || h <= 0) return;
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(w, h);
+    this.renderer.setSize(w, h, false);
+    if (this.canvas) {
+      this.canvas.width = w * Math.min(window.devicePixelRatio, 2);
+      this.canvas.height = h * Math.min(window.devicePixelRatio, 2);
+    }
   }
 
   /*

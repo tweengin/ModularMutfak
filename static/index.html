@@ -679,20 +679,25 @@
     </section>
 
     <!-- 3. INTERACTIVE 2D/3D STUDIO VIEW -->
-    <section id="view-studio" class="view-section">
+    <section id="view-studio" class="view-section" style="padding:0; margin:0; max-width:100%; height:calc(100vh - 70px);">
       <div class="studio-layout">
 
-        <!-- Left Sidebar: ADeko Style Accordion Module Palette -->
-        <aside class="sidebar-panel">
-          <div class="panel-header">
-            <span>📚 Hazır Modül Tipleri</span>
+        <!-- Left Sidebar: ADeko Style Collapsible Accordion Module Palette -->
+        <aside class="sidebar-panel studio-left-sidebar" id="studio-left-sidebar">
+          <div class="panel-header" style="margin-bottom:0.75rem;">
+            <span>📚 Modül Kataloğu</span>
             <small id="cat-label-display" style="color:#38bdf8; font-weight:700;">ADeko Modu</small>
           </div>
 
+          <!-- Collapse / Expand Toggle Button -->
+          <button id="btn-toggle-left-sidebar" class="sidebar-toggle-pill" onclick="toggleLeftSidebar()" title="Modül Menüsünü Daralt / Genişlet">
+            <span id="left-sidebar-arrow">◀</span>
+          </button>
+
           <!-- Search Filter -->
-          <div class="adeko-search-box">
+          <div class="adeko-search-box" style="margin-bottom:0.75rem;">
             <span class="adeko-search-icon">🔍</span>
-            <input type="text" id="module-search-input" class="adeko-search-input" placeholder="Modül ara (fırın, eviye, çekmece...)" oninput="filterCatalogModules(this.value)">
+            <input type="text" id="module-search-input" class="adeko-search-input" placeholder="Modül ara (fırın, eviye...)" oninput="filterCatalogModules(this.value)">
           </div>
 
           <!-- Accordion Categories Container -->
@@ -701,120 +706,71 @@
           </div>
         </aside>
 
-        <!-- Center Viewport: Synchronized 2D/3D Canvas -->
+        <!-- Center Viewport: Full-Stage 2D/3D Canvas -->
         <div class="viewport-center">
-          <!-- Wizard Idea Notice Banner (Informs customer they can freely edit) -->
-          <div id="studio-wizard-notice-banner" style="display:none; background:linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.15)); border:1px solid #10b981; border-radius:8px; padding:0.6rem 1rem; margin:0.6rem 1rem; justify-content:space-between; align-items:center; color:#f8fafc; font-size:0.85rem;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:1.2rem;">✨</span>
-              <span><strong>Mutfak Taslak Öneriniz Hazırlandı!</strong> Sihirbaz başlangıç fikri oluşturdu; modülleri tuvalde serbestçe taşıyabilir, silebilir veya sol menüden yenilerini ekleyebilirsiniz. Tasarımınız bittiğinde <strong>"Randevu Talebi Oluştur"</strong> butonu ile ilerleyebilirsiniz.</span>
-            </div>
-            <button onclick="document.getElementById('studio-wizard-notice-banner').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer; padding:0 6px;">✕</button>
+
+          <!-- 1. Floating Glassmorphic CAD HUD Toolbar (Top Center) -->
+          <div class="floating-hud-toolbar" id="floating-cad-hud">
+            <!-- Wall Selector -->
+            <button class="cam-btn active" id="wall-btn-back" onclick="setActiveWall('back')">🧱 Arka Duvar</button>
+            <button class="cam-btn" id="wall-btn-left" onclick="setActiveWall('left')">🧱 Sol Duvar</button>
+
+            <div class="hud-separator"></div>
+
+            <!-- Camera Presets -->
+            <button class="cam-btn" id="cam-auto" onclick="setCameraPreset('auto')" title="360° Otomatik Döner Podyum Modu">🔄 360°</button>
+            <button class="cam-btn" onclick="setCameraPreset('showroom')" title="Göz Hizası Showroom Açısı">👁️ Showroom</button>
+            <button class="cam-btn" onclick="setCameraPreset('front')" title="Tam Karşıdan Ön Cephe">📐 Ön Cephe</button>
+            <button class="cam-btn" onclick="setCameraPreset('left_wall')" title="Sol Duvar Cephesi">📐 Sol Cephe</button>
+            <button class="cam-btn" onclick="setCameraPreset('top')" title="Kuşbakışı Plan">🗺️ Üstten</button>
+            <button class="cam-btn" onclick="setCameraPreset('reset')" title="Kamera Sıfırla">🔍 Sıfırla</button>
+
+            <div class="hud-separator"></div>
+
+            <!-- Tools -->
+            <button class="cam-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" title="3D Sahne Ölçü Cetvellerini Aç / Kapat">
+              📏 Ölçüler: <span id="ruler-toggle-status" style="color:#10b981; font-weight:bold;">AÇIK</span>
+            </button>
+            <button class="cam-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" title="Tezgah Arası Görsel Tonunu Değiştir (Açık / Koyu)">
+              🎨 Tezgah Arası: <span id="backsplash-tone-status" style="color:#38bdf8; font-weight:bold;">AÇIK TON</span>
+            </button>
           </div>
 
-          <!-- Locked State Notice Banner (Informs customer when design is frozen) -->
-          <div id="studio-locked-banner" style="display:none; background:linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.3)); border:1px solid #ef4444; border-radius:8px; padding:0.75rem 1.25rem; margin:0.6rem 1rem; color:#fee2e2; font-size:0.9rem; align-items:center; justify-content:space-between;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:1.5rem;">🔒</span>
-              <div>
-                <strong id="locked-banner-title">Tasarımınız Onaylanıp Kilitlenmiştir!</strong>
-                <div id="locked-banner-desc" style="font-size:0.8rem; color:#fca5a5;">Tasarımınız fabrikamıza iletilmiştir. Görüşme randevunuzda fiyat ve özel aksesuar isteklerinizi belirleyebilirsiniz. Doğrudan revize yapılamaz.</div>
-              </div>
-            </div>
-            <div style="display:flex; gap:8px; align-items:center;">
-              <span id="locked-ref-badge" class="badge badge-warning" style="font-size:0.85rem; padding:6px 10px;">TR-8421</span>
-            </div>
-          </div>
-
-          <div class="viewport-toolbar">
-            <!-- View Mode Switcher: 3D Showroom only for customer -->
-            <div class="view-mode-tabs">
-              <span class="view-tab active" id="tab-3d" style="cursor:default; pointer-events:none; font-weight:800; color:#38bdf8; background:rgba(56, 189, 248, 0.1); border-color:#38bdf8;">
-                🌟 3D Showroom (360° Akıllı Tuval)
-              </span>
-            </div>
-
-            <!-- Active Wall Selector (Arka Duvar / Sol Duvar) -->
-            <div class="active-wall-selector" id="active-wall-selector" title="Aktif Çalışma Duvarı Seçimi">
-              <button class="wall-btn active" id="wall-btn-back" onclick="setActiveWall('back')">
-                <span>🧱 Arka Duvar</span>
-                <span class="wall-cap-badge" id="wall-cap-back">3600 mm</span>
-              </button>
-              <button class="wall-btn" id="wall-btn-left" onclick="setActiveWall('left')">
-                <span>🧱 Sol Duvar</span>
-                <span class="wall-cap-badge" id="wall-cap-left">2600 mm</span>
-              </button>
-            </div>
-
+          <!-- 2. Floating Top Right Action Group -->
+          <div class="floating-top-right-bar">
             <!-- 72-Hour Customer Access Countdown Badge -->
-            <div id="customer-timer-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(30, 41, 59, 0.85); border:1px solid #38bdf8; border-radius:20px; padding:4px 12px; font-size:0.82rem; font-weight:700; color:#38bdf8; margin-left:auto; margin-right:8px;" title="Tasarım Oturum Süresi (Anti-Abuse Güvenliği)">
+            <div id="customer-timer-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(15, 23, 42, 0.85); backdrop-filter:blur(8px); border:1px solid #38bdf8; border-radius:20px; padding:6px 14px; font-size:0.82rem; font-weight:700; color:#38bdf8;" title="Tasarım Oturum Süresi (Anti-Abuse Güvenliği)">
               <span>⏳</span> <span id="timer-badge-text">Kalan Süre: 72s 00dk</span>
             </div>
 
+            <!-- Open Right Drawer (Placed Modules & Materials) -->
+            <button class="cam-btn" onclick="toggleRightDrawer()" id="btn-toggle-drawer" style="background:rgba(30, 41, 59, 0.9); backdrop-filter:blur(8px); border:1px solid #38bdf8; border-radius:20px; padding:6px 14px; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:6px; cursor:pointer;" title="Yerleşim Listesi ve Malzeme Ayarları">
+              <span>📋</span> <span>Yerleşim & Malzeme</span>
+            </button>
+
             <!-- Submit Design & Request Appointment Action Button -->
-            <button id="btn-studio-submit-quote" class="btn btn-success btn-sm" onclick="openSubmitQuoteModal()" style="font-weight:700; display:flex; align-items:center; gap:6px; box-shadow:0 0 12px rgba(16,185,129,0.35);">
+            <button id="btn-studio-submit-quote" class="btn btn-success btn-sm" onclick="openSubmitQuoteModal()" style="font-weight:700; display:flex; align-items:center; gap:6px; box-shadow:0 0 16px rgba(16,185,129,0.45); border-radius:20px; padding:7px 16px; cursor:pointer;">
               <span>📅</span> Tasarımı Tamamla & Randevu Al
             </button>
           </div>
 
-          <!-- 360° Camera Preset & Orbit Toolbar -->
-          <div class="camera-controls-bar" id="camera-controls-bar">
-              <button class="cam-btn" id="cam-auto" onclick="setCameraPreset('auto')" title="360° Otomatik Döner Podyum Modu">
-                🔄 360° Döndür
-              </button>
-              <button class="cam-btn" onclick="setCameraPreset('showroom')" title="Göz Hizası Showroom Açısı">
-                👁️ Showroom
-              </button>
-              <button class="cam-btn" onclick="setCameraPreset('front')" title="Tam Karşıdan Ön Cephe (Arka Duvar)">
-                📐 Arka Cephe
-              </button>
-              <button class="cam-btn" onclick="setCameraPreset('left_wall')" title="Sol Duvar Cephesi">
-                📐 Sol Cephe
-              </button>
-              <button class="cam-btn" onclick="setCameraPreset('top')" title="Kuşbakışı Plan Açısı">
-                🗺️ Üstten
-              </button>
-              <button class="cam-btn" onclick="setCameraPreset('reset')" title="Kamera Açısını ve Yakınlaştırmayı Sıfırla">
-                🔍 Sıfırla
-              </button>
-
-              <!-- 3D Dynamic Ruler Toggle & First-time Info Bubble -->
-              <div style="position: relative; display: inline-block;">
-                <button class="cam-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" title="3D Sahne Ölçü Cetvellerini Aç / Kapat">
-                  📏 Ölçüler: <span id="ruler-toggle-status" style="color:#10b981; font-weight:bold;">AÇIK</span>
-                </button>
-                <!-- Bilgilendirme Baloncuğu -->
-                <div id="ruler-info-bubble" class="ruler-info-bubble" style="display:none;">
-                  <div class="bubble-arrow"></div>
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-                    <div>
-                      <strong style="color:#38bdf8; font-size:12px;">💡 Akıllı Ölçü Cetveli</strong>
-                      <p style="margin:4px 0 0 0; font-size:11px; line-height:1.4; color:#cbd5e1;">
-                        Modül ebatları ve kalan duvar boşlukları sahnede 3D olarak anlık gösterilir. Dilediğiniz zaman bu butondan cetveli kapatıp açabilirsiniz.
-                      </p>
-                    </div>
-                    <button onclick="dismissRulerBubble()" style="background:none; border:none; color:#94a3b8; font-size:14px; cursor:pointer; padding:0; line-height:1;">✕</button>
-                  </div>
-                  <div style="margin-top:8px; text-align:right;">
-                    <button onclick="dismissRulerBubble()" class="bubble-ack-btn">Anladım</button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Tezgah Arası Görsel Ton Değiştirici (Açık / Koyu) -->
-              <button class="cam-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" title="Tezgah Arası Görsel Tonunu Değiştir (Açık / Koyu)">
-                🎨 Tezgah Arası: <span id="backsplash-tone-status" style="color:#38bdf8; font-weight:bold;">AÇIK TON</span>
-              </button>
-            </div>
-
-            <!-- Accessibility / Low Depth Perception Toggle Badge -->
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-              <span class="badge badge-info" title="Perspektif yanılgısını sıfırlayan paralel aksonometrik projeksiyon">
-                ♿ Düşük Derinlik Algısı Desteği
-              </span>
-            </div>
+          <!-- 3. Floating Bottom Notice Toasts -->
+          <div id="studio-wizard-notice-banner" class="floating-studio-toast" style="display:none;">
+            <span style="font-size:1.2rem;">✨</span>
+            <span><strong>Mutfak Taslak Öneriniz Hazırlandı!</strong> Modülleri tuvalde serbestçe taşıyabilir, silebilir veya sol menüden yenilerini ekleyebilirsiniz.</span>
+            <button onclick="document.getElementById('studio-wizard-notice-banner').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer; padding:0 6px; margin-left:auto;">✕</button>
           </div>
 
+          <div id="studio-locked-banner" class="floating-studio-toast danger" style="display:none;">
+            <span style="font-size:1.3rem;">🔒</span>
+            <div>
+              <strong>Tasarımınız Onaylanıp Kilitlenmiştir!</strong>
+              <span style="font-size:0.75rem; color:#fca5a5; margin-left:6px;">Fabrikamıza iletildi. Randevuda görüşebilirsiniz.</span>
+            </div>
+            <span id="locked-ref-badge" class="badge badge-warning" style="font-size:0.8rem; padding:4px 8px; margin-left:auto;">TR-8421</span>
+          </div>
+
+          <!-- 4. Interactive 3D Canvas Workspace (Hero Stage) -->
           <div class="canvas-wrapper" id="canvas-drop-wrapper">
             <!-- Floating Orbit Hint Badge -->
             <div class="orbit-hint-badge" id="orbit-hint-badge">
@@ -865,21 +821,24 @@
             </div>
 
             <!-- 3D Canvas (Primary Showroom View) -->
-            <canvas id="canvas3d-viewport" width="900" height="600"></canvas>
+            <canvas id="canvas3d-viewport"></canvas>
             <!-- 2D Canvas -->
-            <canvas id="canvas2d-viewport" width="900" height="600" style="display:none;"></canvas>
+            <canvas id="canvas2d-viewport" style="display:none;"></canvas>
           </div>
         </div>
 
-        <!-- Right Sidebar: Placed Modules, Materials, Submit Quote -->
-        <aside class="sidebar-panel">
-          <div class="panel-header">
-            <span>Yerleşim Listesi</span>
-            <span class="badge badge-info" id="placed-count-badge">0 Modül</span>
+        <!-- Right Slide-Over Drawer: Placed Modules & Materials -->
+        <aside class="sidebar-panel studio-right-drawer" id="studio-right-drawer">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border-dark); padding-bottom:0.5rem;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <strong style="color:#fff; font-size:1rem;">📋 Yerleşim & Malzemeler</strong>
+              <span class="badge badge-info" id="placed-count-badge">0 Modül</span>
+            </div>
+            <button onclick="toggleRightDrawer(false)" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0 4px; line-height:1;" title="Kapat">✕</button>
           </div>
 
           <!-- Placed Modules List -->
-          <div id="placed-modules-list" style="max-height:220px; overflow-y:auto; margin-bottom:1rem;">
+          <div id="placed-modules-list" style="max-height:260px; overflow-y:auto; margin-bottom:1rem;">
             <!-- Rendered by JS -->
           </div>
 
@@ -921,7 +880,7 @@
             🔒 <strong>Fabrika Fiyatlandırma İlkesi:</strong> Tasarımınız tamamlandığında atölye yöneticimiz dinamik maliyet matrisi üzerinden net fiyat teklifinizi oluşturup randevu saatinde size sunacaktır.
           </div>
 
-          <button class="btn btn-success btn-lg" style="width:100%;" onclick="openSubmitQuoteModal()">
+          <button class="btn btn-success btn-lg" style="width:100%; margin-top:auto;" onclick="openSubmitQuoteModal()">
             Tasarımı Kaydet & Teklif İste 📩
           </button>
         </aside>
