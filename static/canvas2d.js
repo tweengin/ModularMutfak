@@ -558,6 +558,20 @@ class StudioCanvas2D {
         } else {
           const hy = baseTopY + (baseHeight / 2) - 35;
           this.drawMetallicHandle(mx + mw - 18, hy, 6, 70);
+
+          // Draw Single Middle Shelf line (Tek Raf - mimari kesit/görünüş standardı)
+          if (!mod.type?.includes('oven') && !mod.type?.includes('sink')) {
+            ctx.save();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = "rgba(148, 163, 184, 0.45)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            const midY = baseTopY + (baseHeight / 2);
+            ctx.moveTo(mx + 6, midY);
+            ctx.lineTo(mx + mw - 6, midY);
+            ctx.stroke();
+            ctx.restore();
+          }
         }
 
         this.drawModuleBadge(mod.id, mod.name, mx + 8, baseTopY + 22, isSelected);
@@ -590,6 +604,19 @@ class StudioCanvas2D {
         ctx.fillRect(mx + 2, wallY + wallH, mw - 4, 18);
 
         this.drawMetallicHandle(mx + mw - 18, wallY + wallH - 45, 6, 35);
+
+        // Draw Single Middle Shelf line for Wall Cabinet (Tek Raf)
+        ctx.save();
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.45)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const midWallY = wallY + (wallH / 2);
+        ctx.moveTo(mx + 6, midWallY);
+        ctx.lineTo(mx + mw - 6, midWallY);
+        ctx.stroke();
+        ctx.restore();
+
         this.drawModuleBadge(mod.id, mod.name, mx + 8, wallY + 22, isSelected);
 
       } else if (mod.category === 'tall') {

@@ -55,7 +55,9 @@ const ADEKO_MODULE_GROUPS = {
         { type: 'base_dishwasher', name: 'Bulaşık Makinesi Paneli', category: 'base', w: 600, d: 600, h: 720, drawers: 0, hinges: 0, icon: '🍽️', desc: '60cm tam ankastre kapağı' },
         { type: 'base_standard', name: 'Standart Tek Kapak Alt Dolap', category: 'base', w: 500, d: 600, h: 720, drawers: 0, hinges: 2, icon: '🚪', desc: '1 ayarlı raflı tek kapak' },
         { type: 'base_double', name: 'Çift Kapaklı Geniş Alt Dolap', category: 'base', w: 800, d: 600, h: 720, drawers: 0, hinges: 4, icon: '🚪', desc: 'Geniş tencere depolama' },
-        { type: 'base_corner_l', name: 'L-Mutfak Kör Köşe Modülü', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° köşe dönüş modülü' }
+        { type: 'base_corner_straight', name: 'Düz Kör Köşe Alt Dolap', category: 'base', w: 1000, d: 600, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe dönüş dolabı (Tek Raflı)' },
+        { type: 'base_corner_l', name: '90° L-Köşe Alt Dolap', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe dönüş dolabı (Tek Raflı)' },
+        { type: 'base_corner_v', name: 'V-Köşe (45° Diyagonal) Alt Dolap', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe dolabı (Tek Raflı)' }
       ]
     },
     {
@@ -68,7 +70,9 @@ const ADEKO_MODULE_GROUPS = {
         { type: 'wall_double', name: 'Çift Kapaklı Üst Dolap', category: 'wall', w: 800, d: 350, h: 720, drawers: 0, hinges: 4, icon: '📦', desc: '2 ayarlı raflı standart üst' },
         { type: 'wall_single', name: 'Tek Kapaklı Üst Dolap', category: 'wall', w: 500, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📦', desc: 'Dar alan üst depolama' },
         { type: 'wall_hood', name: 'Davlumbaz Üstü Aspiratör Dolabı', category: 'wall', w: 600, d: 350, h: 720, drawers: 0, hinges: 2, icon: '💨', desc: 'Karbon filtreli gömme' },
-        { type: 'wall_corner_l', name: 'L-Mutfak Köşe Üst Dolabı', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° köşe üst asma' }
+        { type: 'wall_corner_straight', name: 'Düz Kör Köşe Üst Dolap', category: 'wall', w: 650, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe üst dolap (Tek Raflı)' },
+        { type: 'wall_corner_l', name: '90° L-Köşe Üst Dolabı', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe üst asma (Tek Raflı)' },
+        { type: 'wall_corner_v', name: 'V-Köşe (45° Diyagonal) Üst Dolap', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe üst dolabı (Tek Raflı)' }
       ]
     },
     {
@@ -368,28 +372,46 @@ window.openSmartCornerModal = function(template, isUpper) {
   if (!modal || !grid) return;
 
   if (isUpper) {
-    desc.innerHTML = `L-Mutfak dönüş köşesinde (0 - 65 cm) üst dolap kapaklarının birbirine çarpmasını engellemek için bu alana <strong>L-Köşe Üst Dolabı</strong> yerleştirilmelidir.`;
+    desc.innerHTML = `L-Mutfak dönüş köşesinde (0 - 65 cm) üst dolap kapaklarının birbirine çarpmasını engellemek için köşeye uygun bir modül seçiniz (Tüm modellerde standart tek orta raf mevcuttur):`;
     grid.innerHTML = `
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('wall_corner_straight', 650)">
+        <div style="font-size:28px; margin-bottom:6px;">📐</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">Düz Kör Köşe Üst Dolabı</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">65x35 cm | Tek Raflı</span>
+        <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
+      </div>
       <div class="corner-option-item" onclick="applyCornerModuleChoice('wall_corner_l', 650)">
         <div style="font-size:28px; margin-bottom:6px;">📐</div>
-        <strong style="color:#f8fafc; font-size:0.85rem;">65x65 cm L-Köşe Üst Dolabı</strong>
-        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">90° asma köşe modülü</span>
+        <strong style="color:#f8fafc; font-size:0.85rem;">90° L-Köşe Üst Dolabı</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">65x65 cm | 90° Çift Kapak & Tek Raflı</span>
+        <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
+      </div>
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('wall_corner_v', 650)">
+        <div style="font-size:28px; margin-bottom:6px;">📐</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">V-Köşe (45° Diyagonal) Üst Dolap</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">65x65 cm | 45° Pahlı Tek Kapak & Tek Raflı</span>
         <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
       </div>
     `;
   } else {
-    desc.innerHTML = `L-Mutfak dönüş köşesinde (0 - 90 cm) standart düz modül kullanılamaz. Kapak ve çekmecelerin birbirine çarpmasını önlemek ve tezgah dönüşünü sağlamak için bu alana <strong>Köşe Alt Modülü</strong> yerleştirilmelidir.`;
+    desc.innerHTML = `L-Mutfak dönüş köşesinde (0 - 90 cm) kapak ve çekmecelerin birbirine çarpmasını önlemek ve tezgah dönüşünü sağlamak için bir köşe modülü seçiniz (Tüm modellerde standart tek orta raf mevcuttur; özel sepet/mekanizma seçenekleri yönetici randevunuzda belirlenir):`;
     grid.innerHTML = `
-      <div class="corner-option-item" onclick="applyCornerModuleChoice('base_corner_l', 900)">
-        <div style="font-size:28px; margin-bottom:6px;">📐</div>
-        <strong style="color:#f8fafc; font-size:0.85rem;">90x90 cm Kör Köşe Alt Dolabı</strong>
-        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">Döner sepet uyumlu L-dönüş</span>
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('base_corner_straight', 1000)">
+        <div style="font-size:28px; margin-bottom:6px;">🗄️</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">Düz Kör Köşe Alt Dolabı</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">100x60 cm | Tek Kapaklı & Tek Raflı</span>
         <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
       </div>
-      <div class="corner-option-item" onclick="applyCornerModuleChoice('base_corner_l', 1050)">
-        <div style="font-size:28px; margin-bottom:6px;">🗄️</div>
-        <strong style="color:#f8fafc; font-size:0.85rem;">105 cm Kör Köşe Alt Dolabı</strong>
-        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">Fasulye sepet / geniş depolama</span>
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('base_corner_l', 900)">
+        <div style="font-size:28px; margin-bottom:6px;">📐</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">90° L-Köşe Alt Dolabı</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">90x90 cm | 90° Katlanır Kapak & Tek L-Raflı</span>
+        <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
+      </div>
+      <div class="corner-option-item" onclick="applyCornerModuleChoice('base_corner_v', 900)">
+        <div style="font-size:28px; margin-bottom:6px;">📐</div>
+        <strong style="color:#f8fafc; font-size:0.85rem;">V-Köşe (45° Diyagonal) Alt Dolap</strong>
+        <span style="font-size:0.75rem; color:#94a3b8; display:block; margin-top:2px;">90x90 cm | 45° Pahlı Tek Kapak & Tek Raflı</span>
         <button class="corner-select-btn">✨ Bu Modülü Yerleştir</button>
       </div>
     `;
@@ -408,24 +430,33 @@ window.applyCornerModuleChoice = function(cornerType, width) {
   closeSmartCornerModal();
   if (!pending) return;
 
+  let defW = width;
+  let defD = (cornerType.includes('straight') ? (pending.isUpper ? 350 : 600) : width);
+
   const cornerTemplate = getModuleTemplate(cornerType) || {
     type: cornerType,
-    name: width === 1050 ? '105 cm Kör Köşe Alt Dolap' : (width === 650 ? '65x65 cm L-Köşe Üst Dolabı' : '90x90 cm Kör Köşe Alt Dolap'),
+    name: cornerType.includes('v') 
+      ? (pending.isUpper ? 'V-Köşe (45° Diyagonal) Üst Dolap' : 'V-Köşe (45° Diyagonal) Alt Dolap')
+      : (cornerType.includes('straight') 
+          ? (pending.isUpper ? 'Düz Kör Köşe Üst Dolap' : 'Düz Kör Köşe Alt Dolap')
+          : (pending.isUpper ? '90° L-Köşe Üst Dolabı' : '90° L-Köşe Alt Dolabı')),
     category: pending.isUpper ? 'wall' : 'base',
-    w: width,
-    d: width,
-    h: 720
+    w: defW,
+    d: defD,
+    h: 720,
+    shelves: 1
   };
-  cornerTemplate.selected_w = width;
+  cornerTemplate.selected_w = defW;
+  cornerTemplate.shelves = 1;
 
   // 1. Place the corner module at x = 0
   addModuleToDesign(cornerTemplate, 0, pending.targetWall);
 
   // 2. Place user's intended module right after the corner module
-  const nextPos = width;
+  const nextPos = defW;
   setTimeout(() => {
     addModuleToDesign(pending.template, nextPos, pending.targetWall);
-    showToast(`✨ L-Köşe modülü (${width / 10} cm) ve ardından ${pending.template.name} yerleştirildi!`, 'success');
+    showToast(`✨ ${cornerTemplate.name} ve ardından ${pending.template.name} yerleştirildi!`, 'success');
   }, 150);
 
   window.CURRENT_PENDING_CORNER_MOD = null;
@@ -1337,26 +1368,63 @@ window.runAutoKitchenGenerator = function() {
     }
   } else {
     // L-KITCHEN (CORNER AT 0,0, SINK ON BACK, COOKING/FRIDGE ON LEFT)
+    const cornerChoice = document.querySelector('input[name="auto-corner-choice"]:checked')?.value || 'l_corner';
+    let baseCornerType = 'base_corner_l';
+    let baseCornerName = '90° L-Köşe Alt Dolap (90x90 cm)';
+    let baseW = 900;
+    let baseD = 900;
+    let wallCornerType = 'wall_corner_l';
+    let wallCornerName = '90° L-Köşe Üst Dolabı';
+    let wallW = 650;
+    let wallD = 650;
+    let backX = 900;
+    let leftZ = 900;
+
+    if (cornerChoice === 'straight') {
+      baseCornerType = 'base_corner_straight';
+      baseCornerName = 'Düz Kör Köşe Alt Dolap (100 cm)';
+      baseW = 1000;
+      baseD = 600;
+      wallCornerType = 'wall_corner_straight';
+      wallCornerName = 'Düz Kör Köşe Üst Dolap';
+      wallW = 650;
+      wallD = 350;
+      backX = 1000;
+      leftZ = 600;
+    } else if (cornerChoice === 'v_corner') {
+      baseCornerType = 'base_corner_v';
+      baseCornerName = 'V-Köşe (45° Diyagonal) Alt Dolap (90x90 cm)';
+      baseW = 900;
+      baseD = 900;
+      wallCornerType = 'wall_corner_v';
+      wallCornerName = 'V-Köşe (45° Diyagonal) Üst Dolap';
+      wallW = 650;
+      wallD = 650;
+      backX = 900;
+      leftZ = 900;
+    }
+
     generatedModules.push({
       id: nextModId(),
-      type: 'base_corner_l',
-      name: cornerW === 1050 ? '105 cm Kör Köşe Alt Dolap' : '90x90 cm Kör Köşe Alt Dolap',
+      type: baseCornerType,
+      name: baseCornerName,
       category: 'base',
       wall: 'back',
-      w: cornerW, d: cornerW, h: 720, x: 0
+      w: baseW, d: baseD, h: 720, x: 0,
+      shelves: 1
     });
 
     generatedModules.push({
       id: nextModId(),
-      type: 'wall_corner_l',
-      name: 'L-Mutfak Köşe Üst Dolabı',
+      type: wallCornerType,
+      name: wallCornerName,
       category: 'wall',
       wall: 'back',
-      w: 650, d: 650, h: 720, x: 0
+      w: wallW, d: wallD, h: 720, x: 0,
+      shelves: 1
     });
 
     // BACK WALL
-    let backX = cornerW;
     const sinkX = backX;
     if ((rw - backX) >= 900) {
       generatedModules.push({
@@ -1489,7 +1557,9 @@ window.runAutoKitchenGenerator = function() {
 
   window.CURRENT_DESIGN.modules = generatedModules;
   navigateTo('studio');
-  showToast('✨ Mutfak Tasarım Sihirbazı: Ergonomik mutfağınız başarıyla hazırlandı!', 'success');
+  showToast('✨ Sihirbaz mutfağınızı hazırladı! Modülleri dilediğiniz gibi taşıyabilir, silebilir veya yeni modüller ekleyebilirsiniz.', 'success');
+  const banner = document.getElementById('studio-wizard-notice-banner');
+  if (banner) banner.style.display = 'flex';
 };
 
 function selectLayoutShape(shapeKey) {
@@ -1559,6 +1629,8 @@ async function submitDesignForQuote() {
   const custPhone = document.getElementById('quote-cust-phone').value.trim();
   const custEmail = document.getElementById('quote-cust-email').value.trim();
   const custCity = document.getElementById('quote-cust-city').value.trim();
+  const appDate = document.getElementById('quote-cust-date')?.value || '';
+  const appTime = document.getElementById('quote-cust-time')?.value || '';
   const notes = document.getElementById('quote-cust-notes').value.trim();
 
   if (!custName || !custPhone) {
@@ -1570,6 +1642,8 @@ async function submitDesignForQuote() {
   window.CURRENT_DESIGN.customer_phone = custPhone;
   window.CURRENT_DESIGN.customer_email = custEmail;
   window.CURRENT_DESIGN.customer_city = custCity;
+  window.CURRENT_DESIGN.appointment_date = appDate;
+  window.CURRENT_DESIGN.appointment_time_slot = appTime;
   window.CURRENT_DESIGN.notes = notes;
 
   try {

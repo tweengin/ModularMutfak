@@ -91,6 +91,8 @@ def init_db():
         appliances_json TEXT NOT NULL, -- selected appliances
         materials_json TEXT NOT NULL, -- body color, door finish, handle type, countertop type
         notes TEXT,
+        appointment_date TEXT,
+        appointment_time_slot TEXT,
         status TEXT NOT NULL DEFAULT 'quote_requested', -- 'draft', 'quote_requested', 'reviewed', 'approved', 'in_production', 'completed'
         quote_price REAL DEFAULT 0.0,
         admin_notes TEXT,
@@ -199,6 +201,16 @@ def init_db():
         sort_order INTEGER DEFAULT 0
     );
     """)
+
+    # Safe schema migration for appointment columns
+    try:
+        c.execute("ALTER TABLE designs ADD COLUMN appointment_date TEXT;")
+    except Exception:
+        pass
+    try:
+        c.execute("ALTER TABLE designs ADD COLUMN appointment_time_slot TEXT;")
+    except Exception:
+        pass
 
     conn.commit()
     seed_module_templates(conn)
@@ -452,14 +464,18 @@ def seed_module_templates(conn):
             ('base_sink', 'kitchen', 'base', 'Eviye Alt Dolabı (2 Kapak)', '💧', 900, 600, 720, json.dumps([600, 800, 900, 1000]), 0, 'Paslanmaz/granit eviye altı', 4),
             ('base_oven', 'kitchen', 'base', 'Ankastre Fırın & Ocak Modülü', '♨️', 600, 600, 720, json.dumps([600, 900]), 0, 'Fırın boşluğu ve alt çekmece', 5),
             ('base_dishwasher', 'kitchen', 'base', 'Bulaşık Makinesi Paneli', '🍽️', 600, 600, 720, json.dumps([450, 600]), 0, 'Tam ankastre bulaşık makinesi kapağı', 6),
-            ('base_corner_l', 'kitchen', 'base', 'L-Mutfak Kör Köşe Modülü', '📐', 900, 900, 720, json.dumps([900, 1050]), 0, '90° köşe dönüş modülü', 7),
+            ('base_corner_straight', 'kitchen', 'base', 'Düz Kör Köşe Alt Dolap', '📐', 1000, 600, 720, json.dumps([1000, 1050]), 0, 'Düz kör köşe dönüş dolabı (Tek Raflı)', 7),
+            ('base_corner_l', 'kitchen', 'base', '90° L-Köşe Alt Dolap', '📐', 900, 900, 720, json.dumps([900, 950]), 0, '90° L köşe dönüş dolabı (Tek Raflı)', 8),
+            ('base_corner_v', 'kitchen', 'base', 'V-Köşe (45° Diyagonal) Alt Dolap', '📐', 900, 900, 720, json.dumps([900, 950]), 0, '45° pahlı diyagonal köşe dolabı (Tek Raflı)', 9),
             
             # Kitchen - Wall
             ('wall_single', 'kitchen', 'wall', 'Tek Kapaklı Üst Dolap', '📦', 500, 350, 720, json.dumps([300, 400, 500, 600]), 1, 'Dar alan üst depolama', 10),
             ('wall_double', 'kitchen', 'wall', 'Çift Kapaklı Üst Dolap', '📦', 800, 350, 720, json.dumps([600, 800, 900, 1000]), 1, '2 ayarlı raflı standart üst dolap', 11),
             ('wall_glass', 'kitchen', 'wall', 'Camlı Yatay Kalkar Dolap', '🪟', 900, 350, 720, json.dumps([600, 800, 900, 1000]), 0, 'Buzlu cam insets & Aventos mekanizma', 12),
             ('wall_hood', 'kitchen', 'wall', 'Davlumbaz Üstü Aspiratör Dolabı', '💨', 600, 350, 720, json.dumps([600, 900]), 0, 'Karbon filtreli gömme aspiratör kabini', 13),
-            ('wall_corner_l', 'kitchen', 'wall', 'L-Mutfak Köşe Üst Dolabı', '📐', 650, 650, 720, json.dumps([650]), 0, '90° köşe üst asma', 14),
+            ('wall_corner_straight', 'kitchen', 'wall', 'Düz Kör Köşe Üst Dolap', '📐', 650, 350, 720, json.dumps([650]), 0, 'Düz kör köşe üst dolap (Tek Raflı)', 14),
+            ('wall_corner_l', 'kitchen', 'wall', '90° L-Köşe Üst Dolabı', '📐', 650, 650, 720, json.dumps([650]), 0, '90° L köşe üst asma (Tek Raflı)', 15),
+            ('wall_corner_v', 'kitchen', 'wall', 'V-Köşe (45° Diyagonal) Üst Dolap', '📐', 650, 650, 720, json.dumps([650]), 0, '45° pahlı diyagonal köşe üst dolabı (Tek Raflı)', 16),
 
             # Kitchen - Tall
             ('tall_pantry_2d', 'kitchen', 'tall', '2 Kapaklı Erzak Boy Kileri', '🚪', 600, 600, 2100, json.dumps([450, 600]), 1, '5 raflı tam boy kiler', 20),
@@ -472,7 +488,7 @@ def seed_module_templates(conn):
             ('hall_coat_wardrobe', 'portmanto', 'tall', '2 Kapaklı Askılıklı Portmanto', '🧥', 1000, 600, 2200, json.dumps([800, 1000, 1200]), 1, 'Askılık borusu ve şapkalık raflı', 32)
         ]
         c.executemany("""
-        INSERT OR IGNORE INTO module_templates (key, category, group_key, name, icon, default_w, default_d, default_h, allowed_widths_json, allow_custom_width, description, sort_order)
+        INSERT OR REPLACE INTO module_templates (key, category, group_key, name, icon, default_w, default_d, default_h, allowed_widths_json, allow_custom_width, description, sort_order)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, templates)
         conn.commit()

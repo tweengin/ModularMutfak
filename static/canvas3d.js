@@ -615,87 +615,309 @@ class StudioCanvas3D {
     const md = mod.d || 600;
     const mh = mod.h || 720;
     const wall = mod.wall || 'back';
+    const isSelected = (this.selectedModuleId === mod.id);
     const bodyMat = this.getDoorMaterial(isSelected);
 
+    const isCornerV = mod.type?.includes('corner_v');
+    const isCornerL = mod.type === 'base_corner_l' || mod.type === 'wall_corner_l';
+    const isCornerStraight = mod.type?.includes('corner_straight') || (mod.name && mod.name.toLowerCase().includes('düz kör'));
+
     if (mod.category === 'base') {
-      // BASE CABINET (Depth: 600mm)
       const plinthH = 100;
-      const plinthGeo = new THREE.BoxGeometry(mw - 30, plinthH, md - 70);
-      const plinthMesh = new THREE.Mesh(plinthGeo, this.matCache.plinthAlu);
-      plinthMesh.position.set(0, plinthH / 2, (md - 70) / 2 + 40);
-      plinthMesh.castShadow = true;
-      plinthMesh.receiveShadow = true;
-      group.add(plinthMesh);
-
-      // Cabinet Body (Height: 720mm, Depth: 600mm, from Z = 0 to Z = 600)
       const bodyH = 720;
-      const bodyGeo = new THREE.BoxGeometry(mw, bodyH, md);
-      const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-      bodyMesh.position.set(0, plinthH + bodyH / 2, md / 2);
-      bodyMesh.castShadow = true;
-      bodyMesh.receiveShadow = true;
-      group.add(bodyMesh);
-
-      // Dynamic Countertop (Thickness: 40mm, Depth: 620mm with 20mm front overhang!)
       const ctThick = 40;
-      const ctDepth = md + 20;
-      const ctGeo = new THREE.BoxGeometry(mw + 4, ctThick, ctDepth);
-      const ctMesh = new THREE.Mesh(ctGeo, this.getCountertopMaterial());
-      ctMesh.position.set(0, plinthH + bodyH + ctThick / 2, ctDepth / 2);
-      ctMesh.castShadow = true;
-      ctMesh.receiveShadow = true;
-      group.add(ctMesh);
 
-      // DETAILS: Oven, Cooktop, Sink, Drawers, or Handles
-      if (mod.type?.includes('oven')) {
-        const ovenMesh = this.createOvenMesh(mw, bodyH, md);
-        ovenMesh.position.set(0, plinthH + bodyH / 2, md + 2);
-        group.add(ovenMesh);
+      if (isCornerV) {
+        // --- 1. V-KÖŞE (45° DİYAGONAL PAHLI KÖŞE DOLAP: 900x900 mm) ---
+        const vW = mw; // 900
+        const vD = md; // 900
 
-        const cooktopMesh = this.createCooktopMesh(mw, ctDepth);
-        cooktopMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
-        group.add(cooktopMesh);
+        // Plinth (V-cut)
+        const plinthShape = new THREE.Shape();
+        plinthShape.moveTo(-vW/2 + 20, -vD/2 + 20);
+        plinthShape.lineTo(vW/2 - 20, -vD/2 + 20);
+        plinthShape.lineTo(vW/2 - 20, vD/2 - 320);
+        plinthShape.lineTo(vW/2 - 320, vD/2 - 20);
+        plinthShape.lineTo(-vW/2 + 20, vD/2 - 20);
+        plinthShape.closePath();
 
-      } else if (mod.type?.includes('sink')) {
-        const sinkMesh = this.createSinkMesh(mw, ctDepth);
-        sinkMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
-        group.add(sinkMesh);
+        const pGeo = new THREE.ExtrudeGeometry(plinthShape, { depth: plinthH, bevelEnabled: false });
+        pGeo.rotateX(Math.PI / 2);
+        const plinthMesh = new THREE.Mesh(pGeo, this.matCache.plinthAlu);
+        plinthMesh.position.set(0, plinthH, 0);
+        group.add(plinthMesh);
 
-      } else if (mod.drawers > 0) {
-        const dh = bodyH / mod.drawers;
-        for (let i = 0; i < mod.drawers; i++) {
-          const dy = plinthH + (i * dh) + (dh / 2);
-          const handleMesh = this.createHandle3D(Math.min(mw * 0.45, 140), 12, true);
-          handleMesh.position.set(0, dy, md + 10);
-          group.add(handleMesh);
-        }
+        // Body (V-cut Extrusion)
+        const bodyShape = new THREE.Shape();
+        bodyShape.moveTo(-vW/2, -vD/2);
+        bodyShape.lineTo(vW/2, -vD/2);
+        bodyShape.lineTo(vW/2, vD/2 - 300);
+        bodyShape.lineTo(vW/2 - 300, vD/2);
+        bodyShape.lineTo(-vW/2, vD/2);
+        bodyShape.closePath();
+
+        const bGeo = new THREE.ExtrudeGeometry(bodyShape, { depth: bodyH, bevelEnabled: false });
+        bGeo.rotateX(Math.PI / 2);
+        const bodyMesh = new THREE.Mesh(bGeo, bodyMat);
+        bodyMesh.position.set(0, plinthH + bodyH, 0);
+        bodyMesh.castShadow = true;
+        bodyMesh.receiveShadow = true;
+        group.add(bodyMesh);
+
+        // Countertop (V-cut with 20mm overhang on front diagonal and returns)
+        const ctShape = new THREE.Shape();
+        ctShape.moveTo(-vW/2 - 2, -vD/2 - 2);
+        ctShape.lineTo(vW/2 + 2, -vD/2 - 2);
+        ctShape.lineTo(vW/2 + 2, vD/2 - 280);
+        ctShape.lineTo(vW/2 - 280, vD/2 + 2);
+        ctShape.lineTo(-vW/2 - 2, vD/2 + 2);
+        ctShape.closePath();
+
+        const ctGeo = new THREE.ExtrudeGeometry(ctShape, { depth: ctThick, bevelEnabled: false });
+        ctGeo.rotateX(Math.PI / 2);
+        const ctMesh = new THREE.Mesh(ctGeo, this.getCountertopMaterial());
+        ctMesh.position.set(0, plinthH + bodyH + ctThick, 0);
+        ctMesh.castShadow = true;
+        ctMesh.receiveShadow = true;
+        group.add(ctMesh);
+
+        // Diagonal 45° Door Frame & Panel
+        const diagDoorW = Math.hypot(300, 300); // ~424mm
+        const doorGeo = new THREE.BoxGeometry(diagDoorW - 8, bodyH - 12, 18);
+        const doorMesh = new THREE.Mesh(doorGeo, bodyMat);
+        doorMesh.position.set(vW/2 - 150, plinthH + bodyH / 2, vD/2 - 150);
+        doorMesh.rotation.y = -Math.PI / 4;
+        group.add(doorMesh);
+
+        // Diagonal Handle
+        const handle = this.createHandle3D(12, 90, false);
+        handle.position.set(vW/2 - 150, plinthH + bodyH / 2, vD/2 - 150);
+        handle.rotation.y = -Math.PI / 4;
+        handle.translateZ(14);
+        group.add(handle);
+
+        // Middle Shelf (Tek Raf - Standart 18mm MDFlam)
+        const sShape = new THREE.Shape();
+        sShape.moveTo(-vW/2 + 18, -vD/2 + 18);
+        sShape.lineTo(vW/2 - 18, -vD/2 + 18);
+        sShape.lineTo(vW/2 - 18, vD/2 - 310);
+        sShape.lineTo(vW/2 - 310, vD/2 - 18);
+        sShape.lineTo(-vW/2 + 18, vD/2 - 18);
+        sShape.closePath();
+        const sGeo = new THREE.ExtrudeGeometry(sShape, { depth: 18, bevelEnabled: false });
+        sGeo.rotateX(Math.PI / 2);
+        const shelfMesh = new THREE.Mesh(sGeo, this.matCache.woodOak);
+        shelfMesh.position.set(0, plinthH + bodyH / 2 + 9, 0);
+        group.add(shelfMesh);
+
+      } else if (isCornerL) {
+        // --- 2. 90° L-KÖŞE DOLABI (900x900 mm) ---
+        const plinthGeo = new THREE.BoxGeometry(mw - 30, plinthH, md - 70);
+        const plinthMesh = new THREE.Mesh(plinthGeo, this.matCache.plinthAlu);
+        plinthMesh.position.set(0, plinthH / 2, (md - 70) / 2 + 40);
+        group.add(plinthMesh);
+
+        // Body Box
+        const bodyGeo = new THREE.BoxGeometry(mw, bodyH, md);
+        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        bodyMesh.position.set(0, plinthH + bodyH / 2, md / 2);
+        bodyMesh.castShadow = true;
+        bodyMesh.receiveShadow = true;
+        group.add(bodyMesh);
+
+        // Countertop
+        const ctDepth = md + 20;
+        const ctGeo = new THREE.BoxGeometry(mw + 4, ctThick, ctDepth);
+        const ctMesh = new THREE.Mesh(ctGeo, this.getCountertopMaterial());
+        ctMesh.position.set(0, plinthH + bodyH + ctThick / 2, ctDepth / 2);
+        group.add(ctMesh);
+
+        // Bi-fold 90° Door representation
+        const d1 = new THREE.Mesh(new THREE.BoxGeometry(mw * 0.45, bodyH - 10, 18), bodyMat);
+        d1.position.set(-mw * 0.22, plinthH + bodyH / 2, md + 2);
+        group.add(d1);
+
+        const d2 = new THREE.Mesh(new THREE.BoxGeometry(mw * 0.45, bodyH - 10, 18), bodyMat);
+        d2.position.set(mw * 0.22, plinthH + bodyH / 2, md + 2);
+        group.add(d2);
+
+        const h1 = this.createHandle3D(12, 90, false);
+        h1.position.set(10, plinthH + bodyH / 2, md + 12);
+        group.add(h1);
+
+        // Middle Shelf (Tek Raf)
+        const shelfGeo = new THREE.BoxGeometry(mw - 36, 18, md - 40);
+        const shelfMesh = new THREE.Mesh(shelfGeo, this.matCache.woodOak);
+        shelfMesh.position.set(0, plinthH + bodyH / 2, md / 2 - 10);
+        group.add(shelfMesh);
+
+      } else if (isCornerStraight) {
+        // --- 3. DÜZ KÖR KÖŞE DOLABI (1000/1050 mm) ---
+        const plinthGeo = new THREE.BoxGeometry(mw - 30, plinthH, md - 70);
+        const plinthMesh = new THREE.Mesh(plinthGeo, this.matCache.plinthAlu);
+        plinthMesh.position.set(0, plinthH / 2, (md - 70) / 2 + 40);
+        group.add(plinthMesh);
+
+        // Body Box
+        const bodyGeo = new THREE.BoxGeometry(mw, bodyH, md);
+        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        bodyMesh.position.set(0, plinthH + bodyH / 2, md / 2);
+        bodyMesh.castShadow = true;
+        bodyMesh.receiveShadow = true;
+        group.add(bodyMesh);
+
+        // Countertop
+        const ctDepth = md + 20;
+        const ctGeo = new THREE.BoxGeometry(mw + 4, ctThick, ctDepth);
+        const ctMesh = new THREE.Mesh(ctGeo, this.getCountertopMaterial());
+        ctMesh.position.set(0, plinthH + bodyH + ctThick / 2, ctDepth / 2);
+        group.add(ctMesh);
+
+        // Blind Filler Panel on left 600mm
+        const blindGeo = new THREE.BoxGeometry(600, bodyH - 10, 18);
+        const blindMesh = new THREE.Mesh(blindGeo, this.matCache.plinthAlu);
+        blindMesh.position.set(-mw / 2 + 300, plinthH + bodyH / 2, md + 2);
+        group.add(blindMesh);
+
+        // Active Door on right (400mm)
+        const doorW = mw - 600;
+        const doorGeo = new THREE.BoxGeometry(doorW - 8, bodyH - 10, 18);
+        const doorMesh = new THREE.Mesh(doorGeo, bodyMat);
+        doorMesh.position.set(-mw / 2 + 600 + doorW / 2, plinthH + bodyH / 2, md + 4);
+        group.add(doorMesh);
+
+        const h = this.createHandle3D(12, 90, false);
+        h.position.set(mw / 2 - 30, plinthH + bodyH / 2, md + 14);
+        group.add(h);
+
+        // Middle Shelf (Tek Raf - Standart 18mm MDFlam)
+        const shelfGeo = new THREE.BoxGeometry(mw - 36, 18, md - 40);
+        const shelfMesh = new THREE.Mesh(shelfGeo, this.matCache.woodOak);
+        shelfMesh.position.set(0, plinthH + bodyH / 2, md / 2 - 10);
+        group.add(shelfMesh);
+
       } else {
-        const handleMesh = this.createHandle3D(12, 90, false);
-        handleMesh.position.set(mw / 2 - 25, plinthH + bodyH / 2, md + 10);
-        group.add(handleMesh);
+        // --- STANDART ALT DOLAPLAR ---
+        const plinthGeo = new THREE.BoxGeometry(mw - 30, plinthH, md - 70);
+        const plinthMesh = new THREE.Mesh(plinthGeo, this.matCache.plinthAlu);
+        plinthMesh.position.set(0, plinthH / 2, (md - 70) / 2 + 40);
+        plinthMesh.castShadow = true;
+        plinthMesh.receiveShadow = true;
+        group.add(plinthMesh);
+
+        const bodyGeo = new THREE.BoxGeometry(mw, bodyH, md);
+        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        bodyMesh.position.set(0, plinthH + bodyH / 2, md / 2);
+        bodyMesh.castShadow = true;
+        bodyMesh.receiveShadow = true;
+        group.add(bodyMesh);
+
+        const ctDepth = md + 20;
+        const ctGeo = new THREE.BoxGeometry(mw + 4, ctThick, ctDepth);
+        const ctMesh = new THREE.Mesh(ctGeo, this.getCountertopMaterial());
+        ctMesh.position.set(0, plinthH + bodyH + ctThick / 2, ctDepth / 2);
+        ctMesh.castShadow = true;
+        ctMesh.receiveShadow = true;
+        group.add(ctMesh);
+
+        // DETAILS: Oven, Cooktop, Sink, Drawers, or Standard Doors
+        if (mod.type?.includes('oven')) {
+          const ovenMesh = this.createOvenMesh(mw, bodyH, md);
+          ovenMesh.position.set(0, plinthH + bodyH / 2, md + 2);
+          group.add(ovenMesh);
+
+          const cooktopMesh = this.createCooktopMesh(mw, ctDepth);
+          cooktopMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
+          group.add(cooktopMesh);
+
+        } else if (mod.type?.includes('sink')) {
+          const sinkMesh = this.createSinkMesh(mw, ctDepth);
+          sinkMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
+          group.add(sinkMesh);
+
+        } else if (mod.drawers > 0) {
+          const dh = bodyH / mod.drawers;
+          for (let i = 0; i < mod.drawers; i++) {
+            const dy = plinthH + (i * dh) + (dh / 2);
+            const handleMesh = this.createHandle3D(Math.min(mw * 0.45, 140), 12, true);
+            handleMesh.position.set(0, dy, md + 10);
+            group.add(handleMesh);
+          }
+        } else {
+          // Standard Single or Double Door with Middle Shelf (Tek Raf)
+          const handleMesh = this.createHandle3D(12, 90, false);
+          handleMesh.position.set(mw / 2 - 25, plinthH + bodyH / 2, md + 10);
+          group.add(handleMesh);
+
+          // Middle Shelf (Tek Raf)
+          const shelfGeo = new THREE.BoxGeometry(mw - 36, 18, md - 40);
+          const shelfMesh = new THREE.Mesh(shelfGeo, this.matCache.woodOak);
+          shelfMesh.position.set(0, plinthH + bodyH / 2, md / 2 - 10);
+          group.add(shelfMesh);
+        }
       }
 
     } else if (mod.category === 'wall') {
       // WALL CABINET (Depth: 350mm, Height: 720mm, Z: 0 to 350 FLUSH AGAINST WALL)
       const wallH = mod.h || 720;
       const wallZ = 1450;
-      const bodyGeo = new THREE.BoxGeometry(mw, wallH, md);
-      const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-      bodyMesh.position.set(0, wallZ + wallH / 2, md / 2);
-      bodyMesh.castShadow = true;
-      bodyMesh.receiveShadow = true;
-      group.add(bodyMesh);
 
-      // Frosted Glass Inset on Door
-      const glassGeo = new THREE.BoxGeometry(mw * 0.8, wallH * 0.45, 8);
-      const glassMesh = new THREE.Mesh(glassGeo, this.matCache.frostedGlass);
-      glassMesh.position.set(0, wallZ + wallH / 2, md + 4);
-      group.add(glassMesh);
+      if (isCornerV) {
+        // V-Corner Wall (650x650 mm)
+        const vW = mw || 650;
+        const vD = md || 650;
+        const vShape = new THREE.Shape();
+        vShape.moveTo(-vW/2, -vD/2);
+        vShape.lineTo(vW/2, -vD/2);
+        vShape.lineTo(vW/2, vD/2 - 250);
+        vShape.lineTo(vW/2 - 250, vD/2);
+        vShape.lineTo(-vW/2, vD/2);
+        vShape.closePath();
 
-      // Horizontal Bar Handle
-      const handleMesh = this.createHandle3D(60, 10, true);
-      handleMesh.position.set(0, wallZ + 35, md + 10);
-      group.add(handleMesh);
+        const vGeo = new THREE.ExtrudeGeometry(vShape, { depth: wallH, bevelEnabled: false });
+        vGeo.rotateX(Math.PI / 2);
+        const bodyMesh = new THREE.Mesh(vGeo, bodyMat);
+        bodyMesh.position.set(0, wallZ + wallH, 0);
+        group.add(bodyMesh);
+
+        // Middle Shelf
+        const sGeo = new THREE.ExtrudeGeometry(vShape, { depth: 18, bevelEnabled: false });
+        sGeo.rotateX(Math.PI / 2);
+        const sMesh = new THREE.Mesh(sGeo, this.matCache.woodOak);
+        sMesh.position.set(0, wallZ + wallH / 2 + 9, 0);
+        group.add(sMesh);
+
+        const hMesh = this.createHandle3D(10, 60, false);
+        hMesh.position.set(vW/2 - 125, wallZ + wallH / 2, vD/2 - 125);
+        hMesh.rotation.y = -Math.PI / 4;
+        hMesh.translateZ(12);
+        group.add(hMesh);
+
+      } else {
+        const bodyGeo = new THREE.BoxGeometry(mw, wallH, md);
+        const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+        bodyMesh.position.set(0, wallZ + wallH / 2, md / 2);
+        bodyMesh.castShadow = true;
+        bodyMesh.receiveShadow = true;
+        group.add(bodyMesh);
+
+        if (mod.type?.includes('glass')) {
+          const glassGeo = new THREE.BoxGeometry(mw * 0.8, wallH * 0.45, 8);
+          const glassMesh = new THREE.Mesh(glassGeo, this.matCache.frostedGlass);
+          glassMesh.position.set(0, wallZ + wallH / 2, md + 4);
+          group.add(glassMesh);
+        }
+
+        const handleMesh = this.createHandle3D(60, 10, true);
+        handleMesh.position.set(0, wallZ + 35, md + 10);
+        group.add(handleMesh);
+
+        // Middle Shelf (Tek Raf)
+        const shelfGeo = new THREE.BoxGeometry(mw - 36, 18, md - 30);
+        const shelfMesh = new THREE.Mesh(shelfGeo, this.matCache.woodOak);
+        shelfMesh.position.set(0, wallZ + wallH / 2, md / 2 - 10);
+        group.add(shelfMesh);
+      }
 
     } else if (mod.category === 'tall') {
       // TALL CABINET / FRIDGE (Depth: 600mm, Height: 2100mm, Z: 0 to 600 FLUSH AGAINST WALL)
@@ -727,6 +949,13 @@ class StudioCanvas3D {
         const h = this.createHandle3D(10, 240, false);
         h.position.set(mw / 2 - 25, tallH / 2, md + 10);
         group.add(h);
+
+        // Middle Shelves for Pantry
+        for (let si = 1; si <= 3; si++) {
+          const sMesh = new THREE.Mesh(new THREE.BoxGeometry(mw - 36, 18, md - 40), this.matCache.woodOak);
+          sMesh.position.set(0, (tallH / 4) * si, md / 2 - 10);
+          group.add(sMesh);
+        }
       }
     }
 

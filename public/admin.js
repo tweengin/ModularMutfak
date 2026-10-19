@@ -170,7 +170,11 @@ const AdminPanel = {
 
       tr.innerHTML = `
         <td><strong style="color:#38bdf8; font-family:monospace; font-size:1rem;">${d.reference_code}</strong></td>
-        <td><strong>${d.customer_name}</strong><br><small style="color:#94a3b8;">${d.customer_phone || ''} | ${d.customer_city || ''}</small></td>
+        <td>
+          <strong>${d.customer_name}</strong><br>
+          <small style="color:#94a3b8;">${d.customer_phone || ''} | ${d.customer_city || ''}</small>
+          ${d.appointment_date ? `<br><span style="color:#10b981; font-size:0.75rem; font-weight:700;">📅 ${d.appointment_date} (${d.appointment_time_slot || ''})</span>` : ''}
+        </td>
         <td><span class="badge badge-info">${d.category?.toUpperCase()}</span></td>
         <td>${d.quote_price > 0 ? (d.quote_price.toLocaleString('tr-TR') + ' ₺') : 'Hesaplanmadı'}</td>
         <td>${statusBadge}</td>
@@ -235,8 +239,10 @@ const AdminPanel = {
     document.getElementById('inspect-customer-name').textContent = design.customer_name;
     document.getElementById('inspect-category').textContent = design.category.toUpperCase();
     document.getElementById('inspect-phone').textContent = design.customer_phone;
-    document.getElementById('inspect-city').textContent = design.customer_city || 'İstanbul';
-    document.getElementById('inspect-notes').textContent = design.notes || 'Müşteri notu yok.';
+    const appText = design.appointment_date 
+      ? `📅 Tercih Edilen Randevu: ${design.appointment_date} (${design.appointment_time_slot || 'Saat belirtilmedi'})` 
+      : 'Randevu tarihi belirtilmedi';
+    document.getElementById('inspect-notes').innerHTML = `${design.notes || 'Müşteri notu yok.'}<br><strong style="color:#10b981; display:inline-block; margin-top:4px;">${appText}</strong>`;
 
     // BOM Items Table
     const tbody = document.getElementById('bom-items-tbody');

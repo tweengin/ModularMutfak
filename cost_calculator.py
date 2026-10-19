@@ -86,8 +86,11 @@ def decompose_module_into_panels(mod, materials):
             "has_hinge_holes": False, "has_minifix": True, "has_shelf_holes": False, "has_groove": True
         })
     
-    # 4. Shelves (Raflar)
-    num_shelves = int(mod.get('shelves', 1 if cat in ['wall', 'tall'] else 0))
+    # 4. Shelves (Raflar - Standart Tek Orta Raf)
+    has_drawers = int(mod.get('drawers', 0)) > 0
+    is_appliance = any(k in mod.get('type', '') for k in ['oven', 'dishwasher'])
+    default_shelves = 0 if (has_drawers or is_appliance) else 1
+    num_shelves = int(mod.get('shelves', default_shelves))
     if num_shelves > 0:
         shelf_depth = max(0, d - 20)  # recessed shelf
         panels.append({

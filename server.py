@@ -547,6 +547,8 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
             appliances_json = json.dumps(body.get('appliances', []), ensure_ascii=False)
             materials_json = json.dumps(body.get('materials', {}), ensure_ascii=False)
             notes = body.get('notes', '')
+            appointment_date = body.get('appointment_date', '').strip()
+            appointment_time_slot = body.get('appointment_time_slot', '').strip()
 
             ref_code = generate_reference_code(category)
 
@@ -557,13 +559,13 @@ class ModulerCraftHandler(BaseHTTPRequestHandler):
                 reference_code, user_id, customer_name, customer_phone, customer_email, customer_city,
                 category, layout_type, room_width, room_depth, room_height,
                 room_config_json, modules_json, appliances_json, materials_json,
-                notes, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'quote_requested')
+                notes, appointment_date, appointment_time_slot, status
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'quote_requested')
             """, (
                 ref_code, user_id, customer_name, customer_phone, customer_email, customer_city,
                 category, layout_type, room_w, room_d, room_h,
                 room_config_json, modules_json, appliances_json, materials_json,
-                notes
+                notes, appointment_date, appointment_time_slot
             ))
             conn.commit()
             conn.close()
