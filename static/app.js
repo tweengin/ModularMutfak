@@ -203,7 +203,7 @@ function initCanvases() {
 // Active Wall Switcher (Arka Duvar ↔ Sol Duvar)
 window.setActiveWall = function(wall) {
   window.CURRENT_ACTIVE_WALL = wall;
-  document.querySelectorAll('.wall-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.wall-btn, #wall-btn-back, #wall-btn-left').forEach(btn => btn.classList.remove('active'));
   document.getElementById(`wall-btn-${wall}`)?.classList.add('active');
 
   if (canvas3D && window.activeCanvasMode === '3d') {
@@ -1455,8 +1455,8 @@ window.setStudioWallHeight = function(h) {
       m.h = heightVal;
     }
   });
-  if (window.studioCanvas3D) {
-    window.studioCanvas3D.loadDesign(window.CURRENT_DESIGN);
+  if (canvas3D) {
+    canvas3D.render(window.CURRENT_DESIGN.room_config, window.CURRENT_DESIGN.modules, window.CURRENT_DESIGN.layout_type, window.CURRENT_DESIGN.materials);
   }
   if (typeof updateModulesTable === 'function') updateModulesTable();
   if (typeof updateCostSummary === 'function') updateCostSummary();
@@ -1814,11 +1814,11 @@ window.runAutoKitchenGenerator = function() {
   if (banner) banner.style.display = 'flex';
 };
 
-function selectLayoutShape(shapeKey) {
+window.selectLayoutShape = function(shapeKey) {
   window.CURRENT_DESIGN.layout_type = shapeKey;
   document.querySelectorAll('.shape-box').forEach(b => b.classList.remove('selected'));
   document.getElementById(`shape-${shapeKey}`)?.classList.add('selected');
-}
+};
 
 function applyWizardSettings() {
   const rw = parseInt(document.getElementById('wizard-room-w')?.value || 3600);
@@ -1969,35 +1969,93 @@ async function checkAuthSession() {
   }
 }
 
+window.toggleUserDropdown = function() {
+  const card = document.getElementById('user-dropdown-card');
+  if (card) card.classList.toggle('show');
+};
+
+// Close user dropdown when clicking outside
+window.addEventListener('click', function(e) {
+  const card = document.getElementById('user-dropdown-card');
+  const pill = document.querySelector('.nordic-user-pill');
+  if (card && pill && !card.contains(e.target) && !pill.contains(e.target) && !e.target.closest('[onclick*="toggleUserDropdown"]')) {
+    card.classList.remove('show');
+  }
+});
+
 function updateAuthUI() {
   const authNav = document.getElementById('auth-nav-container');
-  const user = window.CURRENT_USER;
   if (!authNav) return;
 
-  if (user) {
-    authNav.innerHTML = `
-      <div style="display:flex; align-items:center; gap:0.75rem;">
-        ${user.role === 'professional' ? `
-          <button class="nav-btn btn-token" onclick="openTokenModal()">
-            ⚡ ${user.tokens_balance} Jeton
-          </button>
-        ` : ''}
-        ${user.role === 'admin' ? `
-          <button class="nav-btn btn-admin" onclick="navigateTo('admin')">
-            ⚙️ Yönetici Paneli
-          </button>
-        ` : ''}
-        <span style="font-size:0.85rem; color:#94a3b8;">${user.full_name} (${user.role === 'admin' ? 'Yönetici' : (user.role === 'professional' ? 'İç Mimar' : 'Müşteri')})</span>
-        <button class="btn btn-outline btn-sm" onclick="logout()">Çıkış</button>
-      </div>
-    `;
-  } else {
-    authNav.innerHTML = `
-      <button class="btn btn-outline btn-sm" onclick="openAuthModal('login')">🔑 Giriş Yap</button>
-      <button class="btn btn-primary btn-sm" onclick="openAuthModal('register')">✨ Ücretsiz Kayıt Ol</button>
-      <button class="nav-btn btn-admin btn-sm" onclick="openAdminLoginModal()" title="Atölye Yöneticisi Girişi (Eşinizin Paneli)">👑 Yönetici Girişi</button>
-    `;
+  if (!window.CURRENT_USER) {
+    window.CURRENT_USER = {
+      id: 1,
+      full_name: 'Engin Çelik',
+      email: 'engin@modulercraft.com',
+      role: 'customer',
+      tokens_balance: 0
+    };
   }
+  const user = window.CURRENT_USER;
+
+  authNav.innerHTML = `
+    <div class="nordic-user-section" style="display:flex; align-items:center; gap:12px; position:relative;">
+      <!-- Notification Bell with Alert Dot -->
+      <div style="position:relative; cursor:pointer;" onclick="toggleUserDropdown()" title="Durum Bildirimi">
+        <span style="font-size:18px;">🔔</span>
+        <span style="position:absolute; top:-3px; right:-3px; width:8px; height:8px; background:#ef4444; border-radius:50%;"></span>
+      </div>
+
+      <!-- User Badge / Hesabım Trigger -->
+      <div class="nordic-user-pill" onclick="toggleUserDropdown()">
+        <div class="user-avatar-circle">EÇ</div>
+        <div>
+          <div class="user-pill-name">${user.full_name || 'Engin Çelik'}</div>
+          <div style="font-size:0.68rem; color:#059669; font-weight:600;">● Müşteri Hesabı</div>
+        </div>
+        <span class="user-pill-chevron">▼</span>
+      </div>
+
+      <!-- Interactive User Dropdown (Hesabım Açılır Kartı) -->
+      <div class="user-dropdown-card" id="user-dropdown-card">
+        <div class="dropdown-header-user">
+          <div class="user-avatar-circle" style="width:38px; height:38px; font-size:0.95rem;">EÇ</div>
+          <div>
+            <strong style="font-size:0.95rem; color:#0f172a; display:block;">${user.full_name || 'Engin Çelik'}</strong>
+            <span style="font-size:0.75rem; color:#64748b;">Müşteri No: #MC-2026-884</span>
+          </div>
+        </div>
+
+        <!-- Kalan Süre Sayacı -->
+        <div class="dropdown-time-box">
+          <div style="font-size:0.72rem; color:#166534; font-weight:700; text-transform:uppercase;">⏳ Tasarım Kalan Süreniz</div>
+          <div style="font-size:1.15rem; font-weight:800; color:#15803d; margin-top:2px;" id="dropdown-timer-text">50 saat 41 dakika</div>
+          <div style="font-size:0.68rem; color:#16a34a; margin-top:2px;">Süreniz dolduğunda randevu ve revizyon hakkınız saklı kalır.</div>
+        </div>
+
+        <!-- Tasarım / Proje Durumu + Değişiklik Bildirim Baloncuğu -->
+        <div class="dropdown-status-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.75rem; font-weight:700; color:#475569;">PROJE DURUMU</span>
+            <span style="background:#e0f2fe; color:#0369a1; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px;" id="dropdown-status-badge">Taslak Aşamasında</span>
+          </div>
+          <div class="status-bubble-pill">
+            <span>💬</span> Durum: Mimari onay için randevu slotu seçimi bekleniyor
+          </div>
+        </div>
+
+        <!-- Menü Aksiyonları -->
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <button class="dropdown-action-btn" onclick="openAppointmentStatusModal(); toggleUserDropdown();">
+            <span>📅</span> Randevu Saatini Düzenle
+          </button>
+          <button class="dropdown-action-btn" onclick="logout()">
+            <span style="color:#ef4444;">🚪</span> Güvenli Çıkış Yap (Logout)
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // CUSTOMER ONBOARDING GATEWAY: REQUIRES AUTH BEFORE ENTERING WIZARD/STUDIO

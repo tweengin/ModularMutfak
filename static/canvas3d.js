@@ -62,9 +62,9 @@ class StudioCanvas3D {
     const w = this.container.clientWidth || 900;
     const h = this.container.clientHeight || 600;
 
-    // 1. Scene
+    // 1. Scene - Nordic Light Studio Mood
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x94a3b8);
+    this.scene.background = new THREE.Color(0xf1f5f9);
 
     // 2. Camera (ADeko Natural Perspective Camera)
     this.camera = new THREE.PerspectiveCamera(40, w / h, 10, 30000);
@@ -93,7 +93,7 @@ class StudioCanvas3D {
     this.controls.target.set(1800, 950, 400);
 
     // 5. High-End Showroom Lighting (Studio PBR Warm Neutral)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.70);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.82);
     this.scene.add(ambientLight);
 
     // Key Directional Light (Warm showroom track daylight)
@@ -890,13 +890,13 @@ class StudioCanvas3D {
         const vW = mw; // 900
         const vD = md; // 900
 
-        // Plinth (V-cut)
+        // Plinth (V-cut sitting flush from Z=0 to Z=vD)
         const plinthShape = new THREE.Shape();
-        plinthShape.moveTo(-vW/2 + 20, -vD/2 + 20);
-        plinthShape.lineTo(vW/2 - 20, -vD/2 + 20);
-        plinthShape.lineTo(vW/2 - 20, vD/2 - 320);
-        plinthShape.lineTo(vW/2 - 320, vD/2 - 20);
-        plinthShape.lineTo(-vW/2 + 20, vD/2 - 20);
+        plinthShape.moveTo(-vW/2 + 20, 20);
+        plinthShape.lineTo(vW/2 - 20, 20);
+        plinthShape.lineTo(vW/2 - 20, 580);
+        plinthShape.lineTo(vW/2 - 320, vD - 20);
+        plinthShape.lineTo(-vW/2 + 20, vD - 20);
         plinthShape.closePath();
 
         const pGeo = new THREE.ExtrudeGeometry(plinthShape, { depth: plinthH, bevelEnabled: false });
@@ -905,13 +905,13 @@ class StudioCanvas3D {
         plinthMesh.position.set(0, plinthH, 0);
         group.add(plinthMesh);
 
-        // Body (V-cut Extrusion)
+        // Body (V-cut Extrusion sitting flush from Z=0 to Z=vD)
         const bodyShape = new THREE.Shape();
-        bodyShape.moveTo(-vW/2, -vD/2);
-        bodyShape.lineTo(vW/2, -vD/2);
-        bodyShape.lineTo(vW/2, vD/2 - 300);
-        bodyShape.lineTo(vW/2 - 300, vD/2);
-        bodyShape.lineTo(-vW/2, vD/2);
+        bodyShape.moveTo(-vW/2, 0);
+        bodyShape.lineTo(vW/2, 0);
+        bodyShape.lineTo(vW/2, 600);
+        bodyShape.lineTo(vW/2 - 300, vD);
+        bodyShape.lineTo(-vW/2, vD);
         bodyShape.closePath();
 
         const bGeo = new THREE.ExtrudeGeometry(bodyShape, { depth: bodyH, bevelEnabled: false });
@@ -924,11 +924,11 @@ class StudioCanvas3D {
 
         // Countertop (V-cut with 20mm overhang on front diagonal and returns)
         const ctShape = new THREE.Shape();
-        ctShape.moveTo(-vW/2 - 2, -vD/2 - 2);
-        ctShape.lineTo(vW/2 + 2, -vD/2 - 2);
-        ctShape.lineTo(vW/2 + 2, vD/2 - 280);
-        ctShape.lineTo(vW/2 - 280, vD/2 + 2);
-        ctShape.lineTo(-vW/2 - 2, vD/2 + 2);
+        ctShape.moveTo(-vW/2 - 2, -2);
+        ctShape.lineTo(vW/2 + 2, -2);
+        ctShape.lineTo(vW/2 + 2, 600);
+        ctShape.lineTo(vW/2 - 280, vD + 20);
+        ctShape.lineTo(-vW/2 - 2, vD + 20);
         ctShape.closePath();
 
         const ctGeo = new THREE.ExtrudeGeometry(ctShape, { depth: ctThick, bevelEnabled: false });
@@ -943,24 +943,24 @@ class StudioCanvas3D {
         const diagDoorW = Math.hypot(300, 300); // ~424mm
         const doorGeo = new THREE.BoxGeometry(diagDoorW - 8, bodyH - 12, 18);
         const doorMesh = new THREE.Mesh(doorGeo, bodyMat);
-        doorMesh.position.set(vW/2 - 150, plinthH + bodyH / 2, vD/2 - 150);
+        doorMesh.position.set(vW/2 - 150, plinthH + bodyH / 2, vD - 150);
         doorMesh.rotation.y = -Math.PI / 4;
         group.add(doorMesh);
 
         // Diagonal Handle
         const handle = this.createHandle3D(12, 90, false);
-        handle.position.set(vW/2 - 150, plinthH + bodyH / 2, vD/2 - 150);
+        handle.position.set(vW/2 - 150, plinthH + bodyH / 2, vD - 150);
         handle.rotation.y = -Math.PI / 4;
         handle.translateZ(14);
         group.add(handle);
 
         // Middle Shelf (Tek Raf - Standart 18mm MDFlam)
         const sShape = new THREE.Shape();
-        sShape.moveTo(-vW/2 + 18, -vD/2 + 18);
-        sShape.lineTo(vW/2 - 18, -vD/2 + 18);
-        sShape.lineTo(vW/2 - 18, vD/2 - 310);
-        sShape.lineTo(vW/2 - 310, vD/2 - 18);
-        sShape.lineTo(-vW/2 + 18, vD/2 - 18);
+        sShape.moveTo(-vW/2 + 18, 18);
+        sShape.lineTo(vW/2 - 18, 18);
+        sShape.lineTo(vW/2 - 18, 590);
+        sShape.lineTo(vW/2 - 310, vD - 18);
+        sShape.lineTo(-vW/2 + 18, vD - 18);
         sShape.closePath();
         const sGeo = new THREE.ExtrudeGeometry(sShape, { depth: 18, bevelEnabled: false });
         sGeo.rotateX(Math.PI / 2);
@@ -1148,15 +1148,15 @@ class StudioCanvas3D {
       const wallZ = 1450;
 
       if (isCornerV) {
-        // V-Corner Wall (650x650 mm)
+        // V-Corner Wall (650x650 mm) - Flush from Z=0 to Z=650
         const vW = mw || 650;
         const vD = md || 650;
         const vShape = new THREE.Shape();
-        vShape.moveTo(-vW/2, -vD/2);
-        vShape.lineTo(vW/2, -vD/2);
-        vShape.lineTo(vW/2, vD/2 - 250);
-        vShape.lineTo(vW/2 - 250, vD/2);
-        vShape.lineTo(-vW/2, vD/2);
+        vShape.moveTo(-vW/2, 0);
+        vShape.lineTo(vW/2, 0);
+        vShape.lineTo(vW/2, 350);
+        vShape.lineTo(vW/2 - 300, vD);
+        vShape.lineTo(-vW/2, vD);
         vShape.closePath();
 
         const vGeo = new THREE.ExtrudeGeometry(vShape, { depth: wallH, bevelEnabled: false });
@@ -1166,24 +1166,41 @@ class StudioCanvas3D {
         group.add(bodyMesh);
 
         // Middle Shelf
-        const sGeo = new THREE.ExtrudeGeometry(vShape, { depth: 18, bevelEnabled: false });
+        const sShape = new THREE.Shape();
+        sShape.moveTo(-vW/2 + 18, 18);
+        sShape.lineTo(vW/2 - 18, 18);
+        sShape.lineTo(vW/2 - 18, 340);
+        sShape.lineTo(vW/2 - 310, vD - 18);
+        sShape.lineTo(-vW/2 + 18, vD - 18);
+        sShape.closePath();
+        const sGeo = new THREE.ExtrudeGeometry(sShape, { depth: 18, bevelEnabled: false });
         sGeo.rotateX(Math.PI / 2);
         const sMesh = new THREE.Mesh(sGeo, this.matCache.woodOak);
         sMesh.position.set(0, wallZ + wallH / 2 + 9, 0);
         group.add(sMesh);
 
+        // 45° Diagonal Upper Door
+        const diagDoorW = Math.hypot(300, 300); // ~424mm
+        const doorGeo = new THREE.BoxGeometry(diagDoorW - 8, wallH - 12, 18);
+        const doorMesh = new THREE.Mesh(doorGeo, bodyMat);
+        doorMesh.position.set(vW/2 - 150, wallZ + wallH / 2, vD - 150);
+        doorMesh.rotation.y = -Math.PI / 4;
+        group.add(doorMesh);
+
         const hMesh = this.createHandle3D(10, 60, false);
-        hMesh.position.set(vW/2 - 125, wallZ + wallH / 2, vD/2 - 125);
+        hMesh.position.set(vW/2 - 150, wallZ + 40, vD - 150);
         hMesh.rotation.y = -Math.PI / 4;
-        hMesh.translateZ(12);
+        hMesh.translateZ(14);
+        group.add(hMesh);
+
         // Automatic under-cabinet architectural LED for corner wall cabinet
         const ledStripGeoCorner = new THREE.BoxGeometry(vW - 40, 4, 12);
         const ledStripMeshCorner = new THREE.Mesh(ledStripGeoCorner, this.matCache.ledStripMat);
-        ledStripMeshCorner.position.set(0, wallZ - 2, vD / 2 - 100);
+        ledStripMeshCorner.position.set(0, wallZ - 2, vD / 2);
         group.add(ledStripMeshCorner);
 
         const ledDownLightCorner = new THREE.PointLight(0xffedd5, 0.45, 900, 2);
-        ledDownLightCorner.position.set(0, wallZ - 15, vD / 2 - 100);
+        ledDownLightCorner.position.set(0, wallZ - 15, vD / 2);
         group.add(ledDownLightCorner);
 
       } else {

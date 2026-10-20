@@ -779,31 +779,27 @@
         <!-- Center Viewport: Full-Stage 2D/3D Canvas -->
         <div class="viewport-center">
 
-          <!-- 1. Floating Glassmorphic CAD HUD Toolbar (Top Center) -->
-          <div class="floating-hud-toolbar" id="floating-cad-hud">
+          <!-- 1. Sleek Floating Camera Micro-Dock (Top Center, Zero Overlap) -->
+          <div class="floating-camera-microdock" id="floating-cad-hud">
             <!-- Wall Selector -->
-            <button class="cam-btn active" id="wall-btn-back" onclick="setActiveWall('back')">🧱 Arka Duvar</button>
-            <button class="cam-btn" id="wall-btn-left" onclick="setActiveWall('left')">🧱 Sol Duvar</button>
+            <button class="dock-icon-btn active" id="wall-btn-back" onclick="setActiveWall('back')" data-tip="Arka Duvar (Back Wall)">🧱</button>
+            <button class="dock-icon-btn" id="wall-btn-left" onclick="setActiveWall('left')" data-tip="Sol Duvar (Left Wall)">📐</button>
 
-            <div class="hud-separator"></div>
+            <div class="dock-divider"></div>
 
             <!-- Camera Presets -->
-            <button class="cam-btn" id="cam-auto" onclick="setCameraPreset('auto')" title="360° Otomatik Döner Podyum Modu">🔄 360°</button>
-            <button class="cam-btn" onclick="setCameraPreset('showroom')" title="Göz Hizası Showroom Açısı">👁️ Showroom</button>
-            <button class="cam-btn" onclick="setCameraPreset('front')" title="Tam Karşıdan Ön Cephe">📐 Ön Cephe</button>
-            <button class="cam-btn" onclick="setCameraPreset('left_wall')" title="Sol Duvar Cephesi">📐 Sol Cephe</button>
-            <button class="cam-btn" onclick="setCameraPreset('top')" title="Kuşbakışı Plan">🗺️ Üstten</button>
-            <button class="cam-btn" onclick="setCameraPreset('reset')" title="Kamera Sıfırla">🔍 Sıfırla</button>
+            <button class="dock-icon-btn" id="cam-auto" onclick="setCameraPreset('auto')" data-tip="360° Serbest Yörünge Açısı">🌐</button>
+            <button class="dock-icon-btn" onclick="setCameraPreset('showroom')" data-tip="Göz Hizası Showroom Açısı">👁️</button>
+            <button class="dock-icon-btn" onclick="setCameraPreset('front')" data-tip="Tam Karşıdan Ön Cephe">🖼️</button>
+            <button class="dock-icon-btn" onclick="setCameraPreset('left_wall')" data-tip="Sol Yan Cephe">🏢</button>
+            <button class="dock-icon-btn" onclick="setCameraPreset('top')" data-tip="Kuşbakışı / Üstten Plan">🔝</button>
+            <button class="dock-icon-btn" onclick="setCameraPreset('reset')" data-tip="Kamerayı ve Açıyı Sıfırla">🔄</button>
 
-            <div class="hud-separator"></div>
+            <div class="dock-divider"></div>
 
             <!-- Tools -->
-            <button class="cam-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" title="3D Sahne Ölçü Cetvellerini Aç / Kapat">
-              📏 Ölçüler: <span id="ruler-toggle-status" style="color:#10b981; font-weight:bold;">AÇIK</span>
-            </button>
-            <button class="cam-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" title="Tezgah Arası Görsel Tonunu Değiştir (Açık / Koyu)">
-              🎨 Tezgah Arası: <span id="backsplash-tone-status" style="color:#38bdf8; font-weight:bold;">AÇIK TON</span>
-            </button>
+            <button class="dock-icon-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" data-tip="Ölçü Çizgilerini Aç/Kapat" style="color:#059669;">📏</button>
+            <button class="dock-icon-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" data-tip="Tezgah Arası Işık & Ton Değiştir" style="color:#f59e0b;">💡</button>
           </div>
 
           <!-- 2. Floating Top Right Action Group -->
@@ -1690,9 +1686,9 @@
   <script src="/three.min.js"></script>
   <script src="/OrbitControls.js"></script>
   <script src="/canvas2d.js"></script>
-  <script src="/canvas3d.js"></script>
-  <script src="/admin.js"></script>
-  <script src="/app.js"></script>
+  <script src="/canvas3d.js?v=20261020_5"></script>
+  <script src="/admin.js?v=20261020_5"></script>
+  <script src="/app.js?v=20261020_5"></script>
 
   <script>
     function openRefLookupModal() {

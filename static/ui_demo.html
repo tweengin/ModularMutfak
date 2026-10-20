@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ModulerCraft Pro - 2026 Modern UI & Üst Menü / Kamera Çubuğu Tasarım Seçenekleri</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --surface: #ffffff;
+      --surface-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --primary-light: #e0f2fe;
+      --accent: #10b981;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+      --shadow-float: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f1f5f9;
+      color: var(--text-main);
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container { max-width: 1400px; margin: 0 auto; }
+
+    /* Top Comparison Header */
+    .header-card {
+      background: #ffffff;
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 24px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header-card h1 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge-modern {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* Tab Switcher */
+    .tab-pills {
+      display: flex;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      color: #0284c7;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Comparison Box */
+    .preview-card {
+      background: #ffffff;
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .preview-header {
+      background: #f8fafc;
+      border-bottom: 1px solid var(--surface-border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-header strong {
+      font-size: 1.05rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ========================================================= */
+    /* MOCKUP 1: NORDIC MINIMAL LIGHT STUDIO (SEÇENEK A)         */
+    /* ========================================================= */
+    .nordic-viewport {
+      background: linear-gradient(180deg, #f8fafc 0%, #edf2f7 100%);
+      min-height: 540px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Modern Light Navbar */
+    .nordic-nav {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 50;
+    }
+
+    .nordic-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .nordic-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 18px;
+      box-shadow: 0 4px 8px -2px rgba(2, 132, 199, 0.3);
+    }
+
+    .nordic-links {
+      display: flex;
+      gap: 8px;
+    }
+    .nordic-link {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .nordic-link.active {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    /* Clean User Profile Trigger & Menu */
+    .nordic-user-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .nordic-user-pill {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 4px 14px 4px 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s;
+    }
+    .nordic-user-pill:hover {
+      border-color: #94a3b8;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .user-avatar-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-pill-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .user-pill-chevron {
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+
+    /* Dropdown Card for User Account */
+    .user-dropdown-card {
+      position: absolute;
+      top: 48px;
+      right: 0;
+      width: 340px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: var(--shadow-float);
+      padding: 18px;
+      z-index: 100;
+      display: none;
+      animation: fadeInSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .user-dropdown-card.show {
+      display: block;
+    }
+
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-header-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 12px;
+    }
+    .dropdown-time-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .dropdown-status-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    /* Notification bubble on status update */
+    .status-bubble-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-top: 6px;
+    }
+
+    .dropdown-action-btn {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .dropdown-action-btn:hover {
+      background: #fef2f2;
+      color: #ef4444;
+      border-color: #fecaca;
+    }
+
+    /* 3D Canvas Scene Mockup */
+    .mock-3d-scene {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Upper Top Bar in Studio (Actions without clashing!) */
+    .studio-top-actions {
+      position: absolute;
+      top: 16px;
+      width: calc(100% - 48px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .studio-top-actions > * { pointer-events: auto; }
+
+    .timer-pill-studio {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0284c7;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .studio-right-cta {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-studio-white {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #1e293b;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-studio-emerald {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: none;
+      color: #ffffff;
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 8px -2px rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ========================================================= */
+    /* INNOVATION: ULTRA-COMPACT ICON FLOATING CAMERA MICRO-DOCK */
+    /* ========================================================= */
+    .floating-camera-microdock {
+      position: absolute;
+      top: 68px; /* Positioned cleanly below top pills without overlapping! */
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(203, 213, 225, 0.8);
+      border-radius: 999px;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: var(--shadow-float);
+      z-index: 20;
+    }
+
+    .dock-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #475569;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .dock-icon-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+      border-color: #cbd5e1;
+      transform: scale(1.08);
+    }
+    .dock-icon-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+    }
+
+    .dock-divider {
+      width: 1px;
+      height: 20px;
+      background: #cbd5e1;
+      margin: 0 4px;
+    }
+
+    /* Tooltip */
+    .dock-icon-btn[data-tip]::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #ffffff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .dock-icon-btn[data-tip]:hover::after {
+      opacity: 1;
+    }
+
+    /* 3D Visual Rendering in Preview */
+    .mockup-kitchen-render {
+      width: 80%;
+      max-width: 760px;
+      border-radius: 12px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    /* Comparison Grid */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .analysis-card {
+      background: #ffffff;
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .analysis-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pros-list, .cons-list {
+      list-style: none;
+      margin-top: 8px;
+    }
+    .pros-list li {
+      position: relative;
+      padding-left: 22px;
+      font-size: 0.85rem;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+    .pros-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: 800;
+    }
+    .cons-list li {
+      position: relative;
+      padding-left: 22px;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .cons-list li::before {
+      content: '✕';
+      position: absolute;
+      left: 0;
+      color: #f59e0b;
+      font-weight: 800;
+    }
+
+    /* Current Screenshot View */
+    .current-screenshot-box {
+      border: 2px dashed #f59e0b;
+      background: #fffbeb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .current-screenshot-box img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+      margin-top: 10px;
+      border: 1px solid #fed7aa;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header-card">
+    <div>
+      <h1>
+        <span>✨</span> Modern Site & 3D Stüdyo Arayüzü Tasarım Konseptleri
+        <span class="badge-modern">2026 MİMARİ TREND</span>
+      </h1>
+      <p style="color:#64748b; font-size:0.9rem; margin-top:4px;">
+        Kullanıcımız Engin Çelik giriş yaptığında temizlenen üst navbar, açılır hesap & durum menüsü ve çakışmasız mikro-ikon kamera araç çubuğu.
+      </p>
+    </div>
+
+    <!-- Live Interactive Toggle -->
+    <div class="tab-pills">
+      <button class="tab-btn active" onclick="switchTheme('nordic')">Açık Nordic Showroom (Önerilen)</button>
+      <button class="tab-btn" onclick="switchTheme('progray')">Modern Pro Gri (Apple/Figma)</button>
+      <button class="tab-btn" onclick="switchTheme('current')">Mevcut Durum Analizi</button>
+    </div>
+  </div>
+
+  <!-- VIEW 1: NORDIC MINIMAL LIGHT STUDIO (SEÇENEK A - ÖNERİLEN) -->
+  <div id="view-nordic" class="preview-card">
+    <div class="preview-header">
+      <strong>
+        <span style="color:#0284c7;">🌿 SEÇENEK A:</span> Nordic Light Studio (Ferah & Aydınlık Mimari Showroom)
+      </strong>
+      <span style="font-size:0.8rem; color:#64748b; background:#f1f5f9; padding:4px 10px; border-radius:6px;">
+        🖱️ Sağdaki "Engin Çelik" profiline tıklayarak açılır menüyü test ediniz
+      </span>
+    </div>
+
+    <div class="nordic-viewport">
+
+      <!-- 1. Modern Light Clean Navbar -->
+      <nav class="nordic-nav">
+        <!-- Logo -->
+        <div class="nordic-logo">
+          <div class="nordic-logo-icon">M</div>
+          <span>ModulerCraft<span style="color:#0284c7;">Pro</span></span>
+        </div>
+
+        <!-- Center Nav Links -->
+        <div class="nordic-links">
+          <a href="#" class="nordic-link">Ana Sayfa</a>
+          <a href="#" class="nordic-link">Modeller</a>
+          <a href="#" class="nordic-link active">3D Tasarım Stüdyosu</a>
+          <a href="#" class="nordic-link">Randevularım</a>
+        </div>
+
+        <!-- Right: Authenticated User "Engin Çelik" (NO MORE "Giriş Yap / Yönetici Girişi" buttons!) -->
+        <div class="nordic-user-section">
+          <!-- Notification Bell for Status Changes -->
+          <div style="position:relative; cursor:pointer;" onclick="toggleUserDropdown()" title="Durum Bildirimi">
+            <span style="font-size:18px;">🔔</span>
+            <span style="position:absolute; top:-3px; right:-3px; width:8px; height:8px; background:#ef4444; border-radius:50%;"></span>
+          </div>
+
+          <!-- User Badge / Hesabım Trigger -->
+          <div class="nordic-user-pill" onclick="toggleUserDropdown()">
+            <div class="user-avatar-circle">EÇ</div>
+            <div>
+              <div class="user-pill-name">Engin Çelik</div>
+              <div style="font-size:0.68rem; color:#059669; font-weight:600;">● Müşteri Hesabı</div>
+            </div>
+            <span class="user-pill-chevron">▼</span>
+          </div>
+
+          <!-- Interactive User Dropdown (Hesabım Açılır Kartı) -->
+          <div class="user-dropdown-card" id="user-dropdown-card">
+            <div class="dropdown-header-user">
+              <div class="user-avatar-circle" style="width:38px; height:38px; font-size:0.95rem;">EÇ</div>
+              <div>
+                <strong style="font-size:0.95rem; color:#0f172a; display:block;">Engin Çelik</strong>
+                <span style="font-size:0.75rem; color:#64748b;">Müşteri No: #MC-2026-884</span>
+              </div>
+            </div>
+
+            <!-- Kalan Süre Sayacı -->
+            <div class="dropdown-time-box">
+              <div style="font-size:0.72rem; color:#166534; font-weight:700; text-transform:uppercase;">⏳ Tasarım Kalan Süreniz</div>
+              <div style="font-size:1.15rem; font-weight:800; color:#15803d; margin-top:2px;">50 saat 41 dakika</div>
+              <div style="font-size:0.68rem; color:#16a34a; margin-top:2px;">Süreniz dolduğunda randevu ve revizyon hakkınız saklı kalır.</div>
+            </div>
+
+            <!-- Tasarım / Proje Durumu + Değişiklik Bildirim Baloncuğu -->
+            <div class="dropdown-status-box">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.75rem; font-weight:700; color:#475569;">PROJE DURUMU</span>
+                <span style="background:#e0f2fe; color:#0369a1; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px;">Taslak Aşamasında</span>
+              </div>
+              <div class="status-bubble-pill">
+                <span>💬</span> Durum: Mimari onay için randevu slotu seçimi bekleniyor
+              </div>
+            </div>
+
+            <!-- Menü Aksiyonları -->
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <button class="dropdown-action-btn" onclick="alert('Randevu Takvimine Yönlendiriliyor...')">
+                <span>📅</span> Randevu Saatini Düzenle
+              </button>
+              <button class="dropdown-action-btn" onclick="alert('Güvenli Çıkış Yapıldı!')">
+                <span style="color:#ef4444;">🚪</span> Güvenli Çıkış Yap (Logout)
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- 2. 3D Studio Canvas Area with Zero Clashing -->
+      <div class="mock-3d-scene">
+
+        <!-- Top Canvas Action Bar (Cleanly Separated) -->
+        <div class="studio-top-actions">
+          <div class="timer-pill-studio">
+            <span>⏳</span> Kalan Tasarım Süresi: 50s 41dk
+          </div>
+          <div class="studio-right-cta">
+            <button class="btn-studio-white" onclick="alert('Sağ çekmece açıldı')">
+              <span>📋</span> Yerleşim & Malzeme
+            </button>
+            <button class="btn-studio-emerald" onclick="alert('Randevu adımına geçiliyor')">
+              <span>📅</span> Tasarımı Tamamla & Randevu Al
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. INNOVATIVE ICON-BASED FLOATING CAMERA MICRO-DOCK (Never overlaps!) -->
+        <div class="floating-camera-microdock">
+          <!-- Duvar Seçicileri -->
+          <button class="dock-icon-btn active" data-tip="Arka Duvar (Back Wall)" onclick="setActiveDockBtn(this)">🧱</button>
+          <button class="dock-icon-btn" data-tip="Sol Duvar (Left Wall)" onclick="setActiveDockBtn(this)">📐</button>
+          <div class="dock-divider"></div>
+
+          <!-- Kamera Açıları (Yazı Yerine Net İkonlar + Tooltip) -->
+          <button class="dock-icon-btn" data-tip="360° Serbest Yörünge Açısı" onclick="setActiveDockBtn(this)">🌐</button>
+          <button class="dock-icon-btn" data-tip="Doğal Mutfak Showroom Açısı" onclick="setActiveDockBtn(this)">👁️</button>
+          <button class="dock-icon-btn" data-tip="Düz Ön Cephe (Front View)" onclick="setActiveDockBtn(this)">🖼️</button>
+          <button class="dock-icon-btn" data-tip="Sol Yan Cephe (Side View)" onclick="setActiveDockBtn(this)">🏢</button>
+          <button class="dock-icon-btn" data-tip="Kuşbakışı / Üstten (Plan View)" onclick="setActiveDockBtn(this)">🔝</button>
+          <button class="dock-icon-btn" data-tip="Açıyı ve Kamerayı Sıfırla" onclick="alert('Kamera orijinal konuma sıfırlandı')">🔄</button>
+          <div class="dock-divider"></div>
+
+          <!-- Hızlı Toggle Araçları -->
+          <button class="dock-icon-btn" data-tip="Ölçü Çizgilerini Aç/Kapat" style="color:#059669;" onclick="this.classList.toggle('active')">📏</button>
+          <button class="dock-icon-btn" data-tip="Tezgah Arası Işık & Ton Değiştir" style="color:#f59e0b;" onclick="alert('Tezgah arası tonu değiştirildi')">💡</button>
+        </div>
+
+        <!-- Visual Kitchen Representation -->
+        <div class="mockup-kitchen-render">
+          <div style="font-size:0.8rem; color:#64748b; margin-bottom:12px; font-weight:600;">
+            🏡 3D SHOWROOM GÖRÜNÜMÜ (Aydınlık & Doğal Işık Altında Sıfır Boşluklu Mutfak)
+          </div>
+          <div style="display:flex; justify-content:center; align-items:flex-end; gap:4px; height:180px; border-bottom:4px solid #334155; padding-bottom:8px;">
+            <!-- Tall Fridge -->
+            <div style="width:70px; height:180px; background:#e2e8f0; border:1px solid #94a3b8; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#475569;">
+              Buzdolabı<br>70cm
+            </div>
+            <!-- Lower Cabinets -->
+            <div style="display:flex; flex-direction:column; gap:30px;">
+              <!-- Zero Gap Upper Run (70/80/90cm) -->
+              <div style="display:flex; gap:2px;">
+                <div style="width:60px; height:65px; background:#fed7aa; border:1px solid #f97316; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">Üst 60</div>
+                <div style="width:90px; height:65px; background:#bae6fd; border:1px solid #0284c7; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">Camlı 90</div>
+                <div style="width:60px; height:65px; background:#fef08a; border:1px solid #eab308; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">Davlumbaz</div>
+                <div style="width:80px; height:65px; background:#fed7aa; border:1px solid #f97316; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">Çift 80</div>
+              </div>
+              <!-- Lower Run -->
+              <div style="display:flex; gap:2px;">
+                <div style="width:60px; height:70px; background:#fdba74; border:1px solid #ea580c; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">3-Çekmece</div>
+                <div style="width:90px; height:70px; background:#fdba74; border:1px solid #ea580c; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">Eviye 90</div>
+                <div style="width:60px; height:70px; background:#1e293b; color:#fff; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">Ocak/Fırın</div>
+                <div style="width:80px; height:70px; background:#fdba74; border:1px solid #ea580c; border-radius:3px; font-size:0.65rem; display:flex; align-items:center; justify-content:center;">Alt Dolap</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px; font-size:0.75rem; color:#10b981; font-weight:700;">
+            ✓ Üst dolaplar duvardan duvara sıfır boşlukla hizalandı • Ocak üstü davlumbaz dikey kilitli
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 2: MEVCUT DURUM ANALİZİ -->
+  <div id="view-current" class="preview-card" style="display:none;">
+    <div class="preview-header" style="background:#fff7ed;">
+      <strong style="color:#c2410c;">
+        <span>⚠️</span> MEVCUT DURUM (Yüklenen Ekran Görüntüsündeki Tespitler)
+      </strong>
+    </div>
+    <div style="padding:24px;">
+      <div class="current-screenshot-box">
+        <strong>📸 Gözlemlenen Sorun Noktaları:</strong>
+        <p style="font-size:0.85rem; color:#78350f; margin-top:4px;">
+          1. <strong>Çakışan Barlar:</strong> Kamera açısı buton kutusu ile hemen arkasındaki "Kalan Süre", "Yerleşim & Malzeme", "Tasarımı Tamamla" butonları birbirinin üstüne biniyor.<br>
+          2. <strong>Gereksiz Buton Kalabalığı:</strong> Kullanıcı giriş yapmışken bile sağ üstte "Giriş Yap", "Ücretsiz Kayıt Ol", "Yönetici Girişi" butonları duruyor.<br>
+          3. <strong>Koyu & Ağır Tema:</strong> Müşteri için showroom ferahlığı yerine karanlık ve karmaşık bir hava oluşturuyor.<br>
+          4. <strong>Yazı Ağırlıklı Butonlar:</strong> "Arka Duvar", "Showroom", "Ön Cephe", "Sol Cephe" yazıları gereksiz yer kaplıyor ve butonları hantallaştırıyor.
+        </p>
+        <img src="/static/user_screenshot.png" alt="Mevcut Ekran Görüntüsü">
+      </div>
+    </div>
+  </div>
+
+  <!-- Pros & Cons Decision Support Analysis -->
+  <div class="grid-2col">
+    <!-- Option A -->
+    <div class="analysis-card" style="border-top:4px solid #0284c7;">
+      <h3>
+        <span style="color:#0284c7;">🌿 Seçenek A:</span> Nordic Light Studio (Önerilen)
+      </h3>
+      <p style="font-size:0.85rem; color:#475569; margin-bottom:12px;">
+        2026 İskandinav & İtalyan mimari showroom tasarımı. Açık renkli, ferah, cam blur geçişli ve mikro-ikon kamera araç çubuğu.
+      </p>
+      <ul class="pros-list">
+        <li><strong>Sıfır Çakışma:</strong> Kamera araç çubuğu mikro-ikon pill formuna geçer, üstteki randevu/kalan süre butonlarıyla asla çakışmaz.</li>
+        <li><strong>Kullanıcı Odaklı Navbar:</strong> "Engin Çelik" profil kartı; kalan süre ve durum baloncuğu tek tıkla açılan şık bir menüye taşınır.</li>
+        <li><strong>Ferah Aura:</strong> Koyu arayüz yerine ferah ve lüks bir mimarlık stüdyosu hissi yaratır.</li>
+        <li><strong>Modern İkon Tooltip'leri:</strong> Her kamera açısı için fareyle gelindiğinde açıklama açılır, butonlar minimal kalır.</li>
+      </ul>
+      <ul class="cons-list" style="margin-top:8px;">
+        <li>Beyaz/açık sahnede açık renkli dolapların kontrastını korumak için yumuşak zemin gölgelendirmesi gerekir.</li>
+      </ul>
+    </div>
+
+    <!-- Option B -->
+    <div class="analysis-card" style="border-top:4px solid #64748b;">
+      <h3>
+        <span style="color:#64748b;">💻 Seçenek B:</span> Modern Pro Minimal (Apple / Figma Tarzı)
+      </h3>
+      <p style="font-size:0.85rem; color:#475569; margin-bottom:12px;">
+        Açık taş grisi tonlarında, sağ dikey yüzen araç çubuğu ve kompakt CAD dock kontrolü.
+      </p>
+      <ul class="pros-list">
+        <li><strong>CAD Alışkanlığı:</strong> Çizim ve mimari programlar (Figma, Canva, AutoCAD) kullananlar için tanıdık dikey dock yerleşimi.</li>
+        <li><strong>Geniş Kanvas Dikey Alanı:</strong> Üst ve alt tamamen temizlenir, araçlar sağ dikey şeride toplanır.</li>
+      </ul>
+      <ul class="cons-list" style="margin-top:8px;">
+        <li>Ev sahibi veya son kullanıcı müşteriler için bir tık daha teknik ve soğuk gelebilir.</li>
+        <li>Mobil ve dar tablet ekranlarında dikey yan panel 3D kanvas genişliğini daraltabilir.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTheme(theme) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const vNordic = document.getElementById('view-nordic');
+    const vCurrent = document.getElementById('view-current');
+
+    if (theme === 'nordic') {
+      vNordic.style.display = 'block';
+      vCurrent.style.display = 'none';
+      document.body.style.background = '#f1f5f9';
+    } else if (theme === 'progray') {
+      vNordic.style.display = 'block';
+      vCurrent.style.display = 'none';
+      document.body.style.background = '#e2e8f0';
+    } else if (theme === 'current') {
+      vNordic.style.display = 'none';
+      vCurrent.style.display = 'block';
+    }
+  }
+
+  function toggleUserDropdown() {
+    const card = document.getElementById('user-dropdown-card');
+    card.classList.toggle('show');
+  }
+
+  function setActiveDockBtn(btn) {
+    const siblings = btn.parentElement.querySelectorAll('.dock-icon-btn');
+    siblings.forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Close dropdown if clicked outside
+  window.addEventListener('click', function(e) {
+    const card = document.getElementById('user-dropdown-card');
+    const pill = document.querySelector('.nordic-user-pill');
+    if (card && pill && !card.contains(e.target) && !pill.contains(e.target) && !e.target.closest('[onclick="toggleUserDropdown()"]')) {
+      card.classList.remove('show');
+    }
+  });
+</script>
+
+</body>
+</html>
