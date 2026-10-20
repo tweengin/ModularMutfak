@@ -939,18 +939,18 @@ class StudioCanvas3D {
         ctMesh.receiveShadow = true;
         group.add(ctMesh);
 
-        // Diagonal 45° Door Frame & Panel
+        // Diagonal 45° Door Frame & Panel (Flush closed at 45°)
         const diagDoorW = Math.hypot(300, 300); // ~424mm
         const doorGeo = new THREE.BoxGeometry(diagDoorW - 8, bodyH - 12, 18);
         const doorMesh = new THREE.Mesh(doorGeo, bodyMat);
         doorMesh.position.set(vW/2 - 150, plinthH + bodyH / 2, vD - 150);
-        doorMesh.rotation.y = -Math.PI / 4;
+        doorMesh.rotation.y = Math.PI / 4;
         group.add(doorMesh);
 
         // Diagonal Handle
         const handle = this.createHandle3D(12, 90, false);
         handle.position.set(vW/2 - 150, plinthH + bodyH / 2, vD - 150);
-        handle.rotation.y = -Math.PI / 4;
+        handle.rotation.y = Math.PI / 4;
         handle.translateZ(14);
         group.add(handle);
 
@@ -1179,17 +1179,17 @@ class StudioCanvas3D {
         sMesh.position.set(0, wallZ + wallH / 2 + 9, 0);
         group.add(sMesh);
 
-        // 45° Diagonal Upper Door
+        // 45° Diagonal Upper Door (Flush closed at 45°)
         const diagDoorW = Math.hypot(300, 300); // ~424mm
         const doorGeo = new THREE.BoxGeometry(diagDoorW - 8, wallH - 12, 18);
         const doorMesh = new THREE.Mesh(doorGeo, bodyMat);
         doorMesh.position.set(vW/2 - 150, wallZ + wallH / 2, vD - 150);
-        doorMesh.rotation.y = -Math.PI / 4;
+        doorMesh.rotation.y = Math.PI / 4;
         group.add(doorMesh);
 
         const hMesh = this.createHandle3D(10, 60, false);
         hMesh.position.set(vW/2 - 150, wallZ + 40, vD - 150);
-        hMesh.rotation.y = -Math.PI / 4;
+        hMesh.rotation.y = Math.PI / 4;
         hMesh.translateZ(14);
         group.add(hMesh);
 

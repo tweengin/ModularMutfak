@@ -779,46 +779,73 @@
         <!-- Center Viewport: Full-Stage 2D/3D Canvas -->
         <div class="viewport-center">
 
-          <!-- 1. Sleek Floating Camera Micro-Dock (Top Center, Zero Overlap) -->
-          <div class="floating-camera-microdock" id="floating-cad-hud">
-            <!-- Wall Selector -->
-            <button class="dock-icon-btn active" id="wall-btn-back" onclick="setActiveWall('back')" data-tip="Arka Duvar (Back Wall)">🧱</button>
-            <button class="dock-icon-btn" id="wall-btn-left" onclick="setActiveWall('left')" data-tip="Sol Duvar (Left Wall)">📐</button>
-
-            <div class="dock-divider"></div>
-
-            <!-- Camera Presets -->
-            <button class="dock-icon-btn" id="cam-auto" onclick="setCameraPreset('auto')" data-tip="360° Serbest Yörünge Açısı">🌐</button>
-            <button class="dock-icon-btn" onclick="setCameraPreset('showroom')" data-tip="Göz Hizası Showroom Açısı">👁️</button>
-            <button class="dock-icon-btn" onclick="setCameraPreset('front')" data-tip="Tam Karşıdan Ön Cephe">🖼️</button>
-            <button class="dock-icon-btn" onclick="setCameraPreset('left_wall')" data-tip="Sol Yan Cephe">🏢</button>
-            <button class="dock-icon-btn" onclick="setCameraPreset('top')" data-tip="Kuşbakışı / Üstten Plan">🔝</button>
-            <button class="dock-icon-btn" onclick="setCameraPreset('reset')" data-tip="Kamerayı ve Açıyı Sıfırla">🔄</button>
-
-            <div class="dock-divider"></div>
-
-            <!-- Tools -->
-            <button class="dock-icon-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" data-tip="Ölçü Çizgilerini Aç/Kapat" style="color:#059669;">📏</button>
-            <button class="dock-icon-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" data-tip="Tezgah Arası Işık & Ton Değiştir" style="color:#f59e0b;">💡</button>
-          </div>
-
-          <!-- 2. Floating Top Right Action Group -->
-          <div class="floating-top-right-bar">
-            <!-- 72-Hour Customer Access Countdown Badge -->
-            <div id="customer-timer-badge" style="display:inline-flex; align-items:center; gap:6px; background:rgba(15, 23, 42, 0.85); backdrop-filter:blur(8px); border:1px solid #38bdf8; border-radius:20px; padding:6px 14px; font-size:0.82rem; font-weight:700; color:#38bdf8;" title="Tasarım Oturum Süresi (Anti-Abuse Güvenliği)">
-              <span>⏳</span> <span id="timer-badge-text">Kalan Süre: 72s 00dk</span>
+          <!-- Unified Responsive Top Bar (Zero Overlap, Clean Nordic Layout) -->
+          <div class="studio-viewport-topbar" id="studio-viewport-topbar">
+            <!-- Left: Wall Selector -->
+            <div class="topbar-group">
+              <button class="dock-icon-btn active" id="wall-btn-back" onclick="setActiveWall('back')" data-tip="Arka Duvar (Back Wall)">🧱</button>
+              <button class="dock-icon-btn" id="wall-btn-left" onclick="setActiveWall('left')" data-tip="Sol Duvar (Left Wall)">📐</button>
             </div>
 
-            <!-- Open Right Drawer (Placed Modules & Materials) -->
-            <button class="cam-btn" onclick="toggleRightDrawer()" id="btn-toggle-drawer" style="background:rgba(30, 41, 59, 0.9); backdrop-filter:blur(8px); border:1px solid #38bdf8; border-radius:20px; padding:6px 14px; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:6px; cursor:pointer;" title="Yerleşim Listesi ve Malzeme Ayarları">
-              <span>📋</span> <span>Yerleşim & Malzeme</span>
-            </button>
+            <!-- Center: Sleek 3D Camera Micro-Dock -->
+            <div class="floating-camera-microdock" id="floating-cad-hud" style="position:static; transform:none; top:auto; left:auto;">
+              <button class="dock-icon-btn" id="cam-auto" onclick="setCameraPreset('auto')" data-tip="360° Serbest Yörünge Açısı">🌐</button>
+              <button class="dock-icon-btn" onclick="setCameraPreset('showroom')" data-tip="Göz Hizası Showroom Açısı">👁️</button>
+              <button class="dock-icon-btn" onclick="setCameraPreset('front')" data-tip="Tam Karşıdan Ön Cephe">🖼️</button>
+              <button class="dock-icon-btn" onclick="setCameraPreset('left_wall')" data-tip="Sol Yan Cephe">🏢</button>
+              <button class="dock-icon-btn" onclick="setCameraPreset('top')" data-tip="Kuşbakışı / Üstten Plan">🔝</button>
+              <button class="dock-icon-btn" onclick="setCameraPreset('reset')" data-tip="Kamerayı ve Açıyı Sıfırla">🔄</button>
+              <div class="dock-divider"></div>
+              <button class="dock-icon-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" data-tip="Ölçü Çizgilerini Aç/Kapat" style="color:#059669;">📏</button>
+              <button class="dock-icon-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" data-tip="Tezgah Arası Işık & Ton Değiştir" style="color:#f59e0b;">💡</button>
+            </div>
 
-            <!-- Submit Design & Request Appointment Action Button -->
-            <button id="btn-studio-submit-quote" class="btn btn-success btn-sm" onclick="openSubmitQuoteModal()" style="font-weight:700; display:flex; align-items:center; gap:6px; box-shadow:0 0 16px rgba(16,185,129,0.45); border-radius:20px; padding:7px 16px; cursor:pointer;">
-              <span>📅</span> Tasarımı Tamamla & Randevu Al
-            </button>
+            <!-- Right: Action Buttons -->
+            <div class="topbar-group">
+              <button class="btn btn-outline btn-sm" onclick="toggleRightDrawer()" id="btn-toggle-drawer" style="background:#ffffff; border-color:#cbd5e1; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px;" title="Yerleşim Listesi ve Malzeme Ayarları">
+                <span>📋</span> <span>Yerleşim</span>
+              </button>
+              <button id="btn-studio-submit-quote" class="btn btn-success btn-sm" onclick="openSubmitQuoteModal()" style="font-weight:700; display:flex; align-items:center; gap:6px; box-shadow:0 4px 8px -2px rgba(16,185,129,0.4); border-radius:999px; padding:6px 14px;">
+                <span>📅</span> <span>Randevu Al</span>
+              </button>
+            </div>
           </div>
+
+          <!-- Interactive 3D Canvas Onboarding Helper (Bottom Left, Dismissable with X) -->
+          <div id="studio-onboarding-card" class="studio-onboarding-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="onboarding-mouse-anim">
+                  <div class="mouse-icon"></div>
+                </div>
+                <div>
+                  <strong style="font-size:0.82rem; color:#0f172a; display:block;">3D Görünüm İpuçları</strong>
+                  <span style="font-size:0.7rem; color:#64748b;">Mutfakta serbestçe gezinin</span>
+                </div>
+              </div>
+              <button onclick="dismissOnboardingGuide()" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer; padding:0 4px; line-height:1;" title="Kapat">✕</button>
+            </div>
+            <div class="onboarding-step-list">
+              <div class="onboarding-step-item">
+                <span style="font-size:16px;">🔄</span>
+                <div><strong>Sol Tık + Sürükle:</strong> 360° etrafında dönün</div>
+              </div>
+              <div class="onboarding-step-item">
+                <span style="font-size:16px;">🖐️</span>
+                <div><strong>Sağ Tık + Sürükle:</strong> Sahneyi kaydırın (Pan)</div>
+              </div>
+              <div class="onboarding-step-item">
+                <span style="font-size:16px;">🔍</span>
+                <div><strong>Tekerlek (Scroll):</strong> Yakınlaşın / uzaklaşın</div>
+              </div>
+            </div>
+            <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+              <button class="btn btn-outline btn-sm" style="font-size:0.72rem; padding:3px 10px; border-radius:6px; background:#ffffff;" onclick="dismissOnboardingGuide()">Anladım, Kapat ✓</button>
+            </div>
+          </div>
+
+          <!-- Reopen Guide Floating Button (visible when dismissed) -->
+          <button id="studio-reopen-guide-btn" onclick="toggleOnboardingGuide()" style="display:none; position:absolute; bottom:20px; left:20px; z-index:20; background:rgba(255,255,255,0.95); border:1px solid #cbd5e1; border-radius:50%; width:36px; height:36px; font-size:16px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.1); align-items:center; justify-content:center;" title="3D Gezinme İpuçlarını Aç">💡</button>
 
           <!-- 3. Floating Bottom Notice Toasts -->
           <div id="studio-wizard-notice-banner" class="floating-studio-toast" style="display:none;">

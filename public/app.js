@@ -281,6 +281,12 @@ function navigateTo(viewId) {
       updatePlacedModulesUI();
       checkRulerBubbleInitialDisplay();
       checkCustomerAccessSession();
+      if (localStorage.getItem('mc_hide_3d_guide') === '1') {
+        const card = document.getElementById('studio-onboarding-card');
+        const btn = document.getElementById('studio-reopen-guide-btn');
+        if (card) card.style.display = 'none';
+        if (btn) btn.style.display = 'flex';
+      }
     }, 100);
   } else if (viewId === 'admin') {
     AdminPanel.init();
@@ -1440,12 +1446,34 @@ function fillUpperWallSpan(startX, endX, wallKey, wallH, preferGlass, nextModId,
       d: 350,
       h: wallH,
       x: curPos,
-      hinges: hinges
+      hinges: hinges,
+      shelves: (wallH >= 900) ? 2 : 1,
+      shelfCount: (wallH >= 900) ? 2 : 1
     });
 
     curPos += cw;
   });
 }
+
+// -------------------------------------------------------------
+// 3D CANVAS ONBOARDING HELPER CONTROLLER
+// -------------------------------------------------------------
+window.dismissOnboardingGuide = function() {
+  const card = document.getElementById('studio-onboarding-card');
+  const btn = document.getElementById('studio-reopen-guide-btn');
+  if (card) card.style.display = 'none';
+  if (btn) btn.style.display = 'flex';
+  try { localStorage.setItem('mc_hide_3d_guide', '1'); } catch(e){}
+};
+
+window.toggleOnboardingGuide = function() {
+  const card = document.getElementById('studio-onboarding-card');
+  const btn = document.getElementById('studio-reopen-guide-btn');
+  if (!card) return;
+  const isHidden = (card.style.display === 'none');
+  card.style.display = isHidden ? 'block' : 'none';
+  if (btn) btn.style.display = isHidden ? 'none' : 'flex';
+};
 
 window.setStudioWallHeight = function(h) {
   const heightVal = parseInt(h);
@@ -1453,6 +1481,8 @@ window.setStudioWallHeight = function(h) {
   window.CURRENT_DESIGN.modules.forEach(m => {
     if (m.category === 'wall') {
       m.h = heightVal;
+      m.shelves = (heightVal >= 900) ? 2 : 1;
+      m.shelfCount = m.shelves;
     }
   });
   if (canvas3D) {
@@ -1461,7 +1491,7 @@ window.setStudioWallHeight = function(h) {
   if (typeof updateModulesTable === 'function') updateModulesTable();
   if (typeof updateCostSummary === 'function') updateCostSummary();
   const label = heightVal === 720 ? '70 cm' : (heightVal === 800 ? '80 cm' : '90 cm');
-  showToast(`📏 Üst dolap yüksekliği ${label} olarak güncellendi.`, 'info');
+  showToast(`📏 Üst dolap yüksekliği ${label} olarak güncellendi (${heightVal >= 900 ? '2 raf / 3 bölme' : '1 raf / 2 bölme'}).`, 'info');
 };
 
 window.runAutoKitchenGenerator = function() {
