@@ -749,65 +749,120 @@
     </section>
 
     <!-- 3. INTERACTIVE 2D/3D STUDIO VIEW -->
-    <section id="view-studio" class="view-section" style="padding:0; margin:0; max-width:100%; height:calc(100vh - 70px);">
+    <section id="view-studio" class="view-section" style="padding:0; margin:0; max-width:100%; height:100vh;">
       <div class="studio-layout">
 
-        <!-- Left Sidebar: ADeko Style Collapsible Accordion Module Palette -->
-        <aside class="sidebar-panel studio-left-sidebar" id="studio-left-sidebar">
-          <div class="panel-header" style="margin-bottom:0.75rem;">
-            <span>📚 Modül Kataloğu</span>
-            <small id="cat-label-display" style="color:#38bdf8; font-weight:700;">ADeko Modu</small>
+        <!-- 1. Left Slim Vertical Icon Rail (Planner 5D / Homestyler 56px modern icon dock) -->
+        <aside class="studio-slim-rail" id="studio-slim-rail">
+          <div class="rail-top-group">
+            <button class="rail-btn" id="rail-btn-search" onclick="toggleCatalogFlyout('search')" title="Modül veya Cihaz Ara">
+              <span class="rail-icon">🔍</span>
+              <span class="rail-label">Ara</span>
+            </button>
+            <button class="rail-btn active" id="rail-btn-base" onclick="toggleCatalogFlyout('base')" title="Alt Dolaplar">
+              <span class="rail-icon">🗄️</span>
+              <span class="rail-label">Alt Dolap</span>
+            </button>
+            <button class="rail-btn" id="rail-btn-wall" onclick="toggleCatalogFlyout('wall')" title="Üst Dolaplar">
+              <span class="rail-icon">📦</span>
+              <span class="rail-label">Üst Dolap</span>
+            </button>
+            <button class="rail-btn" id="rail-btn-tall" onclick="toggleCatalogFlyout('tall')" title="Boy Dolap & Kiler">
+              <span class="rail-icon">🧊</span>
+              <span class="rail-label">Boy Dolap</span>
+            </button>
+            <button class="rail-btn" id="rail-btn-appliance" onclick="toggleCatalogFlyout('appliance')" title="Ankastre, Ocak & Eviye">
+              <span class="rail-icon">♨️</span>
+              <span class="rail-label">Cihazlar</span>
+            </button>
+            <button class="rail-btn" id="rail-btn-materials" onclick="toggleCatalogFlyout('materials')" title="Malzeme & Renkler">
+              <span class="rail-icon">🎨</span>
+              <span class="rail-label">Renkler</span>
+            </button>
           </div>
+          <div class="rail-bottom-group">
+            <button class="rail-btn" id="rail-btn-undo" onclick="undoLastAction()" title="Son İşlemi Geri Al (Undo)">
+              <span class="rail-icon">↩️</span>
+              <span class="rail-label">Geri Al</span>
+            </button>
+          </div>
+        </aside>
 
-          <!-- Collapse / Expand Toggle Button -->
-          <button id="btn-toggle-left-sidebar" class="sidebar-toggle-pill" onclick="toggleLeftSidebar()" title="Modül Menüsünü Daralt / Genişlet">
-            <span id="left-sidebar-arrow">◀</span>
-          </button>
+        <!-- 2. Slide-out Flyout Drawer (Homestyler style modular cards catalog) -->
+        <aside class="studio-flyout-drawer open" id="studio-flyout-drawer">
+          <div class="flyout-header">
+            <div class="flyout-title-wrap">
+              <span id="flyout-icon" style="font-size:18px;">🗄️</span>
+              <strong id="flyout-title">Alt Dolaplar</strong>
+            </div>
+            <button class="flyout-close-btn" onclick="closeCatalogFlyout()" title="Kataloğu Gizle (Tuvali Genişlet)">✕</button>
+          </div>
 
           <!-- Search Filter -->
-          <div class="adeko-search-box" style="margin-bottom:0.75rem;">
-            <span class="adeko-search-icon">🔍</span>
-            <input type="text" id="module-search-input" class="adeko-search-input" placeholder="Modül ara (fırın, eviye...)" oninput="filterCatalogModules(this.value)">
+          <div class="flyout-search-wrap">
+            <span class="flyout-search-icon">🔍</span>
+            <input type="text" id="flyout-search-input" class="flyout-search-input" placeholder="Modül ara (fırın, eviye...)" oninput="filterFlyoutModules(this.value)">
           </div>
 
-          <!-- Accordion Categories Container -->
-          <div id="studio-module-catalog" class="adeko-accordion-wrapper">
-            <!-- Populated via JavaScript as collapsible accordions -->
+          <!-- Modül Kataloğu Container (Cards & Accordions) -->
+          <div id="studio-module-catalog" class="flyout-catalog-container">
+            <!-- Populated via JavaScript -->
           </div>
         </aside>
 
         <!-- Center Viewport: Full-Stage 2D/3D Canvas -->
         <div class="viewport-center">
 
-          <!-- Unified Responsive Top Bar (Zero Overlap, Clean Nordic Layout) -->
+          <!-- Unified Responsive Top Bar (Planner 5D / Homestyler Clean Modern Layout) -->
           <div class="studio-viewport-topbar" id="studio-viewport-topbar">
-            <!-- Left: Wall Selector -->
-            <div class="topbar-group">
-              <button class="dock-icon-btn active" id="wall-btn-back" onclick="setActiveWall('back')" data-tip="Arka Duvar (Back Wall)">🧱</button>
-              <button class="dock-icon-btn" id="wall-btn-left" onclick="setActiveWall('left')" data-tip="Sol Duvar (Left Wall)">📐</button>
+            <!-- Left: Back Button & Room Info Pill & Wall Selector -->
+            <div class="topbar-cluster-left">
+              <button class="topbar-back-circle-btn" onclick="navigateTo('landing')" title="Ana Sayfaya Dön">
+                ←
+              </button>
+              
+              <div class="topbar-room-pill" onclick="openRoomDimensionsModal()" title="Oda Ölçülerini İncele">
+                <span style="font-size:15px;">☁</span>
+                <span id="topbar-room-info" style="font-weight:700;">Mutfak (360 × 260 cm)</span>
+                <span style="font-size:10px; color:#94a3b8;">⌵</span>
+              </div>
+
+              <!-- Segmented Wall Switcher: Arka Duvar ↔ Sol Duvar -->
+              <div class="topbar-segmented-dock">
+                <button class="topbar-seg-btn active" id="wall-btn-back" onclick="setActiveWall('back')" title="Arka Duvara Geç">🧱 Arka Duvar</button>
+                <button class="topbar-seg-btn" id="wall-btn-left" onclick="setActiveWall('left')" title="Sol Duvara Geç">📐 Sol Duvar</button>
+              </div>
             </div>
 
-            <!-- Center: Sleek 3D Camera Micro-Dock -->
-            <div class="floating-camera-microdock" id="floating-cad-hud" style="position:static; transform:none; top:auto; left:auto;">
-              <button class="dock-icon-btn" id="cam-auto" onclick="setCameraPreset('auto')" data-tip="360° Serbest Yörünge Açısı">🌐</button>
-              <button class="dock-icon-btn" onclick="setCameraPreset('showroom')" data-tip="Göz Hizası Showroom Açısı">👁️</button>
-              <button class="dock-icon-btn" onclick="setCameraPreset('front')" data-tip="Tam Karşıdan Ön Cephe">🖼️</button>
-              <button class="dock-icon-btn" onclick="setCameraPreset('left_wall')" data-tip="Sol Yan Cephe">🏢</button>
-              <button class="dock-icon-btn" onclick="setCameraPreset('top')" data-tip="Kuşbakışı / Üstten Plan">🔝</button>
-              <button class="dock-icon-btn" onclick="setCameraPreset('reset')" data-tip="Kamerayı ve Açıyı Sıfırla">🔄</button>
-              <div class="dock-divider"></div>
-              <button class="dock-icon-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" data-tip="Ölçü Çizgilerini Aç/Kapat" style="color:#059669;">📏</button>
-              <button class="dock-icon-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" data-tip="Tezgah Arası Işık & Ton Değiştir" style="color:#f59e0b;">💡</button>
+            <!-- Center: 2D/3D Mode Switcher & 3D Micro-Dock -->
+            <div class="topbar-cluster-center">
+              <div class="topbar-segmented-dock mode-switch-dock">
+                <button class="topbar-seg-btn" id="btn-mode-2d" onclick="setStudioViewMode('2d')">2D Plan</button>
+                <button class="topbar-seg-btn active" id="btn-mode-3d" onclick="setStudioViewMode('3d')">3D Sahne</button>
+              </div>
+
+              <div class="floating-camera-microdock" id="floating-cad-hud">
+                <button class="dock-icon-btn" id="cam-auto" onclick="setCameraPreset('auto')" data-tip="360° Serbest Yörünge Açısı">🌐</button>
+                <button class="dock-icon-btn" onclick="setCameraPreset('showroom')" data-tip="Göz Hizası Showroom Açısı">👁️</button>
+                <button class="dock-icon-btn" onclick="setCameraPreset('front')" data-tip="Tam Karşıdan Ön Cephe">🖼️</button>
+                <button class="dock-icon-btn" onclick="setCameraPreset('left_wall')" data-tip="Sol Yan Cephe">🏢</button>
+                <button class="dock-icon-btn" onclick="setCameraPreset('top')" data-tip="Kuşbakışı / Üstten Plan">🔝</button>
+                <button class="dock-icon-btn" onclick="setCameraPreset('reset')" data-tip="Kamerayı ve Açıyı Sıfırla">🔄</button>
+                <div class="dock-divider"></div>
+                <button class="dock-icon-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" data-tip="Ölçü Çizgilerini Aç/Kapat" style="color:#059669;">📏</button>
+                <button class="dock-icon-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" data-tip="Tezgah Arası Işık & Ton Değiştir" style="color:#f59e0b;">💡</button>
+              </div>
             </div>
 
-            <!-- Right: Action Buttons -->
-            <div class="topbar-group">
-              <button class="btn btn-outline btn-sm" onclick="toggleRightDrawer()" id="btn-toggle-drawer" style="background:#ffffff; border-color:#cbd5e1; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px;" title="Yerleşim Listesi ve Malzeme Ayarları">
+            <!-- Right: Action Buttons & Engin Çelik Hesabım Dropdown -->
+            <div class="topbar-cluster-right">
+              <button class="btn btn-outline btn-sm" onclick="toggleRightDrawer()" id="btn-toggle-drawer" style="background:#ffffff; border-color:#cbd5e1; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:5px; padding:6px 12px; border-radius:999px;" title="Yerleşim Listesi ve Malzeme Ayarları">
                 <span>📋</span> <span>Yerleşim</span>
               </button>
-              <button id="btn-studio-submit-quote" class="btn btn-success btn-sm" onclick="openSubmitQuoteModal()" style="font-weight:700; display:flex; align-items:center; gap:6px; box-shadow:0 4px 8px -2px rgba(16,185,129,0.4); border-radius:999px; padding:6px 14px;">
+              <button id="btn-studio-submit-quote" class="topbar-cta-green" onclick="openSubmitQuoteModal()">
                 <span>📅</span> <span>Randevu Al</span>
               </button>
+              <div id="topbar-auth-slot" class="topbar-auth-slot"></div>
             </div>
           </div>
 
@@ -917,6 +972,21 @@
             <canvas id="canvas3d-viewport"></canvas>
             <!-- 2D Canvas -->
             <canvas id="canvas2d-viewport" style="display:none;"></canvas>
+          </div>
+
+          <!-- Floating Bottom Tools Stack (Planner 5D / Homestyler Style) -->
+          <div class="canvas-bottom-right-dock">
+            <button class="circle-tool-btn" onclick="toggleOnboardingGuide()" title="3D Gezinme Rehberi">❓</button>
+            <button class="circle-tool-btn" onclick="canvas3D ? canvas3D.setPreset('reset') : null" title="Kamerayı Sıfırla / Sahneyi Ortala">🎯</button>
+            <button class="circle-tool-btn" onclick="canvas3D ? canvas3D.zoom(350) : null" title="Yakınlaş (+)">➕</button>
+            <button class="circle-tool-btn" onclick="canvas3D ? canvas3D.zoom(-350) : null" title="Uzaklaş (-)">➖</button>
+            <button class="circle-tool-btn" onclick="toggleFullscreenStudio()" title="Tam Ekran Yap">⛶</button>
+          </div>
+
+          <!-- Floating Bottom Left Room Metric Badge -->
+          <div class="canvas-bottom-left-badge" id="canvas-bottom-room-badge">
+            <span class="badge-icon">📐</span>
+            <span id="room-metrics-text">360 × 260 cm | 9.4 m²</span>
           </div>
         </div>
 

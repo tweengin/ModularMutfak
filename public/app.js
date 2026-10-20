@@ -276,11 +276,14 @@ function navigateTo(viewId) {
   document.getElementById(`nav-${viewId}`)?.classList.add('active');
 
   if (viewId === 'studio') {
+    document.body.classList.add('in-studio-mode');
     setTimeout(() => {
       renderActiveCanvas();
       updatePlacedModulesUI();
       checkRulerBubbleInitialDisplay();
       checkCustomerAccessSession();
+      updateRoomInfoBadges();
+      if (canvas3D) canvas3D.onWindowResize();
       if (localStorage.getItem('mc_hide_3d_guide') === '1') {
         const card = document.getElementById('studio-onboarding-card');
         const btn = document.getElementById('studio-reopen-guide-btn');
@@ -288,10 +291,50 @@ function navigateTo(viewId) {
         if (btn) btn.style.display = 'flex';
       }
     }, 100);
-  } else if (viewId === 'admin') {
-    AdminPanel.init();
+  } else {
+    document.body.classList.remove('in-studio-mode');
+    if (viewId === 'admin') {
+      AdminPanel.init();
+    }
   }
 }
+
+function updateRoomInfoBadges() {
+  const rc = window.CURRENT_DESIGN?.room_config || { room_width: 3600, room_depth: 2600, room_height: 2600 };
+  const rw = rc.room_width || 3600;
+  const rd = rc.room_depth || 2600;
+  const rh = rc.room_height || 2600;
+  const areaM2 = ((rw * rd) / 1000000).toFixed(1);
+  const wCm = Math.round(rw / 10);
+  const dCm = Math.round(rd / 10);
+  const hCm = Math.round(rh / 10);
+
+  const topRoomInfo = document.getElementById('topbar-room-info');
+  if (topRoomInfo) topRoomInfo.textContent = `Mutfak (${wCm} × ${dCm} cm)`;
+
+  const bottomRoomText = document.getElementById('room-metrics-text');
+  if (bottomRoomText) bottomRoomText.textContent = `${wCm} × ${dCm} cm | ${areaM2} m² | Tavan: ${hCm} cm`;
+}
+
+window.setStudioViewMode = function(mode) {
+  if (mode === '2d') {
+    setCanvasMode('plan');
+    document.getElementById('btn-mode-2d')?.classList.add('active');
+    document.getElementById('btn-mode-3d')?.classList.remove('active');
+  } else {
+    setCanvasMode('3d');
+    document.getElementById('btn-mode-3d')?.classList.add('active');
+    document.getElementById('btn-mode-2d')?.classList.remove('active');
+  }
+};
+
+window.toggleFullscreenStudio = function() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen?.().catch(e => console.warn(e));
+  } else {
+    document.exitFullscreen?.().catch(e => console.warn(e));
+  }
+};
 
 // 3D RULER TOGGLE & FIRST-TIME INFO BUBBLE
 window.toggle3DRuler = function() {
@@ -926,6 +969,7 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
     showToast("🔒 Tasarımınız kilitlenmiştir. Yeni modül eklemek veya revize yapmak için fabrika yöneticiniz ile görüşünüz.", "error");
     return false;
   }
+  saveDesignStateForUndo();
   const modWidth = template.selected_w || template.w || 600;
   const wall = targetWall || window.CURRENT_ACTIVE_WALL || 'back';
   const cap = getWallCapacity(wall);
@@ -1000,6 +1044,7 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
 }
 
 function removeModule(modId) {
+  saveDesignStateForUndo();
   window.CURRENT_DESIGN.modules = window.CURRENT_DESIGN.modules.filter(m => m.id !== modId);
   hideSelectedModuleGizmo();
   updatePlacedModulesUI();
@@ -1008,6 +1053,7 @@ function removeModule(modId) {
 }
 
 function shiftModule(modId, delta) {
+  saveDesignStateForUndo();
   const m = window.CURRENT_DESIGN.modules.find(x => x.id === modId);
   if (m) {
     const wall = m.wall || 'back';
@@ -1121,22 +1167,139 @@ window.toggleBacksplashTone = function() {
   showToast(`🎨 Tezgah Arası: ${newTone === 'dark' ? 'Koyu Füme/Antrasit Taş' : 'Açık Porselen Seramik'} tonuna ayarlandı.`, 'info');
 };
 
-window.toggleLeftSidebar = function(forceState) {
-  const sidebar = document.getElementById('studio-left-sidebar');
-  const arrow = document.getElementById('left-sidebar-arrow');
-  if (!sidebar) return;
-  const isCollapsed = typeof forceState === 'boolean' ? !forceState : sidebar.classList.contains('collapsed');
-  if (isCollapsed) {
-    sidebar.classList.remove('collapsed');
-    if (arrow) arrow.textContent = '◀';
-  } else {
-    sidebar.classList.add('collapsed');
-    if (arrow) arrow.textContent = '▶';
+// FLYOUT MODULE CATALOG & RAIL CONTROLLER (PLANNER 5D / HOMESTYLER STYLE)
+window.CURRENT_FLYOUT_KEY = 'base';
+
+window.toggleCatalogFlyout = function(catKey) {
+  const drawer = document.getElementById('studio-flyout-drawer');
+  if (!drawer) return;
+
+  if (catKey === 'materials') {
+    toggleRightDrawer(true);
+    return;
   }
+
+  // If already open and same category clicked, close it
+  if (drawer.classList.contains('open') && window.CURRENT_FLYOUT_KEY === catKey) {
+    closeCatalogFlyout();
+    return;
+  }
+
+  window.CURRENT_FLYOUT_KEY = catKey;
+  drawer.classList.add('open');
+
+  // Update Rail Icon Active State
+  document.querySelectorAll('.studio-slim-rail .rail-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.getElementById(`rail-btn-${catKey}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Update Header Title & Icon
+  const titles = {
+    search: { title: 'Tüm Modüller & Cihazlar', icon: '🔍' },
+    base: { title: 'Alt Dolap Modülleri', icon: '🗄️' },
+    wall: { title: 'Üst Dolap Modülleri', icon: '📦' },
+    tall: { title: 'Boy Dolap & Kiler', icon: '🧊' },
+    appliance: { title: 'Ankastre & Pişirme', icon: '♨️' }
+  };
+  const info = titles[catKey] || { title: 'Modül Kataloğu', icon: '📁' };
+  const titleElem = document.getElementById('flyout-title');
+  const iconElem = document.getElementById('flyout-icon');
+  if (titleElem) titleElem.textContent = info.title;
+  if (iconElem) iconElem.textContent = info.icon;
+
+  if (catKey === 'search') {
+    const input = document.getElementById('flyout-search-input');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+    renderFlyoutFiltered(null);
+  } else {
+    renderFlyoutCategory(catKey);
+  }
+
   setTimeout(() => {
     if (canvas3D) canvas3D.onWindowResize();
     if (canvas2D) renderActiveCanvas();
-  }, 280);
+  }, 260);
+};
+
+window.closeCatalogFlyout = function() {
+  const drawer = document.getElementById('studio-flyout-drawer');
+  if (!drawer) return;
+  drawer.classList.remove('open');
+  document.querySelectorAll('.studio-slim-rail .rail-btn').forEach(b => b.classList.remove('active'));
+
+  setTimeout(() => {
+    if (canvas3D) canvas3D.onWindowResize();
+    if (canvas2D) renderActiveCanvas();
+  }, 260);
+};
+
+window.filterFlyoutModules = function(keyword) {
+  if (!keyword || !keyword.trim()) {
+    if (window.CURRENT_FLYOUT_KEY && window.CURRENT_FLYOUT_KEY !== 'search') {
+      renderFlyoutCategory(window.CURRENT_FLYOUT_KEY);
+    } else {
+      renderFlyoutFiltered(null);
+    }
+    return;
+  }
+  renderFlyoutFiltered(keyword.trim().toLowerCase());
+};
+
+function renderFlyoutCategory(catKey) {
+  const allGroups = window.CURRENT_CATALOG_GROUPS || ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
+  const filtered = allGroups.filter(g => g.groupKey === catKey || (catKey === 'appliance' && g.groupKey === 'appliance'));
+  const mapped = (filtered.length > 0 ? filtered : allGroups).map(g => ({ ...g, open: true }));
+  renderCatalogModulesDOM(mapped);
+}
+
+function renderFlyoutFiltered(keyword) {
+  const allGroups = window.CURRENT_CATALOG_GROUPS || ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
+  if (!keyword) {
+    const mapped = allGroups.map(g => ({ ...g, open: true }));
+    renderCatalogModulesDOM(mapped);
+    return;
+  }
+  const filtered = [];
+  allGroups.forEach(grp => {
+    const matchingItems = grp.items.filter(m =>
+      (m.name && m.name.toLowerCase().includes(keyword)) ||
+      (m.desc && m.desc.toLowerCase().includes(keyword)) ||
+      (m.type && m.type.toLowerCase().includes(keyword))
+    );
+    if (matchingItems.length > 0) {
+      filtered.push({ ...grp, open: true, items: matchingItems });
+    }
+  });
+  renderCatalogModulesDOM(filtered);
+}
+
+// STUDIO UNDO / REDO HISTORY CONTROLLER
+window.STUDIO_UNDO_STACK = [];
+window.saveDesignStateForUndo = function() {
+  if (!window.CURRENT_DESIGN || !window.CURRENT_DESIGN.modules) return;
+  window.STUDIO_UNDO_STACK.push(JSON.parse(JSON.stringify(window.CURRENT_DESIGN.modules)));
+  if (window.STUDIO_UNDO_STACK.length > 25) window.STUDIO_UNDO_STACK.shift();
+};
+
+window.undoLastAction = function() {
+  if (!window.STUDIO_UNDO_STACK || window.STUDIO_UNDO_STACK.length === 0) {
+    showToast("ℹ️ Geri alınacak önceki işlem bulunamadı.", "info");
+    return;
+  }
+  const prevModules = window.STUDIO_UNDO_STACK.pop();
+  window.CURRENT_DESIGN.modules = prevModules;
+  hideSelectedModuleGizmo();
+  updatePlacedModulesUI();
+  updateCatalogDimensionPills();
+  renderActiveCanvas();
+  showToast("↩️ Son işlem geri alındı.");
+};
+
+window.toggleLeftSidebar = function(forceState) {
+  toggleCatalogFlyout(window.CURRENT_FLYOUT_KEY || 'base');
 };
 
 window.toggleRightDrawer = function(forceOpen) {
@@ -2015,7 +2178,7 @@ window.addEventListener('click', function(e) {
 
 function updateAuthUI() {
   const authNav = document.getElementById('auth-nav-container');
-  if (!authNav) return;
+  const topbarAuthSlot = document.getElementById('topbar-auth-slot');
 
   if (!window.CURRENT_USER) {
     window.CURRENT_USER = {
@@ -2028,16 +2191,16 @@ function updateAuthUI() {
   }
   const user = window.CURRENT_USER;
 
-  authNav.innerHTML = `
-    <div class="nordic-user-section" style="display:flex; align-items:center; gap:12px; position:relative;">
+  const userHtml = `
+    <div class="nordic-user-section" style="display:flex; align-items:center; gap:10px; position:relative;">
       <!-- Notification Bell with Alert Dot -->
-      <div style="position:relative; cursor:pointer;" onclick="toggleUserDropdown()" title="Durum Bildirimi">
+      <div style="position:relative; cursor:pointer;" onclick="toggleUserDropdown(this)" title="Durum Bildirimi">
         <span style="font-size:18px;">🔔</span>
         <span style="position:absolute; top:-3px; right:-3px; width:8px; height:8px; background:#ef4444; border-radius:50%;"></span>
       </div>
 
       <!-- User Badge / Hesabım Trigger -->
-      <div class="nordic-user-pill" onclick="toggleUserDropdown()">
+      <div class="nordic-user-pill" onclick="toggleUserDropdown(this)">
         <div class="user-avatar-circle">EÇ</div>
         <div>
           <div class="user-pill-name">${user.full_name || 'Engin Çelik'}</div>
@@ -2086,6 +2249,9 @@ function updateAuthUI() {
       </div>
     </div>
   `;
+
+  if (authNav) authNav.innerHTML = userHtml;
+  if (topbarAuthSlot) topbarAuthSlot.innerHTML = userHtml;
 }
 
 // CUSTOMER ONBOARDING GATEWAY: REQUIRES AUTH BEFORE ENTERING WIZARD/STUDIO

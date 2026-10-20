@@ -1121,9 +1121,31 @@ class StudioCanvas3D {
             group.add(cooktopMesh);
 
           } else if (mod.type?.includes('sink')) {
+            // Realistic Single-Bowl Sink & Gooseneck Mixer Faucet
             const sinkMesh = this.createSinkMesh(mw, ctDepth);
             sinkMesh.position.set(0, plinthH + bodyH + ctThick + 2, ctDepth / 2);
             group.add(sinkMesh);
+
+            // Doors under the sink: double doors if mw >= 700, single door if mw < 700
+            if (mw >= 700) {
+              // Center dividing seam
+              const seamMesh = new THREE.Mesh(new THREE.BoxGeometry(2, bodyH - 12, 2), this.matCache.plinthAlu);
+              seamMesh.position.set(0, plinthH + bodyH / 2, md + 1);
+              group.add(seamMesh);
+
+              // Symmetrical double handles meeting in the center
+              const hLeft = this.createHandle3D(12, 100, false);
+              hLeft.position.set(-24, plinthH + bodyH - 110, md + 10);
+              group.add(hLeft);
+
+              const hRight = this.createHandle3D(12, 100, false);
+              hRight.position.set(24, plinthH + bodyH - 110, md + 10);
+              group.add(hRight);
+            } else {
+              const hSingle = this.createHandle3D(12, 100, false);
+              hSingle.position.set(mw / 2 - 28, plinthH + bodyH - 110, md + 10);
+              group.add(hSingle);
+            }
 
           } else if (mod.drawers > 0) {
             const dh = bodyH / mod.drawers;
@@ -1134,10 +1156,29 @@ class StudioCanvas3D {
               group.add(handleMesh);
             }
           } else {
-            // Standard Single or Double Door (Kapaklar Kapalı)
-            const handleMesh = this.createHandle3D(12, 90, false);
-            handleMesh.position.set(mw / 2 - 25, plinthH + bodyH / 2, md + 10);
-            group.add(handleMesh);
+            // Standard Base Cabinets (Double vs Single Door Handle Placement)
+            const isDouble = (mod.type === 'base_double' || mw >= 750);
+            if (isDouble) {
+              // Center dividing vertical seam
+              const seamMesh = new THREE.Mesh(new THREE.BoxGeometry(2, bodyH - 12, 2), this.matCache.plinthAlu);
+              seamMesh.position.set(0, plinthH + bodyH / 2, md + 1);
+              group.add(seamMesh);
+
+              // Left door handle
+              const hLeft = this.createHandle3D(12, 100, false);
+              hLeft.position.set(-24, plinthH + bodyH - 110, md + 10);
+              group.add(hLeft);
+
+              // Right door handle
+              const hRight = this.createHandle3D(12, 100, false);
+              hRight.position.set(24, plinthH + bodyH - 110, md + 10);
+              group.add(hRight);
+            } else {
+              // Single door: handle placed near opening edge
+              const hSingle = this.createHandle3D(12, 100, false);
+              hSingle.position.set(mw / 2 - 28, plinthH + bodyH - 110, md + 10);
+              group.add(hSingle);
+            }
           }
         }
       }
@@ -1302,9 +1343,39 @@ class StudioCanvas3D {
             group.add(filterMesh);
           }
 
-          const handleMesh = this.createHandle3D(60, 10, true);
-          handleMesh.position.set(0, wallZ + 35, md + 10);
-          group.add(handleMesh);
+          // Handles for Upper Cabinets: Lift-up horizontal for glass, double vertical for double cabinets, single for single
+          if (mod.type?.includes('glass')) {
+            const handleMesh = this.createHandle3D(Math.min(mw * 0.45, 140), 10, true);
+            handleMesh.position.set(0, wallZ + 35, md + 10);
+            group.add(handleMesh);
+          } else if (mod.type?.includes('hood')) {
+            const handleMesh = this.createHandle3D(40, 8, true);
+            handleMesh.position.set(0, wallZ + 25, md + 10);
+            group.add(handleMesh);
+          } else {
+            const isDouble = (mod.type === 'wall_double' || mw >= 750);
+            if (isDouble) {
+              // Center dividing vertical seam
+              const seamMesh = new THREE.Mesh(new THREE.BoxGeometry(2, wallH - 12, 2), this.matCache.plinthAlu);
+              seamMesh.position.set(0, wallZ + wallH / 2, md + 1);
+              group.add(seamMesh);
+
+              // Left door handle
+              const hLeft = this.createHandle3D(10, 80, false);
+              hLeft.position.set(-22, wallZ + 55, md + 10);
+              group.add(hLeft);
+
+              // Right door handle
+              const hRight = this.createHandle3D(10, 80, false);
+              hRight.position.set(22, wallZ + 55, md + 10);
+              group.add(hRight);
+            } else {
+              // Single door: handle placed near opening edge
+              const hSingle = this.createHandle3D(10, 80, false);
+              hSingle.position.set(mw / 2 - 25, wallZ + 55, md + 10);
+              group.add(hSingle);
+            }
+          }
         }
 
         if (!isChimneyHood) {
@@ -1433,21 +1504,98 @@ class StudioCanvas3D {
 
   createSinkMesh(mw, ctDepth) {
     const group = new THREE.Group();
-    const sinkGeo = new THREE.BoxGeometry(mw * 0.8, 4, ctDepth * 0.75);
-    const sinkMesh = new THREE.Mesh(sinkGeo, this.matCache.sinkSteel);
-    group.add(sinkMesh);
 
+    // 1. Sink Outer Rim & Flange (Dış Çerçeve: 540x440 mm, fırçalanmış Inox çelik)
+    const flangeW = Math.min(mw - 60, 560);
+    const flangeD = Math.min(ctDepth - 80, 460);
+    const flangeGeo = new THREE.BoxGeometry(flangeW, 4, flangeD);
+    const flangeMesh = new THREE.Mesh(flangeGeo, this.matCache.sinkSteel);
+    flangeMesh.castShadow = true;
+    flangeMesh.receiveShadow = true;
+    group.add(flangeMesh);
+
+    // 2. Recessed Single Basin Bowl (Derin Tek Göz Hazne: 480x380 mm)
+    const basinW = flangeW - 50;
+    const basinD = flangeD - 50;
+    const basinGeo = new THREE.BoxGeometry(basinW, 14, basinD);
+    const basinMat = new THREE.MeshPhysicalMaterial({
+      color: 0x8a9ba8,
+      roughness: 0.16,
+      metalness: 0.92,
+      clearcoat: 0.6
+    });
+    const basinMesh = new THREE.Mesh(basinGeo, basinMat);
+    basinMesh.position.set(0, -6, 10);
+    group.add(basinMesh);
+
+    // Inner Basin Bottom Water/Steel Highlight
+    const waterGeo = new THREE.PlaneGeometry(basinW - 10, basinD - 10);
+    waterGeo.rotateX(-Math.PI / 2);
+    const waterMat = new THREE.MeshPhysicalMaterial({
+      color: 0x64748b,
+      roughness: 0.08,
+      metalness: 0.95,
+      clearcoat: 0.9
+    });
+    const waterMesh = new THREE.Mesh(waterGeo, waterMat);
+    waterMesh.position.set(0, -12, 10);
+    group.add(waterMesh);
+
+    // 3. Central Stainless Drain Strainer with Stopper Basket (Gider Süzgeci)
+    const drainGeo = new THREE.CylinderGeometry(24, 22, 3, 24);
+    const drainMesh = new THREE.Mesh(drainGeo, this.matCache.handleChrome);
+    drainMesh.position.set(0, -11, 10);
+    group.add(drainMesh);
+
+    const plugGeo = new THREE.CylinderGeometry(8, 8, 4, 16);
+    const plugMesh = new THREE.Mesh(plugGeo, this.matCache.plinthAlu);
+    plugMesh.position.set(0, -9.5, 10);
+    group.add(plugMesh);
+
+    // 4. ARCHITECTURAL GOOSENECK FAUCET & MIXER LEVER (Kuğu Boynu Lüks Krom Batarya)
     const faucetGroup = new THREE.Group();
-    const stemGeo = new THREE.CylinderGeometry(5, 5, 80, 16);
+    const tapZ = -flangeD / 2 + 35; // Back deck mounting hole
+
+    // Base Escutcheon Ring (Alt Montaj Rozeti)
+    const baseGeo = new THREE.CylinderGeometry(18, 20, 10, 24);
+    const baseMesh = new THREE.Mesh(baseGeo, this.matCache.handleChrome);
+    baseMesh.position.set(0, 5, tapZ);
+    faucetGroup.add(baseMesh);
+
+    // Vertical Riser Column (Dikey Gövde)
+    const stemGeo = new THREE.CylinderGeometry(10, 11, 120, 24);
     const stemMesh = new THREE.Mesh(stemGeo, this.matCache.handleChrome);
-    stemMesh.position.set(0, 40, -ctDepth * 0.22);
+    stemMesh.position.set(0, 65, tapZ);
+    stemMesh.castShadow = true;
     faucetGroup.add(stemMesh);
 
-    const archGeo = new THREE.TorusGeometry(35, 5, 12, 24, Math.PI);
+    // Curved Gooseneck Spout (Kuğu Boynu Yay: 180° zarif kavis)
+    const archRadius = 55;
+    const archGeo = new THREE.TorusGeometry(archRadius, 9, 16, 32, Math.PI);
     const archMesh = new THREE.Mesh(archGeo, this.matCache.handleChrome);
-    archMesh.position.set(0, 80, -ctDepth * 0.22 + 35);
+    archMesh.position.set(0, 125, tapZ + archRadius);
     archMesh.rotation.y = Math.PI / 2;
+    archMesh.castShadow = true;
     faucetGroup.add(archMesh);
+
+    // Spout Aerator Tip pointing down (Su Çıkış Ucu)
+    const tipGeo = new THREE.CylinderGeometry(8, 9, 28, 16);
+    const tipMesh = new THREE.Mesh(tipGeo, this.matCache.handleChrome);
+    tipMesh.position.set(0, 110, tapZ + archRadius * 2);
+    faucetGroup.add(tipMesh);
+
+    // Single-Lever Ceramic Mixer Handle on right side (Aç-Kapa Sıcak/Soğuk Kumanda Kolu)
+    const leverBaseGeo = new THREE.CylinderGeometry(7, 7, 18, 16);
+    leverBaseGeo.rotateZ(Math.PI / 2);
+    const leverBaseMesh = new THREE.Mesh(leverBaseGeo, this.matCache.handleChrome);
+    leverBaseMesh.position.set(16, 40, tapZ);
+    faucetGroup.add(leverBaseMesh);
+
+    const leverPinGeo = new THREE.CylinderGeometry(3.5, 3.5, 45, 12);
+    const leverPinMesh = new THREE.Mesh(leverPinGeo, this.matCache.handleChrome);
+    leverPinMesh.position.set(24, 55, tapZ);
+    leverPinMesh.rotation.z = -Math.PI / 6;
+    faucetGroup.add(leverPinMesh);
 
     group.add(faucetGroup);
     return group;
@@ -1585,6 +1733,17 @@ class StudioCanvas3D {
     } else if (type === 'auto') {
       this.controls.autoRotate = !this.controls.autoRotate;
     }
+    this.controls.update();
+  }
+
+  zoom(delta) {
+    if (!this.camera || !this.controls) return;
+    const forward = new THREE.Vector3();
+    this.camera.getWorldDirection(forward);
+    const currentDist = this.camera.position.distanceTo(this.controls.target);
+    if (delta > 0 && currentDist < 600) return;
+    if (delta < 0 && currentDist > 12000) return;
+    this.camera.position.addScaledVector(forward, delta);
     this.controls.update();
   }
 
