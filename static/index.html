@@ -568,17 +568,18 @@
               <input type="checkbox" id="auto-app-fridge" checked>
             </label>
 
-            <!-- 3. Oven & Cooktop -->
-            <label class="auto-appliance-card">
+            <!-- 3. Oven & Cooktop (Mandatory) -->
+            <div class="auto-appliance-card mandatory" title="Tezgah üstü ocak & pişirme modülü zorunludur">
               <div style="display:flex; align-items:center; gap:10px;">
                 <span style="font-size:22px;">♨️</span>
                 <div>
-                  <strong style="font-size:0.85rem; color:#f8fafc;">Ankastre Fırın & Ocak</strong>
-                  <div style="font-size:0.7rem; color:#94a3b8;">60 cm Pişirme Ünitesi</div>
+                  <strong style="font-size:0.85rem; color:#34d399;">Ankastre Fırın & Ocak</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">60 cm Pişirme Ünitesi (Zorunlu)</div>
                 </div>
               </div>
-              <input type="checkbox" id="auto-app-oven" checked>
-            </label>
+              <span class="badge badge-success" style="font-size:0.7rem;">ZORUNLU</span>
+              <input type="checkbox" id="auto-app-oven" checked style="display:none;">
+            </div>
 
             <!-- 4. Dishwasher -->
             <label class="auto-appliance-card">
@@ -604,17 +605,18 @@
               <input type="checkbox" id="auto-app-drawer" checked>
             </label>
 
-            <!-- 6. Range Hood -->
-            <label class="auto-appliance-card">
+            <!-- 6. Range Hood (Mandatory on top of cooktop) -->
+            <div class="auto-appliance-card mandatory" title="Ocak üstü havalandırma zorunludur">
               <div style="display:flex; align-items:center; gap:10px;">
                 <span style="font-size:22px;">💨</span>
                 <div>
-                  <strong style="font-size:0.85rem; color:#f8fafc;">Davlumbaz & Aspiratör</strong>
-                  <div style="font-size:0.7rem; color:#94a3b8;">Fırın üstü hava tahliyesi</div>
+                  <strong style="font-size:0.85rem; color:#34d399;">Ocak Üstü Davlumbaz</strong>
+                  <div style="font-size:0.7rem; color:#94a3b8;">Ocağın tam dikey üst hizası (Zorunlu)</div>
                 </div>
               </div>
-              <input type="checkbox" id="auto-app-hood" checked>
-            </label>
+              <span class="badge badge-success" style="font-size:0.7rem;">ZORUNLU</span>
+              <input type="checkbox" id="auto-app-hood" checked style="display:none;">
+            </div>
 
             <!-- 7. Glass Wall Cabinet -->
             <label class="auto-appliance-card">
@@ -627,6 +629,74 @@
               </div>
               <input type="checkbox" id="auto-app-glass" checked>
             </label>
+          </div>
+
+          <!-- Mandatory Upper Cabinet Height Selection -->
+          <div id="auto-wall-height-section" style="background:rgba(56, 189, 248, 0.08); border:1px solid #38bdf8; border-radius:8px; padding:1.25rem; margin-bottom:1.5rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+              <strong style="color:#f8fafc; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                <span>📏</span> Üst Dolap Net Yüksekliği
+              </strong>
+              <span class="badge badge-success">ZORUNLU SEÇİM</span>
+            </div>
+            <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:1rem; line-height:1.4;">
+              Alt dolap yükseklikleri dünya standardında sabit iken (~86-90 cm), tavan mesafenize ve depolama ihtiyacınıza uygun üst dolap yüksekliğini seçiniz:
+            </p>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem;">
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; padding:0.85rem; border-radius:6px; cursor:pointer; border:1px solid #475569;">
+                <input type="radio" name="auto-wall-height" value="720" checked style="margin-top:3px;">
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc; display:block;">70 cm (Standart)</strong>
+                  <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-top:2px;">Klasik tavan boşluklu, ferah ve standart üst dolap boyu</span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; padding:0.85rem; border-radius:6px; cursor:pointer; border:1px solid #475569;">
+                <input type="radio" name="auto-wall-height" value="800" style="margin-top:3px;">
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc; display:block;">80 cm (Geniş)</strong>
+                  <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-top:2px;">2026 Modern ara boy, %15 daha geniş iç raf ve saklama alanı</span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; padding:0.85rem; border-radius:6px; cursor:pointer; border:1px solid #475569;">
+                <input type="radio" name="auto-wall-height" value="900" style="margin-top:3px;">
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc; display:block;">90 cm (Tavana Kadar)</strong>
+                  <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-top:2px;">Maksimum kiler hacmi, tavan boşluğu bırakmaz ve sıfır toz birikimi</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Mandatory Hood Style Selection for Cooktop -->
+          <div id="auto-hood-style-section" style="background:rgba(245, 158, 11, 0.08); border:1px solid #f59e0b; border-radius:8px; padding:1.25rem; margin-bottom:1.5rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+              <strong style="color:#f8fafc; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+                <span>💨</span> Ocak Üstü Davlumbaz / Aspiratör Tarzı
+              </strong>
+              <span class="badge badge-warning">OCAK ÜSTÜNE ZORUNLU</span>
+            </div>
+            <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:1rem; line-height:1.4;">
+              Tezgah üstü ocağınızın tam dikey üst hizasına havalandırma ünitesi yerleştirilecektir. İstediğiniz görünüm tarzını seçiniz:
+            </p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; padding:0.85rem; border-radius:6px; cursor:pointer; border:1px solid #475569;">
+                <input type="radio" name="auto-hood-choice" value="integrated" checked style="margin-top:3px;">
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc; display:block;">Dolap İçi Gömme Aspiratör</strong>
+                  <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-top:2px;">Üst dolap kapaklarıyla yekpare gizli tasarım, alttan paslanmaz çelik filtreli</span>
+                </div>
+              </label>
+
+              <label style="display:flex; align-items:flex-start; gap:10px; background:#1e293b; padding:0.85rem; border-radius:6px; cursor:pointer; border:1px solid #475569;">
+                <input type="radio" name="auto-hood-choice" value="chimney" style="margin-top:3px;">
+                <div>
+                  <strong style="font-size:0.85rem; color:#f8fafc; display:block;">Açık Paslanmaz Çelik T-Davlumbaz</strong>
+                  <span style="font-size:0.72rem; color:#94a3b8; display:block; margin-top:2px;">Modern açık baca tipi Inox davlumbaz, profesyonel şef mutfağı görünümü</span>
+                </div>
+              </label>
+            </div>
           </div>
 
           <!-- L-Kitchen Corner Requirement Section (Visible ONLY for L-kitchen) -->
@@ -835,6 +905,16 @@
               <span class="badge badge-info" id="placed-count-badge">0 Modül</span>
             </div>
             <button onclick="toggleRightDrawer(false)" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0 4px; line-height:1;" title="Kapat">✕</button>
+          </div>
+
+          <!-- Quick Upper Cabinet Height Control in Studio -->
+          <div class="panel-header" style="margin-top:0.75rem;">
+            <span>📏 Üst Dolap Yüksekliği</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:1rem;">
+            <button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:6px 4px; text-align:center;" onclick="setStudioWallHeight(720)" title="70 cm Standart Üst Dolap">70 cm</button>
+            <button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:6px 4px; text-align:center;" onclick="setStudioWallHeight(800)" title="80 cm Geniş Üst Dolap">80 cm</button>
+            <button type="button" class="btn btn-outline" style="font-size:0.75rem; padding:6px 4px; text-align:center;" onclick="setStudioWallHeight(900)" title="90 cm Tavana Kadar">90 cm</button>
           </div>
 
           <!-- Placed Modules List -->

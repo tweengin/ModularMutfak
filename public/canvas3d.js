@@ -1187,8 +1187,50 @@ class StudioCanvas3D {
         group.add(ledDownLightCorner);
 
       } else {
+        const isChimneyHood = mod.type?.includes('chimney');
         const isOpen = mod.isOpenShelf || mod.type?.includes('open_shelf');
-        if (isOpen) {
+
+        if (isChimneyHood) {
+          // OPEN T-CHIMNEY HOOD (Paslanmaz Çelik Açık T-Davlumbaz)
+          const canopyH = 60;
+          const canopyD = md || 450;
+          const canopyGeo = new THREE.BoxGeometry(mw, canopyH, canopyD);
+          const canopyMesh = new THREE.Mesh(canopyGeo, this.matCache.sinkSteel);
+          canopyMesh.position.set(0, wallZ + canopyH / 2, canopyD / 2);
+          canopyMesh.castShadow = true;
+          group.add(canopyMesh);
+
+          // Stainless grease filter grid underneath
+          const filterGeo = new THREE.BoxGeometry(mw - 40, 6, canopyD - 40);
+          const filterMesh = new THREE.Mesh(filterGeo, this.matCache.plinthAlu);
+          filterMesh.position.set(0, wallZ + 3, canopyD / 2);
+          group.add(filterMesh);
+
+          // Control panel touch strip on front face of canopy
+          const stripGeo = new THREE.BoxGeometry(mw * 0.45, 16, 2);
+          const stripMesh = new THREE.Mesh(stripGeo, this.matCache.ovenGlass);
+          stripMesh.position.set(0, wallZ + canopyH / 2, canopyD + 1);
+          group.add(stripMesh);
+
+          // Vertical stainless chimney flue going up to top
+          const flueW = Math.min(260, mw - 60);
+          const flueD = Math.min(260, canopyD - 40);
+          const flueH = wallH - canopyH;
+          const flueGeo = new THREE.BoxGeometry(flueW, flueH, flueD);
+          const flueMesh = new THREE.Mesh(flueGeo, this.matCache.sinkSteel);
+          flueMesh.position.set(0, wallZ + canopyH + flueH / 2, flueD / 2);
+          flueMesh.castShadow = true;
+          group.add(flueMesh);
+
+          // Downward cooking spotlights
+          const spot1 = new THREE.PointLight(0xffedd5, 0.55, 750, 2);
+          spot1.position.set(-mw / 4, wallZ - 12, canopyD / 2);
+          group.add(spot1);
+          const spot2 = new THREE.PointLight(0xffedd5, 0.55, 750, 2);
+          spot2.position.set(mw / 4, wallZ - 12, canopyD / 2);
+          group.add(spot2);
+
+        } else if (isOpen) {
           // OPEN SHELF WALL CABINET (Kapaksız Üst Dolap - İçi ve Rafları Görünür)
           const t = 18;
           const leftP = new THREE.Mesh(new THREE.BoxGeometry(t, wallH, md), bodyMat);
@@ -1235,22 +1277,32 @@ class StudioCanvas3D {
             group.add(glassMesh);
           }
 
+          if (mod.type?.includes('hood')) {
+            // Recessed extractor filter at bottom of integrated hood cabinet
+            const filterGeo = new THREE.BoxGeometry(mw - 40, 8, md - 40);
+            const filterMesh = new THREE.Mesh(filterGeo, this.matCache.plinthAlu);
+            filterMesh.position.set(0, wallZ + 4, md / 2);
+            group.add(filterMesh);
+          }
+
           const handleMesh = this.createHandle3D(60, 10, true);
           handleMesh.position.set(0, wallZ + 35, md + 10);
           group.add(handleMesh);
         }
 
-        // AUTOMATIC ARCHITECTURAL UNDER-CABINET LED LIGHTING
-        // Subtle recessed LED strip profile at the bottom of upper cabinet
-        const ledStripGeo = new THREE.BoxGeometry(mw - 24, 4, 12);
-        const ledStripMesh = new THREE.Mesh(ledStripGeo, this.matCache.ledStripMat);
-        ledStripMesh.position.set(0, wallZ - 2, md / 2);
-        group.add(ledStripMesh);
+        if (!isChimneyHood) {
+          // AUTOMATIC ARCHITECTURAL UNDER-CABINET LED LIGHTING
+          // Subtle recessed LED strip profile at the bottom of upper cabinet
+          const ledStripGeo = new THREE.BoxGeometry(mw - 24, 4, 12);
+          const ledStripMesh = new THREE.Mesh(ledStripGeo, this.matCache.ledStripMat);
+          ledStripMesh.position.set(0, wallZ - 2, md / 2);
+          group.add(ledStripMesh);
 
-        // Soft warm downward projection onto countertop & backsplash
-        const ledDownLight = new THREE.PointLight(0xffedd5, 0.45, 900, 2);
-        ledDownLight.position.set(0, wallZ - 15, md / 2);
-        group.add(ledDownLight);
+          // Soft warm downward projection onto countertop & backsplash
+          const ledDownLight = new THREE.PointLight(0xffedd5, 0.45, 900, 2);
+          ledDownLight.position.set(0, wallZ - 15, md / 2);
+          group.add(ledDownLight);
+        }
       }
 
     } else if (mod.category === 'tall') {

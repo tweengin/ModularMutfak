@@ -71,6 +71,7 @@ const ADEKO_MODULE_GROUPS = {
         { type: 'wall_double', name: 'Çift Kapaklı Üst Dolap', category: 'wall', w: 800, d: 350, h: 720, drawers: 0, hinges: 4, icon: '📦', desc: 'Standart çift kapaklı üst' },
         { type: 'wall_single', name: 'Tek Kapaklı Üst Dolap', category: 'wall', w: 500, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📦', desc: 'Dar alan üst depolama' },
         { type: 'wall_hood', name: 'Davlumbaz Üstü Aspiratör Dolabı', category: 'wall', w: 600, d: 350, h: 720, drawers: 0, hinges: 2, icon: '💨', desc: 'Karbon filtreli gömme' },
+        { type: 'wall_hood_chimney', name: 'Açık Paslanmaz Çelik T-Davlumbaz', category: 'wall', w: 600, d: 450, h: 720, drawers: 0, hinges: 0, icon: '🌪️', desc: 'Inox T-tipi açık baca davlumbaz' },
         { type: 'wall_corner_straight', name: 'Düz Kör Köşe Üst Dolap', category: 'wall', w: 650, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe üst dolap (Tek Raflı)' },
         { type: 'wall_corner_l', name: '90° L-Köşe Üst Dolabı', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe üst asma (Tek Raflı)' },
         { type: 'wall_corner_v', name: 'V-Köşe (45° Diyagonal) Üst Dolap', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe üst dolabı (Tek Raflı)' },
@@ -599,11 +600,12 @@ async function loadCategoryModules(catKey) {
         else if (m.type === 'base_double' || m.type === 'wall_double') m.allowed_widths = [600, 800, 900, 1000];
         else if (m.type === 'base_drawer_3') m.allowed_widths = [400, 450, 600, 800, 900];
         else if (m.type === 'base_sink' || m.type === 'wall_glass') m.allowed_widths = [600, 800, 900, 1000];
+        else if (m.type === 'wall_hood' || m.type === 'wall_hood_chimney') m.allowed_widths = [600, 900];
         else if (m.type === 'tall_pantry_2d') m.allowed_widths = [450, 600];
         else m.allowed_widths = [m.w || 600];
       }
       if (m.allow_custom_width === undefined) {
-        m.allow_custom_width = !['base_drawer_3', 'base_oven', 'base_dishwasher'].includes(m.type);
+        m.allow_custom_width = !['base_drawer_3', 'base_oven', 'base_dishwasher', 'wall_hood', 'wall_hood_chimney'].includes(m.type);
       }
       m.selected_w = m.selected_w || m.w || m.allowed_widths[0];
       m.w = m.selected_w;
@@ -1334,6 +1336,134 @@ window.startManualStudio = function() {
   showToast('🎨 Manuel Tasarım: Boş tuval açıldı. Sol menüden modül eklemeye başlayabilirsiniz.', 'info');
 };
 
+// -------------------------------------------------------------
+// UPPER CABINET SPAN PARTITIONING (ZERO GAPS & FLEXIBLE MODULAR)
+// -------------------------------------------------------------
+function partitionSpanToStandardWidths(totalSpan) {
+  if (totalSpan <= 0) return [];
+  if (totalSpan < 300) return [totalSpan];
+
+  const standards = [900, 800, 600, 500, 400, 300];
+  const rem = totalSpan % 100;
+  const baseSpan = totalSpan - rem;
+
+  const memo = {};
+  function findBest(target) {
+    if (target === 0) return [];
+    if (target in memo) return memo[target];
+    let best = null;
+    for (const w of standards) {
+      if (w <= target) {
+        const sub = findBest(target - w);
+        if (sub !== null) {
+          const candidate = [w, ...sub];
+          if (best === null || candidate.length < best.length) {
+            best = candidate;
+          }
+        }
+      }
+    }
+    memo[target] = best;
+    return best;
+  }
+
+  let pieces = findBest(baseSpan);
+  if (!pieces || pieces.length === 0) {
+    pieces = [];
+    let cur = baseSpan;
+    while (cur > 0) {
+      const w = standards.find(s => s <= cur) || 300;
+      const useW = Math.min(w, cur);
+      pieces.push(useW);
+      cur -= useW;
+    }
+  }
+
+  // Absorb remainder into the last cabinet so total width is exactly totalSpan (0 mm gap)
+  if (rem > 0 && pieces.length > 0) {
+    pieces[pieces.length - 1] += rem;
+  } else if (rem > 0) {
+    pieces.push(rem);
+  }
+
+  return pieces;
+}
+
+function fillUpperWallSpan(startX, endX, wallKey, wallH, preferGlass, nextModId, generatedModules) {
+  const span = endX - startX;
+  if (span < 200) return;
+
+  const widths = partitionSpanToStandardWidths(span);
+  let curPos = startX;
+  let glassPlaced = false;
+
+  widths.forEach(cw => {
+    let modType = 'wall_single';
+    let modName = 'Tek Kapaklı Üst Dolap';
+    let hinges = 2;
+
+    if (cw >= 800) {
+      if (preferGlass && !glassPlaced) {
+        modType = 'wall_glass';
+        modName = 'Camlı Yatay Kalkar Dolap';
+        hinges = 2;
+        glassPlaced = true;
+      } else {
+        modType = 'wall_double';
+        modName = 'Çift Kapaklı Üst Dolap';
+        hinges = 4;
+      }
+    } else if (cw >= 600) {
+      if (preferGlass && !glassPlaced) {
+        modType = 'wall_glass';
+        modName = 'Camlı Yatay Kalkar Dolap';
+        hinges = 2;
+        glassPlaced = true;
+      } else {
+        modType = 'wall_single';
+        modName = 'Tek Kapaklı Üst Dolap';
+        hinges = 2;
+      }
+    } else {
+      modType = 'wall_single';
+      modName = 'Tek Kapaklı Üst Dolap';
+      hinges = 2;
+    }
+
+    generatedModules.push({
+      id: nextModId(),
+      type: modType,
+      name: modName,
+      category: 'wall',
+      wall: wallKey,
+      w: cw,
+      d: 350,
+      h: wallH,
+      x: curPos,
+      hinges: hinges
+    });
+
+    curPos += cw;
+  });
+}
+
+window.setStudioWallHeight = function(h) {
+  const heightVal = parseInt(h);
+  if (!heightVal || !window.CURRENT_DESIGN || !window.CURRENT_DESIGN.modules) return;
+  window.CURRENT_DESIGN.modules.forEach(m => {
+    if (m.category === 'wall') {
+      m.h = heightVal;
+    }
+  });
+  if (window.studioCanvas3D) {
+    window.studioCanvas3D.loadDesign(window.CURRENT_DESIGN);
+  }
+  if (typeof updateModulesTable === 'function') updateModulesTable();
+  if (typeof updateCostSummary === 'function') updateCostSummary();
+  const label = heightVal === 720 ? '70 cm' : (heightVal === 800 ? '80 cm' : '90 cm');
+  showToast(`📏 Üst dolap yüksekliği ${label} olarak güncellendi.`, 'info');
+};
+
 window.runAutoKitchenGenerator = function() {
   applyWizardSettings();
   const layout = window.CURRENT_DESIGN.layout_type || 'single_wall';
@@ -1342,14 +1472,17 @@ window.runAutoKitchenGenerator = function() {
   const rd = window.CURRENT_DESIGN.room_depth || 2600;
 
   const hasFridge = document.getElementById('auto-app-fridge')?.checked ?? true;
-  const hasOven = document.getElementById('auto-app-oven')?.checked ?? true;
+  const hasOven = true; // Mandatory: Tezgah üstü ocak & pişirme modülü her zaman yer alır
   const hasDishwasher = document.getElementById('auto-app-dishwasher')?.checked ?? true;
   const hasDrawer = document.getElementById('auto-app-drawer')?.checked ?? true;
-  const hasHood = document.getElementById('auto-app-hood')?.checked ?? true;
+  const hasHood = true; // Mandatory: Ocağın tam dikey üst hizasında davlumbaz/aspiratör
   const hasGlassWall = document.getElementById('auto-app-glass')?.checked ?? true;
 
-  const cornerType = document.querySelector('input[name="auto-corner-choice"]:checked')?.value || '900';
-  const cornerW = parseInt(cornerType);
+  // Read Mandatory Upper Cabinet Height (720, 800, 900)
+  const wallHeightVal = parseInt(document.querySelector('input[name="auto-wall-height"]:checked')?.value || '720');
+
+  // Read Mandatory Hood Style Choice ('integrated' or 'chimney')
+  const hoodStyle = document.querySelector('input[name="auto-hood-choice"]:checked')?.value || 'integrated';
 
   const generatedModules = [];
   let modIndex = 1;
@@ -1372,6 +1505,8 @@ window.runAutoKitchenGenerator = function() {
       curX += 700;
     }
 
+    const upperStartX = curX; // Upper cabinets begin after tall fridge (or at 0)
+
     // 2. Base 3-Drawer Prep Counter
     if (hasDrawer && (rw - curX) >= 600) {
       generatedModules.push({
@@ -1386,9 +1521,8 @@ window.runAutoKitchenGenerator = function() {
       curX += 600;
     }
 
-    // 3. Sink Unit (Mandatory)
+    // 3. Sink Unit (Mandatory Base Unit)
     const sinkW = (rw - curX) >= 900 ? 900 : 800;
-    const sinkX = curX;
     if ((rw - curX) >= sinkW) {
       generatedModules.push({
         id: nextModId(),
@@ -1400,18 +1534,6 @@ window.runAutoKitchenGenerator = function() {
         hinges: 4
       });
       curX += sinkW;
-
-      if (hasGlassWall) {
-        generatedModules.push({
-          id: nextModId(),
-          type: 'wall_glass',
-          name: 'Camlı Yatay Kalkar Dolap',
-          category: 'wall',
-          wall: 'back',
-          w: sinkW, d: 350, h: 720, x: sinkX,
-          hinges: 2
-        });
-      }
     }
 
     // 4. Dishwasher adjacent to sink
@@ -1427,9 +1549,10 @@ window.runAutoKitchenGenerator = function() {
       curX += 600;
     }
 
-    // 5. Oven & Cooktop
-    const ovenX = curX;
-    if (hasOven && (rw - curX) >= 600) {
+    // 5. Oven & Cooktop (Mandatory)
+    let ovenPlaced = false;
+    let ovenX = curX;
+    if ((rw - curX) >= 600) {
       generatedModules.push({
         id: nextModId(),
         type: 'base_oven',
@@ -1439,21 +1562,10 @@ window.runAutoKitchenGenerator = function() {
         w: 600, d: 600, h: 720, x: curX
       });
       curX += 600;
-
-      if (hasHood) {
-        generatedModules.push({
-          id: nextModId(),
-          type: 'wall_hood',
-          name: 'Davlumbaz Üstü Aspiratör Dolabı',
-          category: 'wall',
-          wall: 'back',
-          w: 600, d: 350, h: 720, x: ovenX,
-          hinges: 2
-        });
-      }
+      ovenPlaced = true;
     }
 
-    // 6. Fill remaining space with standard modular cabinets
+    // 6. Fill remaining base space with standard modular cabinets
     let remSpace = rw - curX;
     while (remSpace >= 400) {
       const fillW = remSpace >= 800 ? 800 : (remSpace >= 600 ? 600 : (remSpace >= 500 ? 500 : 400));
@@ -1466,22 +1578,39 @@ window.runAutoKitchenGenerator = function() {
         w: fillW, d: 600, h: 720, x: curX,
         hinges: fillW >= 800 ? 4 : 2
       });
-
-      generatedModules.push({
-        id: nextModId(),
-        type: fillW >= 800 ? 'wall_double' : 'wall_single',
-        name: fillW >= 800 ? 'Çift Kapaklı Üst Dolap' : 'Tek Kapaklı Üst Dolap',
-        category: 'wall',
-        wall: 'back',
-        w: fillW, d: 350, h: 720, x: curX,
-        hinges: fillW >= 800 ? 4 : 2
-      });
-
       curX += fillW;
       remSpace = rw - curX;
     }
+
+    // 7. UPPER WALL: ZERO-GAPS MODULAR RUN WITH MANDATORY HOOD DIRECTLY ABOVE OVEN
+    if (ovenPlaced) {
+      // Span 1: From upperStartX to ovenX (includes glass cabinets over sink)
+      fillUpperWallSpan(upperStartX, ovenX, 'back', wallHeightVal, hasGlassWall, nextModId, generatedModules);
+
+      // Mandatory Hood directly vertically aligned with cooktop
+      const hoodType = (hoodStyle === 'chimney') ? 'wall_hood_chimney' : 'wall_hood';
+      const hoodName = (hoodStyle === 'chimney') ? 'Açık Paslanmaz Çelik T-Davlumbaz' : 'Davlumbaz Üstü Aspiratör Dolabı';
+      generatedModules.push({
+        id: nextModId(),
+        type: hoodType,
+        name: hoodName,
+        category: 'wall',
+        wall: 'back',
+        w: 600,
+        d: hoodStyle === 'chimney' ? 450 : 350,
+        h: wallHeightVal,
+        x: ovenX,
+        hinges: hoodStyle === 'chimney' ? 0 : 2
+      });
+
+      // Span 2: From ovenX + 600 to rw (Zero gaps to the wall edge)
+      fillUpperWallSpan(ovenX + 600, rw, 'back', wallHeightVal, false, nextModId, generatedModules);
+    } else {
+      fillUpperWallSpan(upperStartX, rw, 'back', wallHeightVal, hasGlassWall, nextModId, generatedModules);
+    }
+
   } else {
-    // L-KITCHEN (CORNER AT 0,0, SINK ON BACK, COOKING/FRIDGE ON LEFT)
+    // L-KITCHEN (CORNER AT 0,0, SINK ON BACK WALL, COOKING & FRIDGE ON LEFT WALL)
     const cornerChoice = document.querySelector('input[name="auto-corner-choice"]:checked')?.value || 'l_corner';
     let baseCornerType = 'base_corner_l';
     let baseCornerName = '90° L-Köşe Alt Dolap (90x90 cm)';
@@ -1518,6 +1647,7 @@ window.runAutoKitchenGenerator = function() {
       leftZ = 900;
     }
 
+    // Base Corner Cabinet
     generatedModules.push({
       id: nextModId(),
       type: baseCornerType,
@@ -1528,18 +1658,21 @@ window.runAutoKitchenGenerator = function() {
       shelves: 1
     });
 
+    // Wall Corner Cabinet (uses user-selected wallHeightVal)
     generatedModules.push({
       id: nextModId(),
       type: wallCornerType,
       name: wallCornerName,
       category: 'wall',
       wall: 'back',
-      w: wallW, d: wallD, h: 720, x: 0,
+      w: wallW, d: wallD, h: wallHeightVal, x: 0,
       shelves: 1
     });
 
-    // BACK WALL
-    const sinkX = backX;
+    // ---------------------------------------------------------
+    // BACK WALL (Runs along X from Corner to rw)
+    // ---------------------------------------------------------
+    // Base: Sink
     if ((rw - backX) >= 900) {
       generatedModules.push({
         id: nextModId(),
@@ -1551,19 +1684,9 @@ window.runAutoKitchenGenerator = function() {
         hinges: 4
       });
       backX += 900;
-
-      if (hasGlassWall) {
-        generatedModules.push({
-          id: nextModId(),
-          type: 'wall_glass',
-          name: 'Camlı Yatay Kalkar Dolap',
-          category: 'wall',
-          wall: 'back',
-          w: 900, d: 350, h: 720, x: sinkX
-        });
-      }
     }
 
+    // Base: Dishwasher
     if (hasDishwasher && (rw - backX) >= 600) {
       generatedModules.push({
         id: nextModId(),
@@ -1576,7 +1699,7 @@ window.runAutoKitchenGenerator = function() {
       backX += 600;
     }
 
-    // Fill remaining on back wall
+    // Base: Fill remaining on Back Wall
     let remBack = rw - backX;
     while (remBack >= 400) {
       const fillW = remBack >= 800 ? 800 : (remBack >= 600 ? 600 : (remBack >= 500 ? 500 : 400));
@@ -1589,45 +1712,37 @@ window.runAutoKitchenGenerator = function() {
         w: fillW, d: 600, h: 720, x: backX,
         hinges: fillW >= 800 ? 4 : 2
       });
-      generatedModules.push({
-        id: nextModId(),
-        type: fillW >= 800 ? 'wall_double' : 'wall_single',
-        name: fillW >= 800 ? 'Çift Kapaklı Üst Dolap' : 'Tek Kapaklı Üst Dolap',
-        category: 'wall',
-        wall: 'back',
-        w: fillW, d: 350, h: 720, x: backX
-      });
       backX += fillW;
       remBack = rw - backX;
     }
 
-    // LEFT WALL
+    // Upper Back Wall: ZERO GAPS across entire span from wallW to rw
+    fillUpperWallSpan(wallW, rw, 'back', wallHeightVal, hasGlassWall, nextModId, generatedModules);
+
+    // ---------------------------------------------------------
+    // LEFT WALL (Runs along Z from Corner to rd)
+    // ---------------------------------------------------------
     leftZ = (cornerChoice === 'straight' ? 600 : 900);
+    const upperWallLeftStart = (cornerChoice === 'straight' ? 350 : 650);
+
+    // Determine tall fridge placement at far end of left wall
+    const hasFridgeLeft = hasFridge && (rd - leftZ) >= 700;
+    const fridgeStartLeft = hasFridgeLeft ? (rd - 700) : rd;
+
+    // 1. Oven & Cooktop on Left Wall (Mandatory)
     const ovenZ = leftZ;
-    if (hasOven && (rd - leftZ) >= 600) {
-      generatedModules.push({
-        id: nextModId(),
-        type: 'base_oven',
-        name: 'Ankastre Fırın & Ocak Modülü',
-        category: 'base',
-        wall: 'left',
-        w: 600, d: 600, h: 720, x: leftZ
-      });
-      leftZ += 600;
+    generatedModules.push({
+      id: nextModId(),
+      type: 'base_oven',
+      name: 'Ankastre Fırın & Ocak Modülü',
+      category: 'base',
+      wall: 'left',
+      w: 600, d: 600, h: 720, x: ovenZ
+    });
+    leftZ += 600;
 
-      if (hasHood) {
-        generatedModules.push({
-          id: nextModId(),
-          type: 'wall_hood',
-          name: 'Davlumbaz Üstü Aspiratör Dolabı',
-          category: 'wall',
-          wall: 'left',
-          w: 600, d: 350, h: 720, x: ovenZ
-        });
-      }
-    }
-
-    if (hasDrawer && (rd - leftZ) >= 600) {
+    // 2. 3-Drawer Prep Counter
+    if (hasDrawer && (fridgeStartLeft - leftZ) >= 600) {
       generatedModules.push({
         id: nextModId(),
         type: 'base_drawer_3',
@@ -1640,20 +1755,8 @@ window.runAutoKitchenGenerator = function() {
       leftZ += 600;
     }
 
-    if (hasFridge && (rd - leftZ) >= 700) {
-      generatedModules.push({
-        id: nextModId(),
-        type: 'tall_fridge',
-        name: 'No-Frost Buzdolabı Kabini',
-        category: 'tall',
-        wall: 'left',
-        w: 700, d: 600, h: 2100, x: leftZ
-      });
-      leftZ += 700;
-    }
-
-    // Fill remaining on left wall
-    let remLeft = rd - leftZ;
+    // 3. Fill remaining base on Left Wall between drawers and tall fridge
+    let remLeft = fridgeStartLeft - leftZ;
     while (remLeft >= 400) {
       const fillW = remLeft >= 600 ? 600 : (remLeft >= 500 ? 500 : 400);
       generatedModules.push({
@@ -1665,8 +1768,43 @@ window.runAutoKitchenGenerator = function() {
         w: fillW, d: 600, h: 720, x: leftZ
       });
       leftZ += fillW;
-      remLeft = rd - leftZ;
+      remLeft = fridgeStartLeft - leftZ;
     }
+
+    // 4. Tall Fridge at the end of Left Wall
+    if (hasFridgeLeft) {
+      generatedModules.push({
+        id: nextModId(),
+        type: 'tall_fridge',
+        name: 'No-Frost Buzdolabı Kabini',
+        category: 'tall',
+        wall: 'left',
+        w: 700, d: 600, h: 2100, x: fridgeStartLeft
+      });
+    }
+
+    // 5. Upper Left Wall: ZERO GAPS MODULAR RUN WITH MANDATORY HOOD DIRECTLY ABOVE OVEN
+    // Span 1: From upper corner (upperWallLeftStart) to ovenZ
+    fillUpperWallSpan(upperWallLeftStart, ovenZ, 'left', wallHeightVal, false, nextModId, generatedModules);
+
+    // Mandatory Hood directly vertically aligned with oven on left wall
+    const hoodTypeLeft = (hoodStyle === 'chimney') ? 'wall_hood_chimney' : 'wall_hood';
+    const hoodNameLeft = (hoodStyle === 'chimney') ? 'Açık Paslanmaz Çelik T-Davlumbaz' : 'Davlumbaz Üstü Aspiratör Dolabı';
+    generatedModules.push({
+      id: nextModId(),
+      type: hoodTypeLeft,
+      name: hoodNameLeft,
+      category: 'wall',
+      wall: 'left',
+      w: 600,
+      d: hoodStyle === 'chimney' ? 450 : 350,
+      h: wallHeightVal,
+      x: ovenZ,
+      hinges: hoodStyle === 'chimney' ? 0 : 2
+    });
+
+    // Span 2: From ovenZ + 600 to fridgeStartLeft (Zero gaps up to the fridge column / wall edge)
+    fillUpperWallSpan(ovenZ + 600, fridgeStartLeft, 'left', wallHeightVal, false, nextModId, generatedModules);
   }
 
   window.CURRENT_DESIGN.modules = generatedModules;
