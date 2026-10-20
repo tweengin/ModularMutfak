@@ -392,6 +392,7 @@ function navigateTo(viewId) {
       renderActiveCanvas();
       updatePlacedModulesUI();
       checkRulerBubbleInitialDisplay();
+      checkScreenResolutionAdvisory();
       checkCustomerAccessSession();
       updateRoomInfoBadges();
       if (canvas3D) canvas3D.onWindowResize();
@@ -487,6 +488,61 @@ function checkRulerBubbleInitialDisplay() {
     setTimeout(() => {
       dismissRulerBubble();
     }, 8000);
+  }
+}
+
+// 2026 SHOWROOM LIGHTING & ATMOSPHERE MODES
+window.cycleLightingMode = function() {
+  if (!canvas3D || !canvas3D.setLightingMode) return;
+  const modes = ['daylight', 'evening_warm', 'showroom_lux'];
+  const cur = canvas3D.currentLightingMode || 'daylight';
+  const nextIdx = (modes.indexOf(cur) + 1) % modes.length;
+  const nextMode = modes[nextIdx];
+  canvas3D.setLightingMode(nextMode);
+
+  const btn = document.getElementById('btn-lighting-mode');
+  const modeInfo = {
+    daylight: { icon: '☀️', label: 'Gündüz Doğal Işık (5500K)', color: '#f59e0b' },
+    evening_warm: { icon: '🌙', label: 'Sıcak Akşam & Gizli Tezgah LED', color: '#f97316' },
+    showroom_lux: { icon: '💎', label: 'Lüks Showroom Spotları (PBR Yansıma)', color: '#38bdf8' }
+  };
+  const info = modeInfo[nextMode] || modeInfo.daylight;
+  if (btn) {
+    btn.textContent = info.icon;
+    btn.style.color = info.color;
+  }
+  showToast(`✨ Aydınlatma Modu: ${info.icon} ${info.label}`, 'info');
+};
+
+// SMART HANDLE DIRECTION (AKILLI KULP YÖNÜ DEĞİŞTİRME)
+window.toggleSelectedHandleSide = function() {
+  if (!canvas3D) return;
+  const selId = canvas3D.selectedModuleId || window.CURRENT_SELECTED_MODULE_ID;
+  if (!selId) {
+    showToast("Önce kulp yönünü değiştirmek istediğiniz dolaba tıklayınız", "info");
+    return;
+  }
+  const mod = (window.CURRENT_DESIGN.modules || []).find(m => m.id === selId);
+  if (!mod) return;
+
+  const curSide = mod.handle_side || canvas3D.getSmartHandleSide(mod, 3600);
+  mod.handle_side = (curSide === 'left') ? 'right' : 'left';
+  canvas3D.render(window.CURRENT_ROOM_DIMS, window.CURRENT_DESIGN.modules, window.CURRENT_ROOM_DIMS?.layout_type, window.CURRENT_DESIGN.materials);
+  showToast(`🔁 ${mod.name}: Kulp açılış yönü ${mod.handle_side === 'left' ? 'SOL' : 'SAĞ'} olarak ayarlandı`, 'info');
+};
+
+// RESPONSIVE WIDE SCREEN ADVISORY BANNER
+window.dismissScreenAdvisory = function() {
+  const banner = document.getElementById('screen-recommendation-banner');
+  if (banner) banner.style.display = 'none';
+  sessionStorage.setItem('mc_screen_advisory_dismissed', '1');
+};
+
+function checkScreenResolutionAdvisory() {
+  if (sessionStorage.getItem('mc_screen_advisory_dismissed')) return;
+  if (window.innerWidth < 1024) {
+    const banner = document.getElementById('screen-recommendation-banner');
+    if (banner) banner.style.display = 'flex';
   }
 }
 
@@ -1213,7 +1269,15 @@ function setupDragAndDrop() {
     if (modTemplate) {
       if (window.activeCanvasMode === '3d' && canvas3D) {
         const ghostInfo = canvas3D.getGhostSnapPosition();
-        if (!ghostInfo.isValid) {
+        if (ghostInfo.hasCollision) {
+          const added = addModuleToDesign(modTemplate, ghostInfo.pos, ghostInfo.wall);
+          if (added && typeof added === 'object') {
+            added.hasCollision = true;
+          }
+          if (canvas3D.updateAllCollisions) canvas3D.updateAllCollisions();
+          canvas3D.render(window.CURRENT_ROOM_DIMS, window.CURRENT_DESIGN.modules, window.CURRENT_ROOM_DIMS?.layout_type, window.CURRENT_DESIGN.materials);
+          showToast(`⚠️ Çakışma Uyarısı: Modül başka bir dolabın üzerine bırakıldı! Lütfen kaydırarak düzeltiniz.`, 'warning');
+        } else if (!ghostInfo.isValid) {
           showToast(`⚠️ Duvar sınırı aşıldı! Modül ${ghostInfo.wall === 'left' ? 'Sol Duvara' : 'Arka Duvara'} sığmıyor.`, 'error');
         } else {
           addModuleToDesign(modTemplate, ghostInfo.pos, ghostInfo.wall);
@@ -1335,7 +1399,7 @@ function addModuleToDesign(template, customPos = null, targetWall = null) {
   updatePlacedModulesUI();
   updateCatalogDimensionPills();
   renderActiveCanvas();
-  return true;
+  return newMod;
 }
 
 function removeModule(modId) {

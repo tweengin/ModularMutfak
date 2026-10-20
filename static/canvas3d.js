@@ -131,6 +131,15 @@ class StudioCanvas3D {
     underCabLight.position.set(1800, 1450, 250);
     this.scene.add(underCabLight);
 
+    // Save lighting references for Showroom Lighting Modes
+    this.ambientLight = ambientLight;
+    this.dirLight = dirLight;
+    this.rimLight = rimLight;
+    this.spot1 = spot1;
+    this.spot2 = spot2;
+    this.underCabLight = underCabLight;
+    this.currentLightingMode = 'daylight';
+
     this.roomGroup = new THREE.Group();
     this.cabinetsGroup = new THREE.Group();
     this.helperGroup = new THREE.Group();
@@ -410,12 +419,203 @@ class StudioCanvas3D {
         roughness: 0.1
       }),
       wallBorderMat: new THREE.LineBasicMaterial({ color: 0x3b82f6, linewidth: 3 }),
-      ghostValidMat: new THREE.MeshStandardMaterial({ color: 0x0284c7, transparent: true, opacity: 0.45 }),
-      ghostInvalidMat: new THREE.MeshStandardMaterial({ color: 0xef4444, transparent: true, opacity: 0.55 }),
-      ghostWireMat: new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 }),
+      ghostValidMat: new THREE.MeshStandardMaterial({ color: 0x10b981, transparent: true, opacity: 0.50 }),
+      ghostInvalidMat: new THREE.MeshStandardMaterial({ color: 0xef4444, transparent: true, opacity: 0.65 }),
+      ghostWireMat: new THREE.LineBasicMaterial({ color: 0x34d399, linewidth: 2 }),
       ghostWireInvalidMat: new THREE.LineBasicMaterial({ color: 0xf87171, linewidth: 2 }),
-      selectedMat: new THREE.MeshPhysicalMaterial({ color: 0x0284c7, roughness: 0.2, metalness: 0.15, clearcoat: 0.8 })
+      selectedMat: new THREE.MeshPhysicalMaterial({ color: 0x0284c7, roughness: 0.2, metalness: 0.15, clearcoat: 0.8 }),
+      collisionMat: new THREE.MeshPhysicalMaterial({
+        color: 0xef4444, // Red collision warning tint
+        emissive: 0x991b1b,
+        emissiveIntensity: 0.45,
+        roughness: 0.20,
+        metalness: 0.10,
+        clearcoat: 0.70
+      }),
+      validDragMat: new THREE.MeshPhysicalMaterial({
+        color: 0x10b981, // Emerald green valid placement tint
+        emissive: 0x065f46,
+        emissiveIntensity: 0.35,
+        roughness: 0.20,
+        metalness: 0.10,
+        clearcoat: 0.70
+      })
     };
+  }
+
+  // 2026 Showroom Lighting Modes: Gündüz / Sıcak Akşam LED / Showroom Lüks Spot
+  setLightingMode(mode) {
+    this.currentLightingMode = mode;
+    if (mode === 'daylight') {
+      if (this.ambientLight) {
+        this.ambientLight.color.setHex(0xffffff);
+        this.ambientLight.intensity = 0.95;
+      }
+      if (this.dirLight) {
+        this.dirLight.color.setHex(0xfffaf0);
+        this.dirLight.intensity = 1.15;
+      }
+      if (this.rimLight) {
+        this.rimLight.color.setHex(0xe0f2fe);
+        this.rimLight.intensity = 0.40;
+      }
+      if (this.spot1) this.spot1.intensity = 0.15;
+      if (this.spot2) this.spot2.intensity = 0.15;
+      if (this.underCabLight) this.underCabLight.intensity = 0.20;
+      this.scene.background = new THREE.Color(0xf8fafc);
+      this.backsplashTone = 'light';
+    } else if (mode === 'evening_warm') {
+      if (this.ambientLight) {
+        this.ambientLight.color.setHex(0xfef3c7);
+        this.ambientLight.intensity = 0.42;
+      }
+      if (this.dirLight) {
+        this.dirLight.color.setHex(0xfde68a);
+        this.dirLight.intensity = 0.45;
+      }
+      if (this.rimLight) {
+        this.rimLight.color.setHex(0x93c5fd);
+        this.rimLight.intensity = 0.30;
+      }
+      if (this.spot1) {
+        this.spot1.color.setHex(0xffd8a8);
+        this.spot1.intensity = 0.95;
+      }
+      if (this.spot2) {
+        this.spot2.color.setHex(0xffd8a8);
+        this.spot2.intensity = 0.95;
+      }
+      if (this.underCabLight) {
+        this.underCabLight.color.setHex(0xffedd5);
+        this.underCabLight.intensity = 1.5;
+      }
+      this.scene.background = new THREE.Color(0x0f172a);
+      this.backsplashTone = 'dark';
+    } else if (mode === 'showroom_lux') {
+      if (this.ambientLight) {
+        this.ambientLight.color.setHex(0xf1f5f9);
+        this.ambientLight.intensity = 0.70;
+      }
+      if (this.dirLight) {
+        this.dirLight.color.setHex(0xffffff);
+        this.dirLight.intensity = 1.25;
+      }
+      if (this.rimLight) {
+        this.rimLight.color.setHex(0x38bdf8);
+        this.rimLight.intensity = 0.85;
+      }
+      if (this.spot1) {
+        this.spot1.color.setHex(0xfffbeb);
+        this.spot1.intensity = 1.15;
+      }
+      if (this.spot2) {
+        this.spot2.color.setHex(0xfffbeb);
+        this.spot2.intensity = 1.15;
+      }
+      if (this.underCabLight) {
+        this.underCabLight.color.setHex(0xffedd5);
+        this.underCabLight.intensity = 0.85;
+      }
+      this.scene.background = new THREE.Color(0x1e293b);
+      this.backsplashTone = 'light';
+    }
+    const mat = (this.backsplashTone === 'dark') ? this.matCache.wallBacksplashDark : this.matCache.wallBacksplashLight;
+    if (this.backsplashMeshBack) this.backsplashMeshBack.material = mat;
+    if (this.backsplashMeshLeft) this.backsplashMeshLeft.material = mat;
+    if (this.backWallMesh) this.backWallMesh.material = mat;
+    this.render(this.roomConfig, this.modules, this.roomConfig?.layout_type, this.materials);
+    return this.currentLightingMode;
+  }
+
+  // COLLISION DETECTION & SMART SNAP SYSTEM
+  checkModuleCollision(mod, posX, wall = 'back') {
+    const mw = mod.w || 600;
+    const isUpper = (mod.category === 'wall');
+    const isTall = (mod.category === 'tall');
+
+    for (let other of this.modules) {
+      if (other.id === mod.id) continue;
+      if ((other.wall || 'back') !== wall) continue;
+
+      const otherIsUpper = (other.category === 'wall');
+      const otherIsTall = (other.category === 'tall');
+
+      let shouldCheck = false;
+      if (isTall || otherIsTall) {
+        shouldCheck = true;
+      } else if (isUpper === otherIsUpper) {
+        shouldCheck = true;
+      }
+
+      if (!shouldCheck) continue;
+
+      const ox = other.x || 0;
+      const ow = other.w || 600;
+
+      // Interval overlap check (with 5mm tolerance for flush adjacency)
+      const overlap = (posX < ox + ow - 5) && (posX + mw > ox + 5);
+      if (overlap) {
+        return { isColliding: true, collidingWith: other };
+      }
+    }
+    return { isColliding: false, collidingWith: null };
+  }
+
+  updateAllCollisions() {
+    for (let i = 0; i < this.modules.length; i++) {
+      const a = this.modules[i];
+      let hasCol = false;
+      const wall = a.wall || 'back';
+      const ax = a.x || 0;
+      const aw = a.w || 600;
+      const aIsUpper = (a.category === 'wall');
+      const aIsTall = (a.category === 'tall');
+
+      for (let j = 0; j < this.modules.length; j++) {
+        if (i === j) continue;
+        const b = this.modules[j];
+        if ((b.wall || 'back') !== wall) continue;
+
+        const bIsUpper = (b.category === 'wall');
+        const bIsTall = (b.category === 'tall');
+        const shouldCheck = (aIsTall || bIsTall || (aIsUpper === bIsUpper));
+        if (!shouldCheck) continue;
+
+        const bx = b.x || 0;
+        const bw = b.w || 600;
+        if ((ax < bx + bw - 5) && (ax + aw > bx + 5)) {
+          hasCol = true;
+          break;
+        }
+      }
+      a.hasCollision = hasCol;
+    }
+  }
+
+  // SMART HANDLE DIRECTION (AKILLI KULP YÖNÜ)
+  getSmartHandleSide(mod, wallLen) {
+    if (mod.handle_side === 'left' || mod.handle_side === 'right') {
+      return mod.handle_side;
+    }
+    const wall = mod.wall || 'back';
+    const x = mod.x || 0;
+    const mw = mod.w || 600;
+
+    // 1. Against left wall/corner (< 60mm): door opens from right, handle is on RIGHT
+    if (x <= 60) return 'right';
+
+    // 2. Against right boundary (> wallLen - mw - 60mm): door opens from left, handle is on LEFT
+    if (x + mw >= wallLen - 60) return 'left';
+
+    // 3. Tall cabinet proximity check
+    const tallLeft = this.modules.find(m => m.id !== mod.id && (m.wall || 'back') === wall && m.category === 'tall' && Math.abs((m.x + m.w) - x) < 50);
+    const tallRight = this.modules.find(m => m.id !== mod.id && (m.wall || 'back') === wall && m.category === 'tall' && Math.abs(m.x - (x + mw)) < 50);
+
+    if (tallLeft && !tallRight) return 'right';
+    if (tallRight && !tallLeft) return 'left';
+
+    // 4. Default: If in right half of kitchen, handle on left; else on right
+    return (x > wallLen / 2) ? 'left' : 'right';
   }
 
   setBacksplashTone(tone) {
@@ -426,7 +626,13 @@ class StudioCanvas3D {
     if (this.backWallMesh) this.backWallMesh.material = mat;
   }
 
-  getDoorMaterial(isSelected = false) {
+  getDoorMaterial(isSelected = false, hasCollision = false, isCurrentlyDragging = false, isDragColliding = false) {
+    if (isCurrentlyDragging) {
+      return isDragColliding ? this.matCache.collisionMat : this.matCache.validDragMat;
+    }
+    if (hasCollision) {
+      return this.matCache.collisionMat;
+    }
     if (isSelected) return this.matCache.selectedMat;
     const key = (this.materials?.door_material || this.materials?.cabinet_material || 'mdflam').toLowerCase();
     if (this.matCache['door_' + key]) return this.matCache['door_' + key];
@@ -625,36 +831,64 @@ class StudioCanvas3D {
         if (this.raycaster.ray.intersectPlane(plane, hit)) {
           let rawPos = (wall === 'left') ? (hit.z - this.dragOffset) : (hit.x - this.dragOffset);
           let snapped = Math.round(rawPos / 50) * 50;
+          let isSnapped = false;
+          let snapFeedback = '';
+          const mw = mod.w || 600;
 
-          // Snap to neighbor cabinet edges (within 80mm)
-          const isUpper = mod.category === 'wall';
+          // 1. Magnetic Snap to Wall Start (0 mm)
+          if (Math.abs(rawPos) < 90) {
+            snapped = 0;
+            isSnapped = true;
+            snapFeedback = 'Duvar Başı (0 mm)';
+          }
+          // 2. Magnetic Snap to Wall End (wallLen - mw)
+          else if (Math.abs(rawPos + mw - wallLen) < 90) {
+            snapped = wallLen - mw;
+            isSnapped = true;
+            snapFeedback = `Duvar Sonu (${wallLen - mw} mm)`;
+          }
+
+          // 3. Magnetic Snap to Neighbor Modules on this wall
+          const isUpper = (mod.category === 'wall');
           const neighbors = this.modules.filter(m => m.id !== mod.id && (m.wall || 'back') === wall && (isUpper ? m.category === 'wall' : m.category !== 'wall'));
-          for (let n of neighbors) {
-            const rEdge = (n.x || 0) + (n.w || 600);
-            const lEdge = (n.x || 0) - (mod.w || 600);
-            if (Math.abs(snapped - rEdge) < 80) {
-              snapped = rEdge;
-              break;
-            } else if (Math.abs(snapped - lEdge) < 80) {
-              snapped = lEdge;
-              break;
+          if (!isSnapped) {
+            for (let n of neighbors) {
+              const rEdge = (n.x || 0) + (n.w || 600);
+              const lEdge = (n.x || 0) - mw;
+              if (Math.abs(rawPos - rEdge) < 90) {
+                snapped = rEdge;
+                isSnapped = true;
+                snapFeedback = `${n.name} Sağına Mıknatıslandı`;
+                break;
+              } else if (Math.abs(rawPos - lEdge) < 90) {
+                snapped = lEdge;
+                isSnapped = true;
+                snapFeedback = `${n.name} Soluna Mıknatıslandı`;
+                break;
+              }
             }
           }
 
-          // STRICT CLAMP TO WALL BOUNDARY!
-          // Cabinets can NEVER overflow the wall end!
-          const mw = mod.w || 600;
+          // STRICT CLAMP TO WALL BOUNDARY
           const isAtBoundary = (snapped < 0 || snapped > wallLen - mw);
           mod.x = Math.max(0, Math.min(wallLen - mw, snapped));
+
+          // Check real-time collision
+          const colCheck = this.checkModuleCollision(mod, mod.x, wall);
+          this.draggedIsColliding = colCheck.isColliding;
 
           // Fast live re-render
           this.render(this.roomConfig, this.modules, this.roomConfig?.layout_type, this.materials);
 
-          // Update floating coordinate badge
-          if (isAtBoundary) {
-            this.showDragPill(`⛔ ${mod.name}: Duvar sınırına ulaşıldı! (${mod.x} mm)`, true);
+          // Update floating coordinate badge with Red/Green feedback
+          if (this.draggedIsColliding) {
+            this.showDragPill(`⚠️ ÇAKIŞMA: ${colCheck.collidingWith ? colCheck.collidingWith.name : 'Başka Modül'} üzerine biniyor! (${mod.x} mm)`, true, false);
+          } else if (isSnapped) {
+            this.showDragPill(`🧲 ${snapFeedback} [${mod.x} mm]`, false, true);
+          } else if (isAtBoundary) {
+            this.showDragPill(`⛔ ${mod.name}: Duvar sınırına ulaşıldı! (${mod.x} mm)`, true, false);
           } else {
-            this.showDragPill(`↔ ${mod.id}: ${mod.name} | ${wall === 'left' ? 'Sol Duvar' : 'Arka Duvar'} Konumu: ${mod.x} mm`, false);
+            this.showDragPill(`↔ ${mod.name} | Konum: ${mod.x} mm`, false, false);
           }
         }
       }
@@ -678,15 +912,26 @@ class StudioCanvas3D {
       this.hideDragPill();
 
       if (this.draggedModule && this.hasMovedCabinet) {
+        const wall = this.draggedModule.wall || 'back';
+        const colCheck = this.checkModuleCollision(this.draggedModule, this.draggedModule.x, wall);
+        // If dropped while colliding, it STAYS RED until moved away!
+        this.draggedModule.hasCollision = colCheck.isColliding;
+        this.draggedIsColliding = false;
+
+        this.updateAllCollisions();
+
         if (this.onModuleMoved) {
           this.onModuleMoved(this.draggedModule);
         }
+      } else {
+        this.draggedIsColliding = false;
       }
       this.draggedModule = null;
+      this.render(this.roomConfig, this.modules, this.roomConfig?.layout_type, this.materials);
     }
   }
 
-  showDragPill(text, isWarning = false) {
+  showDragPill(text, isWarning = false, isSuccess = false) {
     const pill = document.getElementById('canvas-drag-pill');
     const txt = document.getElementById('canvas-drag-text');
     if (pill && txt) {
@@ -695,10 +940,17 @@ class StudioCanvas3D {
       if (isWarning) {
         pill.style.background = '#ef4444';
         pill.style.borderColor = '#b91c1c';
-        pill.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.4)';
+        pill.style.color = '#ffffff';
+        pill.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.45)';
+      } else if (isSuccess) {
+        pill.style.background = '#10b981';
+        pill.style.borderColor = '#059669';
+        pill.style.color = '#ffffff';
+        pill.style.boxShadow = '0 4px 16px rgba(16, 185, 129, 0.35)';
       } else {
         pill.style.background = '';
         pill.style.borderColor = '';
+        pill.style.color = '';
         pill.style.boxShadow = '';
       }
     }
@@ -842,15 +1094,34 @@ class StudioCanvas3D {
       }
     }
 
-    // 3. Populate Cabinets
+    // 3. Populate Cabinets with Collision & Smart Snap Detection
+    this.updateAllCollisions();
+
     this.modules.forEach(mod => {
-      const meshGroup = this.createCabinet3D(mod);
+      const isCurrentlyDragging = (this.isDraggingCabinet && this.draggedModule?.id === mod.id);
+      const isDragColliding = isCurrentlyDragging && this.draggedIsColliding;
+      const hasCollision = mod.hasCollision || isDragColliding;
+      const isSelected = (this.selectedModuleId === mod.id);
+
+      const meshGroup = this.createCabinet3D(mod, isSelected, hasCollision, isCurrentlyDragging, isDragColliding);
       if (meshGroup) {
         this.cabinetsGroup.add(meshGroup);
 
-        // Highlight selected module with glowing BoxHelper
-        if (this.selectedModuleId === mod.id) {
-          const boxHelper = new THREE.BoxHelper(meshGroup, 0x38bdf8);
+        // Highlight with BoxHelper:
+        // RED if colliding/invalid (during drag or when left in collision spot!)
+        // GREEN if validly being dragged/snapped!
+        // SKY BLUE if cleanly selected!
+        if (isCurrentlyDragging) {
+          const helperColor = isDragColliding ? 0xef4444 : 0x10b981;
+          const boxHelper = new THREE.BoxHelper(meshGroup, helperColor);
+          boxHelper.material.linewidth = 2.5;
+          this.helperGroup.add(boxHelper);
+        } else if (hasCollision) {
+          const boxHelper = new THREE.BoxHelper(meshGroup, 0xef4444);
+          boxHelper.material.linewidth = 2.5;
+          this.helperGroup.add(boxHelper);
+        } else if (isSelected) {
+          const boxHelper = new THREE.BoxHelper(meshGroup, 0x0284c7);
           boxHelper.material.linewidth = 2;
           this.helperGroup.add(boxHelper);
         }
@@ -867,14 +1138,13 @@ class StudioCanvas3D {
    * CREATE SOLID 3D CABINET MESH WITH TRUE DEPTH (600mm / 350mm)
    * Built in local coordinates centered at (0, y, z), then placed on Back Wall or Left Wall!
    */
-  createCabinet3D(mod) {
+  createCabinet3D(mod, isSelected = false, hasCollision = false, isCurrentlyDragging = false, isDragColliding = false) {
     const group = new THREE.Group();
     const mw = mod.w || 600;
     const md = mod.d || 600;
     const mh = mod.h || 720;
     const wall = mod.wall || 'back';
-    const isSelected = (this.selectedModuleId === mod.id);
-    const bodyMat = this.getDoorMaterial(isSelected);
+    const bodyMat = this.getDoorMaterial(isSelected, hasCollision, isCurrentlyDragging, isDragColliding);
 
     const isCornerV = mod.type?.includes('corner_v');
     const isCornerL = mod.type === 'base_corner_l' || mod.type === 'wall_corner_l';
@@ -1180,9 +1450,13 @@ class StudioCanvas3D {
               hRight.position.set(24, plinthH + bodyH - 110, md + 10);
               group.add(hRight);
             } else {
-              // Single door: handle placed near opening edge
+              const rw = this.roomConfig?.room_width || 3600;
+              const rd = this.roomConfig?.room_depth || 2600;
+              const wallLen = (wall === 'left' || wall === 'right') ? rd : rw;
+              const handleSide = this.getSmartHandleSide(mod, wallLen);
+              const handleX = (handleSide === 'left') ? (-mw / 2 + 28) : (mw / 2 - 28);
               const hSingle = this.createHandle3D(12, 100, false);
-              hSingle.position.set(mw / 2 - 28, plinthH + bodyH - 110, md + 10);
+              hSingle.position.set(handleX, plinthH + bodyH - 110, md + 10);
               group.add(hSingle);
             }
           }
@@ -1376,9 +1650,14 @@ class StudioCanvas3D {
               hRight.position.set(22, wallZ + 55, md + 10);
               group.add(hRight);
             } else {
-              // Single door: handle placed near opening edge
+              // Single door: smart handle placement
+              const rw = this.roomConfig?.room_width || 3600;
+              const rd = this.roomConfig?.room_depth || 2600;
+              const wallLen = (wall === 'left' || wall === 'right') ? rd : rw;
+              const handleSide = this.getSmartHandleSide(mod, wallLen);
+              const handleX = (handleSide === 'left') ? (-mw / 2 + 25) : (mw / 2 - 25);
               const hSingle = this.createHandle3D(10, 80, false);
-              hSingle.position.set(mw / 2 - 25, wallZ + 55, md + 10);
+              hSingle.position.set(handleX, wallZ + 55, md + 10);
               group.add(hSingle);
             }
           }
@@ -1730,24 +2009,41 @@ class StudioCanvas3D {
       }
     }
 
+    const snapPos = Math.max(0, Math.min(wallLen - mw, bestSnapPos));
+    this.ghostSnapPos = snapPos;
+
+    // Check collision for ghost
+    const colCheck = this.checkModuleCollision(moduleTemplate, snapPos, targetWall);
+    const isColliding = colCheck.isColliding;
+    const isValid = (bestSnapPos >= 0) && (bestSnapPos + mw <= wallLen) && !isColliding;
+    this.ghostIsValid = isValid;
+    this.ghostIsColliding = isColliding;
+
     // Update real-time drag pill with magnetic snap indicator
     const dragPill = document.getElementById('canvas-drag-pill');
     const dragText = document.getElementById('canvas-drag-text');
     if (dragPill && dragText) {
       dragPill.style.display = 'flex';
-      if (isSnapped) {
-        dragText.innerHTML = `🧲 <strong>${snapFeedback}</strong> [${bestSnapPos} mm]`;
-        dragPill.style.borderColor = '#10b981';
+      if (isColliding) {
+        dragText.innerHTML = `⚠️ <strong>ÇAKIŞMA:</strong> ${colCheck.collidingWith ? colCheck.collidingWith.name : 'Başka Modül'} üzerine biniyor! [${snapPos} mm]`;
+        dragPill.style.background = '#ef4444';
+        dragPill.style.borderColor = '#b91c1c';
+        dragPill.style.color = '#ffffff';
+        dragPill.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.45)';
+      } else if (isSnapped) {
+        dragText.innerHTML = `🧲 <strong>${snapFeedback}</strong> [${snapPos} mm]`;
+        dragPill.style.background = '#10b981';
+        dragPill.style.borderColor = '#059669';
+        dragPill.style.color = '#ffffff';
+        dragPill.style.boxShadow = '0 4px 16px rgba(16, 185, 129, 0.35)';
       } else {
-        dragText.textContent = `↔ ${moduleTemplate.name} | Konum: ${bestSnapPos} mm`;
+        dragText.textContent = `↔ ${moduleTemplate.name} | Konum: ${snapPos} mm`;
+        dragPill.style.background = '';
         dragPill.style.borderColor = '#38bdf8';
+        dragPill.style.color = '';
+        dragPill.style.boxShadow = '';
       }
     }
-
-    // VALIDATION: Does it fit on the wall?
-    const isValid = (bestSnapPos >= 0) && (bestSnapPos + mw <= wallLen);
-    this.ghostIsValid = isValid;
-    this.ghostSnapPos = Math.max(0, Math.min(wallLen - mw, bestSnapPos));
 
     const gz = moduleTemplate.category === 'wall' ? 1450 : (moduleTemplate.category === 'base' ? 100 : 0);
 
@@ -1791,7 +2087,8 @@ class StudioCanvas3D {
     return {
       pos: this.ghostSnapPos,
       wall: this.ghostTargetWall,
-      isValid: this.ghostIsValid
+      isValid: this.ghostIsValid,
+      hasCollision: this.ghostIsColliding
     };
   }
 

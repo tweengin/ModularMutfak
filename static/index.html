@@ -845,7 +845,7 @@
                 <button class="dock-icon-btn" onclick="setCameraPreset('reset')" data-tip="Kamerayı ve Açıyı Sıfırla">🔄</button>
                 <div class="dock-divider"></div>
                 <button class="dock-icon-btn active-tool-btn" id="btn-toggle-ruler" onclick="toggle3DRuler()" data-tip="Ölçü Çizgilerini Aç/Kapat" style="color:#059669;">📏</button>
-                <button class="dock-icon-btn" id="btn-toggle-backsplash" onclick="toggleBacksplashTone()" data-tip="Tezgah Arası Işık & Ton Değiştir" style="color:#f59e0b;">💡</button>
+                <button class="dock-icon-btn" id="btn-lighting-mode" onclick="cycleLightingMode()" data-tip="Aydınlatma Atmosferi: Gündüz / Sıcak Akşam LED / Showroom Spot" style="color:#f59e0b;">☀️</button>
               </div>
             </div>
 
@@ -859,6 +859,18 @@
               </button>
               <div id="topbar-auth-slot" class="topbar-auth-slot"></div>
             </div>
+          </div>
+
+          <!-- Responsive Wide Screen Advisory Banner (< 1024px screens) -->
+          <div id="screen-recommendation-banner" class="screen-recommendation-toast" style="display:none;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:20px; line-height:1;">🖥️</span>
+              <div>
+                <strong style="font-size:12px; color:#0f172a; display:block;">Geniş Ekran Tavsiyesi:</strong>
+                <span style="font-size:11px; color:#475569;">Modüler mutfağınızı konforlu tasarlamak için bilgisayar veya tablet ekranı önerilir.</span>
+              </div>
+            </div>
+            <button onclick="dismissScreenAdvisory()" style="background:#f1f5f9; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer; color:#64748b; font-size:12px; display:flex; align-items:center; justify-content:center;" title="Kapat">✕</button>
           </div>
 
           <!-- Interactive 3D Canvas Onboarding Helper (Bottom Left, Dismissable with X) -->
@@ -942,6 +954,7 @@
                 <button class="fmt-btn" onclick="shiftSelectedModule(100)" title="100mm Sağa Kaydır">▶ Sağa</button>
                 <button class="fmt-btn" onclick="autoFillActiveWallGap(window.CURRENT_ACTIVE_WALL, 'base')" title="Kalan boşluğu otomatik doldur">✨ Boşluğu Doldur</button>
                 <button class="fmt-btn" onclick="toggleSelectedModuleWall()" title="Diğer Duvara Taşı (Arka ↔ Sol)">🧱 Duvar Değiştir</button>
+                <button class="fmt-btn" id="btn-toggle-handle" onclick="toggleSelectedHandleSide()" title="Tek kapaklı modüllerde kulp açılış yönünü tersine çevir">🔁 Kulp Yönü</button>
                 <button class="fmt-btn fmt-btn-danger" onclick="deleteSelectedModule()" title="Modülü Sil">🗑️ Sil</button>
                 <button class="fmt-btn fmt-btn-close" onclick="deselectModule()" title="Seçimi Kapat">✕</button>
               </div>
