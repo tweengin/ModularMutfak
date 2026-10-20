@@ -662,13 +662,16 @@ body.in-studio-mode #view-studio {
 .flyout-catalog-container {
   flex: 1 1 0%;
   min-height: 0;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 12px 14px 100px 14px;
+  height: 100%;
+  max-height: calc(100vh - 110px);
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  padding: 10px 10px 140px 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 #f8fafc;
 }
@@ -1360,60 +1363,227 @@ body.in-studio-mode #view-studio {
   gap: 6px;
 }
 
-/* Light styling for module cards inside flyout catalog */
-.flyout-catalog-container .module-catalog-item {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 10px 12px;
-  cursor: grab;
-  transition: all 0.16s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-}
-
-.flyout-catalog-container .module-catalog-item:hover {
-  background: #f8fafc;
-  border-color: #38bdf8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.12);
-}
-
+/* Modern Visual Module Cards (Planner 5D / Homestyler Style) */
 .flyout-catalog-container .adeko-accordion-group {
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #ffffff;
   overflow: hidden;
   margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .flyout-catalog-container .adeko-accordion-header {
   background: #f8fafc;
   border: none;
-  border-bottom: 1px solid #f1f5f9;
-  padding: 10px 14px;
+  padding: 10px 12px;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   color: #1e293b;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   width: 100%;
+  user-select: none;
+  transition: background 0.15s ease;
 }
 
 .flyout-catalog-container .adeko-accordion-header:hover {
   background: #f1f5f9;
 }
 
-.flyout-catalog-container .adeko-accordion-content {
-  padding: 10px;
+.flyout-catalog-container .adeko-accordion-group.open .adeko-accordion-header {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.flyout-catalog-container .adeko-accordion-header .acc-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flyout-catalog-container .adeko-accordion-header .acc-badge {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.flyout-catalog-container .adeko-accordion-header .acc-arrow {
+  display: inline-block;
+  font-size: 10px;
+  color: #64748b;
+  transition: transform 0.2s ease;
+}
+
+.flyout-catalog-container .adeko-accordion-group.open .acc-arrow {
+  transform: rotate(180deg);
+}
+
+.flyout-catalog-container .adeko-accordion-group:not(.open) .adeko-accordion-content {
+  display: none !important;
+}
+
+.flyout-catalog-container .adeko-accordion-group.open .adeko-accordion-content {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  background: #f8fafc !important;
+}
+
+/* 2-Column Visual Module Card */
+.flyout-catalog-container .module-catalog-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 6px;
+  cursor: grab;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: stretch;
+  gap: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  position: relative;
+  user-select: none;
+}
+
+.flyout-catalog-container .module-catalog-item:hover {
+  background: #ffffff;
+  border-color: #0284c7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.14);
+}
+
+.flyout-catalog-container .module-catalog-item:active {
+  cursor: grabbing;
+}
+
+.flyout-catalog-container .module-catalog-item.dragging {
+  opacity: 0.35;
+  border: 2px dashed #0284c7;
+  transform: scale(0.95);
+}
+
+/* Visual SVG preview container */
+.vcard-preview-box {
+  width: 100%;
+  height: 68px;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.vcard-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+  line-height: 1.25;
+  height: 28px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 2px;
+}
+
+.vcard-ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.vcard-width-select {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #334155;
+  padding: 3px 2px;
+  cursor: pointer;
+  outline: none;
+  text-align: center;
+}
+
+.vcard-width-select:focus {
+  border-color: #0284c7;
+}
+
+.vcard-add-btn {
+  padding: 4px 8px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.vcard-add-btn:hover {
+  background: #0369a1;
+  transform: scale(1.04);
+}
+
+/* Appointment Slot Cards Light Theme */
+.slot-option-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.slot-option-card:hover {
+  border-color: #38bdf8;
+  background: #f0f9ff;
+  transform: translateY(-1px);
+}
+
+.slot-option-card.selected {
+  border-color: #0284c7 !important;
+  background: #e0f2fe !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.18) !important;
+}
+
+.slot-option-card .slot-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #0284c7;
+  text-transform: uppercase;
+}
+
+.slot-option-card .slot-date {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 3px 0;
+}
+
+.slot-option-card .slot-time {
+  font-size: 0.74rem;
+  color: #0369a1;
+  font-weight: 600;
 }
 
 .flyout-catalog-container .dim-pill {
@@ -1735,7 +1905,7 @@ canvas {
 .adeko-accordion-content {
   display: none;
   padding: 0.5rem;
-  background: #182234;
+  background: #f8fafc;
   flex-direction: column;
   gap: 0.45rem;
 }

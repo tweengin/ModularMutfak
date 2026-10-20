@@ -732,25 +732,229 @@ window.handleCustomWidthChange = function(type, valCm) {
   }
 };
 
-// ADeko Accordion Module Palette Generator with Smart Dimension Pills (Seçenek 1)
+// Visual SVG Illustration Generator for 2026 Modular Kitchen Catalog
+function getModuleVisualSVG(type, name) {
+  const counter = '#cbd5e1';
+  const border = '#94a3b8';
+  const handle = '#475569';
+  const plinth = '#64748b';
+  const fill = '#ffffff';
+
+  // 1. BASE MODULES
+  if (type === 'base_drawer_3') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="10" width="54" height="3" rx="1" fill="${counter}" stroke="#94a3b8" stroke-width="0.7"/>
+      <rect x="15" y="13" width="50" height="40" rx="1" fill="#f8fafc" stroke="${border}" stroke-width="1"/>
+      <rect x="17" y="53" width="46" height="4" fill="${plinth}"/>
+      <line x1="15" y1="26" x2="65" y2="26" stroke="${border}" stroke-width="1"/>
+      <line x1="15" y1="39" x2="65" y2="39" stroke="${border}" stroke-width="1"/>
+      <line x1="32" y1="19" x2="48" y2="19" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+      <line x1="32" y1="32" x2="48" y2="32" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+      <line x1="32" y1="46" x2="48" y2="46" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type === 'base_bottle_pullout') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="25" y="10" width="30" height="3" rx="1" fill="${counter}" stroke="#94a3b8" stroke-width="0.7"/>
+      <rect x="27" y="13" width="26" height="40" rx="1" fill="#f8fafc" stroke="${border}" stroke-width="1"/>
+      <rect x="28" y="53" width="24" height="4" fill="${plinth}"/>
+      <line x1="31" y1="18" x2="31" y2="32" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="43" cy="24" r="3.5" fill="#10b981"/>
+      <circle cx="43" cy="40" r="3.5" fill="#f59e0b"/>
+    </svg>`;
+  }
+
+  if (type === 'base_standard') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="10" width="54" height="3" rx="1" fill="${counter}" stroke="#94a3b8" stroke-width="0.7"/>
+      <rect x="15" y="13" width="50" height="40" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <rect x="17" y="53" width="46" height="4" fill="${plinth}"/>
+      <line x1="58" y1="24" x2="58" y2="42" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type === 'base_double') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="10" width="54" height="3" rx="1" fill="${counter}" stroke="#94a3b8" stroke-width="0.7"/>
+      <rect x="15" y="13" width="50" height="40" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <rect x="17" y="53" width="46" height="4" fill="${plinth}"/>
+      <line x1="40" y1="13" x2="40" y2="53" stroke="${border}" stroke-width="1"/>
+      <line x1="37" y1="26" x2="37" y2="40" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+      <line x1="43" y1="26" x2="43" y2="40" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type === 'base_sink') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="10" width="54" height="3" rx="1" fill="${counter}" stroke="#94a3b8" stroke-width="0.7"/>
+      <rect x="15" y="13" width="50" height="40" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <rect x="17" y="53" width="46" height="4" fill="${plinth}"/>
+      <line x1="40" y1="13" x2="40" y2="53" stroke="${border}" stroke-width="1"/>
+      <line x1="37" y1="26" x2="37" y2="40" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+      <line x1="43" y1="26" x2="43" y2="40" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+      <rect x="25" y="6" width="30" height="4.5" rx="1.5" fill="#94a3b8" stroke="#64748b" stroke-width="0.5"/>
+      <path d="M40 7 Q40 1 45 1 Q48 1 48 4 L48 6" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type === 'base_oven' || type === 'app_oven') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="9" width="54" height="3" rx="1" fill="#1e293b"/>
+      <circle cx="28" cy="10.5" r="1.8" fill="#ef4444"/>
+      <circle cx="52" cy="10.5" r="1.8" fill="#ef4444"/>
+      <rect x="15" y="12" width="50" height="41" rx="1" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+      <rect x="17" y="53" width="46" height="4" fill="${plinth}"/>
+      <rect x="20" y="18" width="40" height="26" rx="2" fill="#1e293b" stroke="#64748b" stroke-width="0.8"/>
+      <line x1="25" y1="22" x2="55" y2="22" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
+      <line x1="15" y1="47" x2="65" y2="47" stroke="#475569" stroke-width="1"/>
+    </svg>`;
+  }
+
+  if (type === 'base_dishwasher') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="10" width="54" height="3" rx="1" fill="${counter}"/>
+      <rect x="15" y="13" width="50" height="40" rx="1" fill="#f1f5f9" stroke="${border}" stroke-width="1"/>
+      <rect x="17" y="53" width="46" height="4" fill="${plinth}"/>
+      <rect x="17" y="15" width="46" height="6" fill="#1e293b" rx="1"/>
+      <circle cx="22" cy="18" r="1.2" fill="#10b981"/>
+      <line x1="30" y1="26" x2="50" y2="26" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type && type.startsWith('base_corner')) {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <polygon points="16,10 64,10 64,28 46,28 46,48 16,48" fill="${counter}" stroke="#94a3b8" stroke-width="0.8"/>
+      <rect x="18" y="48" width="42" height="4" fill="${plinth}"/>
+      <text x="32" y="32" font-size="10" font-weight="bold" fill="#0284c7">90°</text>
+    </svg>`;
+  }
+
+  if (type === 'base_open_shelf') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="10" width="54" height="3" rx="1" fill="${counter}"/>
+      <rect x="15" y="13" width="50" height="40" rx="1" fill="#f8fafc" stroke="${border}" stroke-width="1"/>
+      <rect x="17" y="53" width="46" height="4" fill="${plinth}"/>
+      <line x1="16" y1="33" x2="64" y2="33" stroke="${border}" stroke-width="1.5"/>
+    </svg>`;
+  }
+
+  // 2. WALL MODULES
+  if (type === 'wall_single') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="15" y="10" width="50" height="42" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <line x1="58" y1="34" x2="58" y2="46" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type === 'wall_double') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="15" y="10" width="50" height="42" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <line x1="40" y1="10" x2="40" y2="52" stroke="${border}" stroke-width="1"/>
+      <line x1="37" y1="34" x2="37" y2="46" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+      <line x1="43" y1="34" x2="43" y2="46" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type === 'wall_glass') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="13" y="13" width="54" height="36" rx="1" fill="#f8fafc" stroke="${border}" stroke-width="1"/>
+      <rect x="18" y="18" width="44" height="26" rx="1" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1" fill-opacity="0.6"/>
+      <line x1="22" y1="38" x2="38" y2="22" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="30" y1="40" x2="50" y2="40" stroke="${handle}" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  if (type === 'wall_hood') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="15" y="10" width="50" height="34" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <line x1="40" y1="10" x2="40" y2="44" stroke="${border}" stroke-width="1"/>
+      <rect x="15" y="44" width="50" height="8" fill="#cbd5e1" stroke="#94a3b8" stroke-width="0.8"/>
+      <line x1="22" y1="48" x2="58" y2="48" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,2"/>
+    </svg>`;
+  }
+
+  if (type === 'wall_hood_chimney') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="34" y="6" width="12" height="34" fill="#94a3b8" stroke="#64748b" stroke-width="0.8"/>
+      <polygon points="12,48 68,48 62,40 18,40" fill="#cbd5e1" stroke="#64748b" stroke-width="1"/>
+      <rect x="10" y="48" width="60" height="5" rx="1" fill="#64748b"/>
+    </svg>`;
+  }
+
+  if (type && type.startsWith('wall_corner')) {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <polygon points="16,10 64,10 64,30 44,30 44,48 16,48" fill="#ffffff" stroke="#94a3b8" stroke-width="1"/>
+      <text x="32" y="32" font-size="10" font-weight="bold" fill="#0284c7">90°</text>
+    </svg>`;
+  }
+
+  if (type === 'wall_open_shelf') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="15" y="10" width="50" height="42" rx="1" fill="#f8fafc" stroke="${border}" stroke-width="1"/>
+      <line x1="16" y1="24" x2="64" y2="24" stroke="${border}" stroke-width="1.5"/>
+      <line x1="16" y1="38" x2="64" y2="38" stroke="${border}" stroke-width="1.5"/>
+    </svg>`;
+  }
+
+  // 3. TALL MODULES
+  if (type === 'tall_fridge' || type === 'app_fridge') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="22" y="5" width="36" height="50" rx="2" fill="#e2e8f0" stroke="#64748b" stroke-width="1"/>
+      <rect x="24" y="55" width="32" height="3" fill="${plinth}"/>
+      <rect x="23" y="6" width="34" height="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.5"/>
+      <rect x="23" y="23" width="34" height="31" fill="#f1f5f9" stroke="#94a3b8" stroke-width="0.5"/>
+      <rect x="27" y="27" width="8" height="9" fill="#0f172a" rx="1"/>
+      <line x1="53" y1="10" x2="53" y2="18" stroke="${handle}" stroke-width="1.5"/>
+      <line x1="53" y1="26" x2="53" y2="40" stroke="${handle}" stroke-width="1.5"/>
+    </svg>`;
+  }
+
+  if (type === 'tall_pantry_2d') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="22" y="5" width="36" height="50" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <rect x="24" y="55" width="32" height="3" fill="${plinth}"/>
+      <line x1="22" y1="24" x2="58" y2="24" stroke="${border}" stroke-width="1"/>
+      <line x1="53" y1="12" x2="53" y2="20" stroke="${handle}" stroke-width="1.5"/>
+      <line x1="53" y1="28" x2="53" y2="42" stroke="${handle}" stroke-width="1.5"/>
+    </svg>`;
+  }
+
+  if (type === 'tall_oven_microwave') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="22" y="5" width="36" height="50" rx="1" fill="${fill}" stroke="${border}" stroke-width="1"/>
+      <rect x="24" y="55" width="32" height="3" fill="${plinth}"/>
+      <rect x="23" y="6" width="34" height="9" fill="#ffffff" stroke="${border}" stroke-width="0.5"/>
+      <rect x="24" y="17" width="32" height="11" rx="1" fill="#1e293b" stroke="#64748b" stroke-width="0.5"/>
+      <rect x="24" y="30" width="32" height="13" rx="1" fill="#0f172a" stroke="#64748b" stroke-width="0.5"/>
+      <line x1="27" y1="32" x2="53" y2="32" stroke="#e2e8f0" stroke-width="1.2"/>
+      <line x1="22" y1="46" x2="58" y2="46" stroke="${border}" stroke-width="1"/>
+    </svg>`;
+  }
+
+  // 4. APPLIANCES
+  if (type === 'app_sink') {
+    return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+      <rect x="14" y="18" width="52" height="28" rx="2" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
+      <rect x="18" y="22" width="26" height="20" rx="1.5" fill="#94a3b8"/>
+      <circle cx="31" cy="32" r="3" fill="#64748b"/>
+      <path d="M48 24 Q48 10 54 10 Q58 10 58 14 L58 17" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  // Fallback icon
+  return `<svg viewBox="0 0 80 60" width="100%" height="100%">
+    <rect x="15" y="12" width="50" height="40" rx="2" fill="#f8fafc" stroke="${border}" stroke-width="1"/>
+    <text x="40" y="36" font-size="16" text-anchor="middle" fill="#64748b">📦</text>
+  </svg>`;
+}
+
+// Visual Module Catalog Generator with 2-Column Visual Cards
 async function loadCategoryModules(catKey) {
   const container = document.getElementById('studio-module-catalog');
   if (!container) return;
 
-  let groups = null;
-  try {
-    const res = await fetch(`/api/catalog/modules?category=${catKey}`);
-    const data = await res.json();
-    if (data.groups && data.groups.length > 0) {
-      groups = data.groups;
-    }
-  } catch (err) {
-    console.warn("Could not fetch catalog modules, using defaults:", err);
-  }
-
-  if (!groups) {
-    groups = ADEKO_MODULE_GROUPS[catKey] || ADEKO_MODULE_GROUPS.kitchen;
-  }
+  const groups = ADEKO_MODULE_GROUPS[catKey] || ADEKO_MODULE_GROUPS.kitchen;
 
   // Ensure default width options for all modules
   groups.forEach(grp => {
@@ -774,8 +978,7 @@ async function loadCategoryModules(catKey) {
   });
 
   window.CURRENT_CATALOG_GROUPS = groups;
-  renderCatalogModulesDOM(groups);
-  updateCatalogDimensionPills();
+  renderFlyoutCategory(window.CURRENT_FLYOUT_KEY || 'base');
 }
 
 function renderCatalogModulesDOM(groups, appendOnly = false) {
@@ -800,7 +1003,7 @@ function renderCatalogModulesDOM(groups, appendOnly = false) {
         </span>
         <span style="display:flex; align-items:center; gap:0.4rem;">
           <span class="acc-badge">${grp.items.length}</span>
-          <span class="acc-arrow">▼</span>
+          <span class="acc-arrow">${grp.open ? '▲' : '▼'}</span>
         </span>
       </button>
       <div class="adeko-accordion-content" id="acc-content-${grp.groupKey}"></div>
@@ -814,7 +1017,7 @@ function renderCatalogModulesDOM(groups, appendOnly = false) {
       item.className = 'module-catalog-item';
       item.id = `catalog-card-${m.type}`;
       item.draggable = true;
-      item.title = "Tuvale sürükleyip bırakın veya + Ekle butonuna basın";
+      item.title = `${m.name} - Tuvale sürükleyip bırakın veya + Ekle butonuna basın`;
 
       item.addEventListener('dragstart', (e) => {
         item.classList.add('dragging');
@@ -830,83 +1033,37 @@ function renderCatalogModulesDOM(groups, appendOnly = false) {
       });
 
       const remSpace = m.category === 'wall' ? cap.wallRemaining : cap.baseRemaining;
-      item.innerHTML = renderModuleCardInner(m, remSpace);
+      item.innerHTML = renderVisualModuleCardInner(m, remSpace);
 
       contentDiv.appendChild(item);
     });
   });
 }
 
-function renderModuleCardInner(m, remSpace) {
-  const remCm = Math.floor(remSpace / 10);
+function renderVisualModuleCardInner(m, remSpace) {
   const widths = m.allowed_widths || [m.w || 600];
   const curW = m.selected_w || m.w || widths[0];
-  const curH = (m.category === 'wall') ? (window.getActiveStudioWallHeight ? window.getActiveStudioWallHeight() : (m.h || 720)) : (m.h || 720);
+  const svgHtml = getModuleVisualSVG(m.type, m.name);
 
-  let pillsHtml = '';
+  let widthOptions = '';
   widths.forEach(w => {
     const wCm = Math.round(w / 10);
     const fits = w <= remSpace;
-    const isSelected = w === curW;
-    pillsHtml += `
-      <button type="button" 
-        class="dim-pill ${isSelected ? 'active-pill' : ''} ${fits ? '' : 'disabled-pill'}" 
-        data-mod-type="${m.type}" 
-        data-w="${w}"
-        ${fits ? '' : 'disabled'}
-        title="${fits ? wCm + ' cm seç' : 'Duvarda ' + remCm + ' cm yer kaldı, sığmaz!'}"
-        onclick="event.stopPropagation(); selectModuleWidth('${m.type}', ${w})">
-        ${wCm} cm
-      </button>
-    `;
+    widthOptions += `<option value="${w}" ${w === curW ? 'selected' : ''} ${fits ? '' : 'disabled'}>${wCm} cm ${fits ? '' : '(Dolu)'}</option>`;
   });
 
-  let customHtml = '';
-  if (m.allow_custom_width) {
-    const fitsAny = remSpace >= 150;
-    customHtml = `
-      <div class="custom-width-row" onclick="event.stopPropagation()">
-        <span>✏️ Özel Ebat:</span>
-        <div style="display:flex; align-items:center; gap:2px;">
-          <input type="number" 
-            class="custom-width-input" 
-            id="custom-w-${m.type}" 
-            min="20" 
-            max="${remCm}" 
-            value="${Math.round(curW / 10)}" 
-            ${fitsAny ? '' : 'disabled'}
-            onchange="handleCustomWidthChange('${m.type}', this.value)"
-            onkeydown="if(event.key==='Enter'){handleCustomWidthChange('${m.type}', this.value); addModuleToDesign(getModuleTemplate('${m.type}'));}">
-          <span style="font-size:0.75rem; color:#94a3b8;">cm</span>
-        </div>
-      </div>
-    `;
-  }
-
   return `
-    <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-      <div style="display:flex; align-items:center; gap:0.5rem;">
-        <span class="drag-grip-icon" title="Tutup Tuvale Sürükleyin">⋮⋮</span>
-        <span style="font-size:1.3rem;">${m.icon}</span>
-        <div class="module-info">
-          <h4 style="font-size:0.85rem; color:#0f172a; font-weight:700; margin:0;">${m.name}</h4>
-          <span style="font-size:0.75rem; color:#64748b;" id="dim-txt-${m.type}">D: ${m.d}mm | Y: ${curH}mm</span>
-        </div>
-      </div>
-      <button class="btn btn-primary btn-sm" style="padding:0.3rem 0.75rem; font-size:0.75rem; font-weight:700; border-radius:6px; background:#0284c7; color:#ffffff;" onclick="event.stopPropagation(); addModuleToDesign(getModuleTemplate('${m.type}'))">
-        ➕ Ekle
-      </button>
+    <div class="vcard-preview-box" title="Tuvale sürükleyin">
+      ${svgHtml}
     </div>
-
-    <div class="module-pills-wrapper" onclick="event.stopPropagation()">
-      <div class="pills-header">
-        <span>Genişlik:</span>
-        <span class="rem-space ${remSpace <= 0 ? 'full' : ''}" id="rem-badge-${m.type}">Kalan: ${remCm} cm</span>
-      </div>
-      <div class="dimension-pills-row">
-        ${pillsHtml}
-      </div>
-      ${customHtml}
+    <div class="vcard-title" title="${m.name}">${m.name}</div>
+    <div class="vcard-ctrl-row" onclick="event.stopPropagation()">
+      <select class="vcard-width-select" onchange="event.stopPropagation(); selectModuleWidth('${m.type}', parseInt(this.value))" title="Genişlik Değiştir">
+        ${widthOptions}
+      </select>
+      <button type="button" class="vcard-add-btn" onclick="event.stopPropagation(); addModuleToDesign(getModuleTemplate('${m.type}'))" title="Tuvale Yerleştir">
+        + Ekle
+      </button>
     </div>
   `;
 }
@@ -936,9 +1093,22 @@ function updateCatalogDimensionPills() {
         remElem.className = `rem-space ${remSpace <= 0 ? 'full' : ''}`;
       }
 
-      // Update pill buttons
+      // Update visual card width select options
       const card = document.getElementById(`catalog-card-${m.type}`);
       if (card) {
+        const sel = card.querySelector('.vcard-width-select');
+        if (sel) {
+          const curW = m.selected_w || m.w || (m.allowed_widths ? m.allowed_widths[0] : 600);
+          const widths = m.allowed_widths || [m.w || 600];
+          let optHtml = '';
+          widths.forEach(w => {
+            const wCm = Math.round(w / 10);
+            const fits = w <= remSpace;
+            optHtml += `<option value="${w}" ${w === curW ? 'selected' : ''} ${fits ? '' : 'disabled'}>${wCm} cm ${fits ? '' : '(Dolu)'}</option>`;
+          });
+          sel.innerHTML = optHtml;
+        }
+
         const curW = m.selected_w || m.w || (m.allowed_widths ? m.allowed_widths[0] : 600);
         const pills = card.querySelectorAll('.dim-pill');
         pills.forEach(p => {
@@ -972,7 +1142,17 @@ function updateCatalogDimensionPills() {
 
 window.toggleAccordion = function(groupKey) {
   const grp = document.getElementById(`acc-group-${groupKey}`);
-  if (grp) grp.classList.toggle('open');
+  if (!grp) return;
+  const wasOpen = grp.classList.contains('open');
+  if (wasOpen) {
+    grp.classList.remove('open');
+  } else {
+    grp.classList.add('open');
+  }
+  const arrow = grp.querySelector('.acc-arrow');
+  if (arrow) {
+    arrow.textContent = wasOpen ? '▼' : '▲';
+  }
 };
 
 window.filterCatalogModules = function(query) {
@@ -1392,17 +1572,20 @@ function renderFlyoutCategory(catKey) {
     return;
   }
 
-  const allGroups = window.CURRENT_CATALOG_GROUPS || ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
+  const allGroups = ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
 
   // Filter groups for this specific category
-  const filtered = allGroups.filter(g =>
-    g.category === catKey ||
-    g.groupKey === catKey ||
-    g.groupKey.startsWith(catKey + '_') ||
-    (catKey === 'appliance' && (g.category === 'appliance' || g.groupKey.startsWith('app_')))
-  );
+  let filtered = allGroups;
+  if (catKey && catKey !== 'search' && catKey !== 'all') {
+    filtered = allGroups.filter(g =>
+      g.category === catKey ||
+      g.groupKey === catKey ||
+      g.groupKey.startsWith(catKey + '_') ||
+      (catKey === 'appliance' && (g.category === 'appliance' || g.groupKey.startsWith('app_')))
+    );
+  }
 
-  const mapped = (filtered.length > 0 ? filtered : allGroups).map(g => ({ ...g, open: true }));
+  const mapped = filtered.map(g => ({ ...g, open: true }));
 
   container.innerHTML = '';
 
@@ -2478,6 +2661,16 @@ async function openSubmitQuoteModal() {
     document.getElementById('quote-cust-name').value = savedName;
   }
 
+  // Populate Quick Project Summary Strip
+  const dimsEl = document.getElementById('modal-summary-dims');
+  const modCountEl = document.getElementById('modal-summary-mod-count');
+  if (dimsEl && window.CURRENT_ROOM_DIMS) {
+    dimsEl.textContent = `Mutfak ${Math.round(window.CURRENT_ROOM_DIMS.width / 10)} × ${Math.round(window.CURRENT_ROOM_DIMS.depth / 10)} cm`;
+  }
+  if (modCountEl && window.CURRENT_DESIGN && window.CURRENT_DESIGN.modules) {
+    modCountEl.textContent = `${window.CURRENT_DESIGN.modules.length} Modül`;
+  }
+
   await loadSuggestedAppointmentSlots();
 
   const modal = document.getElementById('submit-quote-modal');
@@ -3097,13 +3290,13 @@ function start72HourTimer(remainingSeconds) {
 window.start72HourTimer = start72HourTimer;
 
 // ==========================================
-// APPOINTMENT SLOTS (NEAREST 3) & STATUS TRACKING
+// APPOINTMENT SLOTS (NEAREST 3) & STATUS TRACKING (LIGHT NORDIC THEME)
 // ==========================================
 async function loadSuggestedAppointmentSlots() {
   const container = document.getElementById('nearest-slots-container');
   if (!container) return;
 
-  container.innerHTML = '<div style="color:#94a3b8; font-size:0.8rem; grid-column:1/-1;">Uygun randevu saatleri yükleniyor...</div>';
+  container.innerHTML = '<div style="color:#64748b; font-size:0.8rem; grid-column:1/-1;">Uygun randevu saatleri yükleniyor...</div>';
   try {
     const res = await fetch('/api/appointments/suggested-slots');
     const data = await res.json();
@@ -3116,11 +3309,10 @@ async function loadSuggestedAppointmentSlots() {
 
     container.innerHTML = slots.map((s, idx) => `
       <div class="slot-option-card ${idx === 0 ? 'selected' : ''}" 
-           style="background:${idx === 0 ? 'rgba(56, 189, 248, 0.2)' : '#0f172a'}; border:2px solid ${idx === 0 ? '#38bdf8' : '#334155'}; border-radius:8px; padding:0.6rem; cursor:pointer; text-align:center; transition:all 0.2s;" 
            onclick="selectAppointmentSlot(this, '${s.date}', '${s.time_slot}')">
-        <div style="font-size:0.7rem; font-weight:700; color:#93c5fd; text-transform:uppercase;">Seçenek ${idx + 1}</div>
-        <div style="font-size:0.85rem; font-weight:700; color:#ffffff; margin:4px 0;">${s.date_label}</div>
-        <div style="font-size:0.75rem; color:#38bdf8; font-weight:600;">⏰ ${s.time_label}</div>
+        <div class="slot-tag">Seçenek ${idx + 1}</div>
+        <div class="slot-date">${s.date_label}</div>
+        <div class="slot-time">⏰ ${s.time_label}</div>
       </div>
     `).join('');
 
@@ -3138,14 +3330,10 @@ window.loadSuggestedAppointmentSlots = loadSuggestedAppointmentSlots;
 
 function selectAppointmentSlot(element, date, slot) {
   document.querySelectorAll('#nearest-slots-container .slot-option-card').forEach(c => {
-    c.style.background = '#0f172a';
-    c.style.borderColor = '#334155';
     c.classList.remove('selected');
   });
 
   if (element) {
-    element.style.background = 'rgba(56, 189, 248, 0.2)';
-    element.style.borderColor = '#38bdf8';
     element.classList.add('selected');
   }
 
