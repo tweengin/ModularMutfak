@@ -1638,19 +1638,64 @@ class StudioCanvas3D {
 
     let rawPos = (targetWall === 'left') ? (hitPoint.z - mw / 2) : (hitPoint.x - mw / 2);
     let bestSnapPos = Math.round(rawPos / 50) * 50;
+    let isSnapped = false;
+    let snapFeedback = '';
 
-    // Check snap with existing modules on this wall
+    // 1. Magnetic Snap to wall start (0 mm)
+    if (Math.abs(rawPos) < 110) {
+      bestSnapPos = 0;
+      isSnapped = true;
+      snapFeedback = 'Duvar Başı (0 mm)';
+    }
+    // 2. Magnetic Snap to wall end (wallLen - mw)
+    else if (Math.abs(rawPos + mw - wallLen) < 110) {
+      bestSnapPos = wallLen - mw;
+      isSnapped = true;
+      snapFeedback = `Duvar Sonu (${wallLen - mw} mm)`;
+    }
+
+    // 3. Magnetic Snap to adjacent existing modules on this wall
     const isUpper = moduleTemplate.category === 'wall';
     const wallMods = this.modules.filter(m => (m.wall || 'back') === targetWall && (isUpper ? m.category === 'wall' : m.category !== 'wall'));
-    for (let m of wallMods) {
-      const rEdge = (m.x || 0) + (m.w || 600);
-      const lEdge = (m.x || 0) - mw;
-      if (Math.abs(rawPos - rEdge) < 120) {
-        bestSnapPos = rEdge;
-        break;
-      } else if (Math.abs(rawPos - lEdge) < 120) {
-        bestSnapPos = lEdge;
-        break;
+    if (!isSnapped) {
+      for (let m of wallMods) {
+        const rEdge = (m.x || 0) + (m.w || 600);
+        const lEdge = (m.x || 0) - mw;
+        if (Math.abs(rawPos - rEdge) < 130) {
+          bestSnapPos = rEdge;
+          isSnapped = true;
+          snapFeedback = `${m.name} Sağına Mıknatıslandı`;
+          break;
+        } else if (Math.abs(rawPos - lEdge) < 130) {
+          bestSnapPos = lEdge;
+          isSnapped = true;
+          snapFeedback = `${m.name} Soluna Mıknatıslandı`;
+          break;
+        }
+      }
+    }
+
+    // 4. Magnetic Snap to L-corner clearance (if L-kitchen)
+    if (!isSnapped && this.layoutType && this.layoutType.startsWith('l_')) {
+      const cornerClearance = isUpper ? 650 : 900;
+      if (Math.abs(rawPos - cornerClearance) < 120) {
+        bestSnapPos = cornerClearance;
+        isSnapped = true;
+        snapFeedback = `Köşe Dönüş Hizası (${cornerClearance} mm)`;
+      }
+    }
+
+    // Update real-time drag pill with magnetic snap indicator
+    const dragPill = document.getElementById('canvas-drag-pill');
+    const dragText = document.getElementById('canvas-drag-text');
+    if (dragPill && dragText) {
+      dragPill.style.display = 'flex';
+      if (isSnapped) {
+        dragText.innerHTML = `🧲 <strong>${snapFeedback}</strong> [${bestSnapPos} mm]`;
+        dragPill.style.borderColor = '#10b981';
+      } else {
+        dragText.textContent = `↔ ${moduleTemplate.name} | Konum: ${bestSnapPos} mm`;
+        dragPill.style.borderColor = '#38bdf8';
       }
     }
 

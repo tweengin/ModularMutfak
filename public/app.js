@@ -43,61 +43,171 @@ window.CURRENT_DESIGN = {
 // ADeko Categorized Module Catalog
 const ADEKO_MODULE_GROUPS = {
   kitchen: [
+    // 1. BASE MODULE SUB-ACCORDIONS
     {
-      groupKey: 'base',
-      title: 'Alt Dolaplar (Base)',
+      groupKey: 'base_drawer',
+      category: 'base',
+      title: 'Çekmeceli Alt Dolaplar',
       icon: '🗄️',
       open: true,
       items: [
-        { type: 'base_drawer_3', name: '3 Çekmeceli Alt Dolap', category: 'base', w: 600, d: 600, h: 720, drawers: 3, hinges: 0, icon: '🗄️', desc: 'Frenli tandem raylı 3 çekmece' },
-        { type: 'base_sink', name: 'Eviye Alt Dolabı (2 Kapak)', category: 'base', w: 900, d: 600, h: 720, drawers: 0, hinges: 4, icon: '💧', desc: 'Paslanmaz/granit eviye altı' },
-        { type: 'base_oven', name: 'Ankastre Fırın & Ocak Modülü', category: 'base', w: 600, d: 600, h: 720, drawers: 1, hinges: 0, icon: '♨️', desc: 'Fırın boşluğu ve alt çekmece' },
-        { type: 'base_dishwasher', name: 'Bulaşık Makinesi Paneli', category: 'base', w: 600, d: 600, h: 720, drawers: 0, hinges: 0, icon: '🍽️', desc: '60cm tam ankastre kapağı' },
+        { type: 'base_drawer_3', name: '3 Çekmeceli Alt Dolap', category: 'base', w: 600, d: 600, h: 720, drawers: 3, hinges: 0, icon: '🗄️', desc: 'Frenli tandem raylı 3 çekmece' }
+      ]
+    },
+    {
+      groupKey: 'base_doors',
+      category: 'base',
+      title: 'Kapaklı & Eviye Alt Dolapları',
+      icon: '🚪',
+      open: true,
+      items: [
         { type: 'base_standard', name: 'Standart Tek Kapak Alt Dolap', category: 'base', w: 500, d: 600, h: 720, drawers: 0, hinges: 2, icon: '🚪', desc: '1 ayarlı raflı tek kapak' },
         { type: 'base_double', name: 'Çift Kapaklı Geniş Alt Dolap', category: 'base', w: 800, d: 600, h: 720, drawers: 0, hinges: 4, icon: '🚪', desc: 'Geniş tencere depolama' },
-        { type: 'base_corner_straight', name: 'Düz Kör Köşe Alt Dolap', category: 'base', w: 1000, d: 600, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe dönüş dolabı (Tek Raflı)' },
+        { type: 'base_sink', name: 'Eviye Alt Dolabı (2 Kapak)', category: 'base', w: 900, d: 600, h: 720, drawers: 0, hinges: 4, icon: '💧', desc: 'Inox tek göz evye & kuğu batarya altı' }
+      ]
+    },
+    {
+      groupKey: 'base_appliances',
+      category: 'base',
+      title: 'Pişirme & Bulaşık Modülleri',
+      icon: '♨️',
+      open: true,
+      items: [
+        { type: 'base_oven', name: 'Ankastre Fırın & Ocak Modülü', category: 'base', w: 600, d: 600, h: 720, drawers: 1, hinges: 0, icon: '♨️', desc: 'Fırın boşluğu ve alt çekmece' },
+        { type: 'base_dishwasher', name: 'Bulaşık Makinesi Paneli', category: 'base', w: 600, d: 600, h: 720, drawers: 0, hinges: 0, icon: '🍽️', desc: '60cm tam ankastre kapağı' }
+      ]
+    },
+    {
+      groupKey: 'base_corners',
+      category: 'base',
+      title: 'Köşe Alt Dolapları',
+      icon: '📐',
+      open: true,
+      items: [
         { type: 'base_corner_l', name: '90° L-Köşe Alt Dolap', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe dönüş dolabı (Tek Raflı)' },
         { type: 'base_corner_v', name: 'V-Köşe (45° Diyagonal) Alt Dolap', category: 'base', w: 900, d: 900, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe dolabı (Tek Raflı)' },
+        { type: 'base_corner_straight', name: 'Düz Kör Köşe Alt Dolap', category: 'base', w: 1000, d: 600, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe dönüş dolabı (Tek Raflı)' }
+      ]
+    },
+    {
+      groupKey: 'base_open',
+      category: 'base',
+      title: 'Açık Raflı Alt Modüller',
+      icon: '📚',
+      open: true,
+      items: [
         { type: 'base_open_shelf', name: 'Açık Raflı Alt Modül (Kapaksız)', category: 'base', w: 400, d: 600, h: 720, isOpenShelf: true, shelfCount: 1, drawers: 0, hinges: 0, icon: '📚', desc: '1-3 ayarlı raflı açık alt modül' }
       ]
     },
+
+    // 2. WALL MODULE SUB-ACCORDIONS
     {
-      groupKey: 'wall',
-      title: 'Üst Dolaplar (Wall)',
+      groupKey: 'wall_doors',
+      category: 'wall',
+      title: 'Kapaklı Asma Dolaplar',
       icon: '📦',
       open: true,
       items: [
-        { type: 'wall_glass', name: 'Camlı Yatay Kalkar Dolap', category: 'wall', w: 900, d: 350, h: 720, drawers: 0, hinges: 2, icon: '🪟', desc: 'Buzlu cam insets & aventos' },
-        { type: 'wall_double', name: 'Çift Kapaklı Üst Dolap', category: 'wall', w: 800, d: 350, h: 720, drawers: 0, hinges: 4, icon: '📦', desc: 'Standart çift kapaklı üst' },
         { type: 'wall_single', name: 'Tek Kapaklı Üst Dolap', category: 'wall', w: 500, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📦', desc: 'Dar alan üst depolama' },
-        { type: 'wall_hood', name: 'Davlumbaz Üstü Aspiratör Dolabı', category: 'wall', w: 600, d: 350, h: 720, drawers: 0, hinges: 2, icon: '💨', desc: 'Karbon filtreli gömme' },
-        { type: 'wall_hood_chimney', name: 'Açık Paslanmaz Çelik T-Davlumbaz', category: 'wall', w: 600, d: 450, h: 720, drawers: 0, hinges: 0, icon: '🌪️', desc: 'Inox T-tipi açık baca davlumbaz' },
-        { type: 'wall_corner_straight', name: 'Düz Kör Köşe Üst Dolap', category: 'wall', w: 650, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe üst dolap (Tek Raflı)' },
-        { type: 'wall_corner_l', name: '90° L-Köşe Üst Dolabı', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe üst asma (Tek Raflı)' },
-        { type: 'wall_corner_v', name: 'V-Köşe (45° Diyagonal) Üst Dolap', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe üst dolabı (Tek Raflı)' },
-        { type: 'wall_open_shelf', name: 'Açık Raflı Üst Modül (Kapaksız)', category: 'wall', w: 400, d: 350, h: 720, isOpenShelf: true, shelfCount: 2, drawers: 0, hinges: 0, icon: '📚', desc: '1-3 ayarlı raflı açık üst modül' }
+        { type: 'wall_double', name: 'Çift Kapaklı Üst Dolap', category: 'wall', w: 800, d: 350, h: 720, drawers: 0, hinges: 4, icon: '📦', desc: 'Standart çift kapaklı üst' }
       ]
     },
     {
-      groupKey: 'tall',
-      title: 'Boy Dolaplar & Kiler (Tall)',
-      icon: '🧊',
-      open: false,
+      groupKey: 'wall_glass',
+      category: 'wall',
+      title: 'Camlı & Kalkar Kapaklar',
+      icon: '🪟',
+      open: true,
       items: [
-        { type: 'tall_fridge', name: 'No-Frost Buzdolabı Kabini', category: 'tall', w: 700, d: 600, h: 2100, drawers: 0, hinges: 2, icon: '🧊', desc: 'Buzdolabı üstü kiler' },
+        { type: 'wall_glass', name: 'Camlı Yatay Kalkar Dolap', category: 'wall', w: 900, d: 350, h: 720, drawers: 0, hinges: 2, icon: '🪟', desc: 'Buzlu cam insets & aventos' }
+      ]
+    },
+    {
+      groupKey: 'wall_hood',
+      category: 'wall',
+      title: 'Aspiratör & Davlumbaz',
+      icon: '💨',
+      open: true,
+      items: [
+        { type: 'wall_hood', name: 'Davlumbaz Üstü Aspiratör Dolabı', category: 'wall', w: 600, d: 350, h: 720, drawers: 0, hinges: 2, icon: '💨', desc: 'Karbon filtreli gömme aspiratör' },
+        { type: 'wall_hood_chimney', name: 'Açık Paslanmaz Çelik T-Davlumbaz', category: 'wall', w: 600, d: 450, h: 720, drawers: 0, hinges: 0, icon: '🌪️', desc: 'Inox T-tipi açık baca davlumbaz' }
+      ]
+    },
+    {
+      groupKey: 'wall_corners',
+      category: 'wall',
+      title: 'Köşe Üst Dolapları',
+      icon: '📐',
+      open: true,
+      items: [
+        { type: 'wall_corner_l', name: '90° L-Köşe Üst Dolabı', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '90° L köşe üst asma (Tek Raflı)' },
+        { type: 'wall_corner_v', name: 'V-Köşe (45° Diyagonal) Üst Dolap', category: 'wall', w: 650, d: 650, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: '45° pahlı diyagonal köşe üst dolabı (Tek Raflı)' },
+        { type: 'wall_corner_straight', name: 'Düz Kör Köşe Üst Dolap', category: 'wall', w: 650, d: 350, h: 720, drawers: 0, hinges: 2, icon: '📐', desc: 'Düz kör köşe üst dolap (Tek Raflı)' }
+      ]
+    },
+    {
+      groupKey: 'wall_open',
+      category: 'wall',
+      title: 'Açık Raflı Asma Modüller',
+      icon: '📚',
+      open: true,
+      items: [
+        { type: 'wall_open_shelf', name: 'Açık Raflı Üst Modül (Kapaksız)', category: 'wall', w: 400, d: 350, h: 720, isOpenShelf: true, shelfCount: 2, drawers: 0, hinges: 0, icon: '📚', desc: '1-3 ayarlı raflı açık üst modül' }
+      ]
+    },
+
+    // 3. TALL MODULE SUB-ACCORDIONS
+    {
+      groupKey: 'tall_cooling',
+      category: 'tall',
+      title: 'Buzdolabı Kabinleri',
+      icon: '🧊',
+      open: true,
+      items: [
+        { type: 'tall_fridge', name: 'No-Frost Buzdolabı Kabini', category: 'tall', w: 700, d: 600, h: 2100, drawers: 0, hinges: 2, icon: '🧊', desc: 'Buzdolabı üstü kiler dolabı' }
+      ]
+    },
+    {
+      groupKey: 'tall_pantry',
+      category: 'tall',
+      title: 'Boy Kiler & Fırın Üniteleri',
+      icon: '🚪',
+      open: true,
+      items: [
         { type: 'tall_oven_pantry', name: 'Ankastre Fırın & Mikrodalga Boy', category: 'tall', w: 600, d: 600, h: 2100, drawers: 2, hinges: 2, icon: '♨️', desc: 'Göz hizası fırın boy ünitesi' },
         { type: 'tall_pantry_2d', name: '2 Kapaklı Erzak Boy Kileri', category: 'tall', w: 600, d: 600, h: 2100, drawers: 0, hinges: 4, icon: '🚪', desc: '5 raflı tam boy kiler' }
       ]
     },
+
+    // 4. APPLIANCE SUB-ACCORDIONS
     {
-      groupKey: 'appliance',
-      title: 'Ankastre Cihazlar (Appliances)',
-      icon: '🔌',
-      open: false,
+      groupKey: 'app_cooking',
+      category: 'appliance',
+      title: 'Pişirme & Havalandırma Cihazları',
+      icon: '♨️',
+      open: true,
       items: [
-        { type: 'app_fridge', name: 'Kombi No-Frost Buzdolabı', category: 'tall', w: 700, d: 600, h: 1850, icon: '🧊', desc: 'A++ Inox çift kapılı' },
-        { type: 'app_oven', name: 'Multifonksiyonel Ankastre Fırın', category: 'base', w: 600, d: 600, h: 600, icon: '♨️', desc: 'Dijital programlı siyah cam' },
-        { type: 'app_sink', name: 'Paslanmaz Çelik Eviye & Batarya', category: 'base', w: 860, d: 500, h: 200, icon: '💧', desc: 'Krom spiral bataryalı' }
+        { type: 'app_oven', name: 'Multifonksiyonel Ankastre Fırın', category: 'base', w: 600, d: 600, h: 600, icon: '♨️', desc: 'Dijital programlı siyah cam' }
+      ]
+    },
+    {
+      groupKey: 'app_wet',
+      category: 'appliance',
+      title: 'Yıkama & Eviye Sistemleri',
+      icon: '💧',
+      open: true,
+      items: [
+        { type: 'app_sink', name: 'Paslanmaz Çelik Eviye & Kuğu Batarya', category: 'base', w: 860, d: 500, h: 200, icon: '💧', desc: 'Krom kuğu bataryalı tek göz Inox' }
+      ]
+    },
+    {
+      groupKey: 'app_cooling',
+      category: 'appliance',
+      title: 'Soğutma Cihazları',
+      icon: '🧊',
+      open: true,
+      items: [
+        { type: 'app_fridge', name: 'Kombi No-Frost Buzdolabı', category: 'tall', w: 700, d: 600, h: 1850, icon: '🧊', desc: 'A++ Inox çift kapılı buzdolabı' }
       ]
     }
   ],
@@ -666,11 +776,13 @@ async function loadCategoryModules(catKey) {
   updateCatalogDimensionPills();
 }
 
-function renderCatalogModulesDOM(groups) {
+function renderCatalogModulesDOM(groups, appendOnly = false) {
   const container = document.getElementById('studio-module-catalog');
   if (!container) return;
 
-  container.innerHTML = '';
+  if (!appendOnly) {
+    container.innerHTML = '';
+  }
   const cap = getWallCapacity(window.CURRENT_ACTIVE_WALL || 'back');
 
   groups.forEach((grp) => {
@@ -727,6 +839,7 @@ function renderModuleCardInner(m, remSpace) {
   const remCm = Math.floor(remSpace / 10);
   const widths = m.allowed_widths || [m.w || 600];
   const curW = m.selected_w || m.w || widths[0];
+  const curH = (m.category === 'wall') ? (window.getActiveStudioWallHeight ? window.getActiveStudioWallHeight() : (m.h || 720)) : (m.h || 720);
 
   let pillsHtml = '';
   widths.forEach(w => {
@@ -774,11 +887,11 @@ function renderModuleCardInner(m, remSpace) {
         <span class="drag-grip-icon" title="Tutup Tuvale Sürükleyin">⋮⋮</span>
         <span style="font-size:1.3rem;">${m.icon}</span>
         <div class="module-info">
-          <h4 style="font-size:0.85rem; color:#fff; margin:0;">${m.name}</h4>
-          <span style="font-size:0.75rem; color:#94a3b8;">D: ${m.d}mm | Y: ${m.h}mm</span>
+          <h4 style="font-size:0.85rem; color:#0f172a; font-weight:700; margin:0;">${m.name}</h4>
+          <span style="font-size:0.75rem; color:#64748b;" id="dim-txt-${m.type}">D: ${m.d}mm | Y: ${curH}mm</span>
         </div>
       </div>
-      <button class="btn btn-outline btn-sm" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="event.stopPropagation(); addModuleToDesign(getModuleTemplate('${m.type}'))">
+      <button class="btn btn-primary btn-sm" style="padding:0.3rem 0.75rem; font-size:0.75rem; font-weight:700; border-radius:6px; background:#0284c7; color:#ffffff;" onclick="event.stopPropagation(); addModuleToDesign(getModuleTemplate('${m.type}'))">
         ➕ Ekle
       </button>
     </div>
@@ -1170,14 +1283,14 @@ window.toggleBacksplashTone = function() {
 // FLYOUT MODULE CATALOG & RAIL CONTROLLER (PLANNER 5D / HOMESTYLER STYLE)
 window.CURRENT_FLYOUT_KEY = 'base';
 
+window.getActiveStudioWallHeight = function() {
+  const wallMod = window.CURRENT_DESIGN?.modules?.find(m => m.category === 'wall');
+  return wallMod?.h || 720;
+};
+
 window.toggleCatalogFlyout = function(catKey) {
   const drawer = document.getElementById('studio-flyout-drawer');
   if (!drawer) return;
-
-  if (catKey === 'materials') {
-    toggleRightDrawer(true);
-    return;
-  }
 
   // If already open and same category clicked, close it
   if (drawer.classList.contains('open') && window.CURRENT_FLYOUT_KEY === catKey) {
@@ -1192,6 +1305,26 @@ window.toggleCatalogFlyout = function(catKey) {
   document.querySelectorAll('.studio-slim-rail .rail-btn').forEach(b => b.classList.remove('active'));
   const activeBtn = document.getElementById(`rail-btn-${catKey}`);
   if (activeBtn) activeBtn.classList.add('active');
+
+  const searchWrap = document.querySelector('.flyout-search-wrap');
+
+  // SPECIAL CATEGORY: MATERIALS & FINISHES (IN LEFT FLYOUT DRAWER)
+  if (catKey === 'materials') {
+    if (searchWrap) searchWrap.style.display = 'none';
+    const titleElem = document.getElementById('flyout-title');
+    const iconElem = document.getElementById('flyout-icon');
+    if (titleElem) titleElem.textContent = 'Malzeme & Renkler';
+    if (iconElem) iconElem.textContent = '🎨';
+    renderFlyoutMaterials();
+
+    setTimeout(() => {
+      if (canvas3D) canvas3D.onWindowResize();
+      if (canvas2D) renderActiveCanvas();
+    }, 260);
+    return;
+  }
+
+  if (searchWrap) searchWrap.style.display = 'block';
 
   // Update Header Title & Icon
   const titles = {
@@ -1249,17 +1382,85 @@ window.filterFlyoutModules = function(keyword) {
 };
 
 function renderFlyoutCategory(catKey) {
+  const container = document.getElementById('studio-module-catalog');
+  if (!container) return;
+
+  if (catKey === 'materials') {
+    renderFlyoutMaterials();
+    return;
+  }
+
   const allGroups = window.CURRENT_CATALOG_GROUPS || ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
-  const filtered = allGroups.filter(g => g.groupKey === catKey || (catKey === 'appliance' && g.groupKey === 'appliance'));
+
+  // Filter groups for this specific category
+  const filtered = allGroups.filter(g =>
+    g.category === catKey ||
+    g.groupKey === catKey ||
+    g.groupKey.startsWith(catKey + '_') ||
+    (catKey === 'appliance' && (g.category === 'appliance' || g.groupKey.startsWith('app_')))
+  );
+
   const mapped = (filtered.length > 0 ? filtered : allGroups).map(g => ({ ...g, open: true }));
-  renderCatalogModulesDOM(mapped);
+
+  container.innerHTML = '';
+
+  // 1. IF WALL: PREPEND UPPER CABINET HEIGHT SELECTOR AT VERY TOP
+  if (catKey === 'wall') {
+    const curH = getActiveStudioWallHeight();
+    const widget = document.createElement('div');
+    widget.className = 'flyout-wall-height-widget';
+    widget.id = 'flyout-wall-height-widget';
+    widget.innerHTML = `
+      <div class="fwh-header">
+        <div class="fwh-title"><span>📏</span> Üst Dolap Net Yüksekliği</div>
+        <span class="fwh-badge" id="fwh-active-badge">${Math.round(curH / 10)} cm</span>
+      </div>
+      <div class="fwh-btn-group">
+        <button type="button" class="fwh-btn ${curH === 720 ? 'active' : ''}" id="fwh-btn-720" onclick="setStudioWallHeight(720)">
+          <strong>70 cm</strong>
+          <small>Standart (1 Raf)</small>
+        </button>
+        <button type="button" class="fwh-btn ${curH === 800 ? 'active' : ''}" id="fwh-btn-800" onclick="setStudioWallHeight(800)">
+          <strong>80 cm</strong>
+          <small>Geniş (1 Raf)</small>
+        </button>
+        <button type="button" class="fwh-btn ${curH === 900 ? 'active' : ''}" id="fwh-btn-900" onclick="setStudioWallHeight(900)">
+          <strong>90 cm</strong>
+          <small>Tavana (2 Raf)</small>
+        </button>
+      </div>
+    `;
+    container.appendChild(widget);
+  }
+
+  // 2. SMART GAP FILLER ASSISTANT BANNER (SEÇENEK B)
+  const cap = getWallCapacity(window.CURRENT_ACTIVE_WALL || 'back');
+  const remSpace = (catKey === 'wall') ? cap.wallRemaining : cap.baseRemaining;
+  if (remSpace >= 250) {
+    const gapPill = document.createElement('div');
+    gapPill.style.cssText = 'background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;';
+    gapPill.innerHTML = `
+      <div>
+        <strong style="font-size:11px; color:#166534; display:block;">✨ Kalan Boşluk: ${Math.round(remSpace / 10)} cm</strong>
+        <span style="font-size:10px; color:#15803d;">${window.CURRENT_ACTIVE_WALL === 'left' ? 'Sol Duvar' : 'Arka Duvar'}</span>
+      </div>
+      <button class="smart-gap-pill-btn" onclick="autoFillActiveWallGap('${window.CURRENT_ACTIVE_WALL || 'back'}', '${catKey}')" title="Kalan boşluğu otomatik standart modülle doldur">
+        Tamamla ⚡
+      </button>
+    `;
+    container.appendChild(gapPill);
+  }
+
+  // 3. RENDER SUB-ACCORDION GROUPS
+  renderCatalogModulesDOM(mapped, true);
+  updateCatalogDimensionPills();
 }
 
 function renderFlyoutFiltered(keyword) {
   const allGroups = window.CURRENT_CATALOG_GROUPS || ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
   if (!keyword) {
     const mapped = allGroups.map(g => ({ ...g, open: true }));
-    renderCatalogModulesDOM(mapped);
+    renderCatalogModulesDOM(mapped, false);
     return;
   }
   const filtered = [];
@@ -1273,8 +1474,192 @@ function renderFlyoutFiltered(keyword) {
       filtered.push({ ...grp, open: true, items: matchingItems });
     }
   });
-  renderCatalogModulesDOM(filtered);
+  renderCatalogModulesDOM(filtered, false);
 }
+
+// SMART GAP FILLER ASSISTANT (SEÇENEK B)
+window.autoFillActiveWallGap = function(targetWall, targetCat) {
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlidir. Değişiklik yapılamaz.", "error");
+    return;
+  }
+  const wall = targetWall || window.CURRENT_ACTIVE_WALL || 'back';
+  const cap = getWallCapacity(wall);
+  const isUpper = (targetCat === 'wall');
+  const rem = isUpper ? cap.wallRemaining : cap.baseRemaining;
+
+  if (rem < 250) {
+    showToast(`ℹ️ ${wall === 'left' ? 'Sol Duvar' : 'Arka Duvar'} zaten tam dolu (Kalan: ${Math.round(rem / 10)} cm).`, 'info');
+    return;
+  }
+
+  // Pick ideal matching module & standard width
+  let templateType = isUpper ? 'wall_double' : 'base_double';
+  let chosenW = 600;
+
+  if (rem >= 900) {
+    chosenW = 900;
+  } else if (rem >= 800) {
+    chosenW = 800;
+  } else if (rem >= 600) {
+    chosenW = 600;
+  } else if (rem >= 500) {
+    templateType = isUpper ? 'wall_single' : 'base_standard';
+    chosenW = 500;
+  } else if (rem >= 450) {
+    templateType = isUpper ? 'wall_single' : 'base_standard';
+    chosenW = 450;
+  } else if (rem >= 400) {
+    templateType = isUpper ? 'wall_single' : 'base_standard';
+    chosenW = 400;
+  } else if (rem >= 300) {
+    templateType = isUpper ? 'wall_single' : 'base_standard';
+    chosenW = 300;
+  } else {
+    templateType = isUpper ? 'wall_single' : 'base_standard';
+    chosenW = rem;
+  }
+
+  const tmpl = getModuleTemplate(templateType);
+  if (tmpl) {
+    const clone = JSON.parse(JSON.stringify(tmpl));
+    clone.selected_w = chosenW;
+    clone.w = chosenW;
+    if (isUpper) {
+      clone.h = getActiveStudioWallHeight();
+      clone.shelves = (clone.h >= 900) ? 2 : 1;
+      clone.shelfCount = clone.shelves;
+    }
+    addModuleToDesign(clone, null, wall);
+    showToast(`✨ ${Math.round(chosenW / 10)} cm modül ile kalan boşluk milimetrik tamamlandı!`, 'success');
+  }
+};
+
+// RENDER MATERIALS & FINISHES IN THE LEFT FLYOUT DRAWER (NORDIC LIGHT THEME)
+function renderFlyoutMaterials() {
+  const container = document.getElementById('studio-module-catalog');
+  if (!container) return;
+
+  const mats = window.CURRENT_DESIGN?.materials || {
+    body_material: 'mdf_18mm_standart',
+    door_material: 'mdf_18mm_highgloss',
+    countertop_material: 'tezgah_cimstone'
+  };
+
+  container.innerHTML = `
+    <div class="flyout-materials-view">
+      <!-- 1. Gövde Malzemesi -->
+      <div class="flyout-mat-card">
+        <div class="flyout-mat-title">
+          <span>🪵</span> Gövde Malzemesi (18mm E1)
+        </div>
+        <select class="flyout-mat-select" id="flyout-mat-body" onchange="updateStudioMaterial('body_material', this.value)">
+          <option value="mdf_18mm_standart" ${mats.body_material === 'mdf_18mm_standart' ? 'selected' : ''}>18mm MDFlam Standart (Kaşmir Gri)</option>
+          <option value="mdf_18mm_highgloss" ${mats.body_material === 'mdf_18mm_highgloss' ? 'selected' : ''}>18mm MDFlam Beyaz Meşe</option>
+          <option value="mdf_18mm_antrasit" ${mats.body_material === 'mdf_18mm_antrasit' ? 'selected' : ''}>18mm Mat Füme / Antrasit</option>
+        </select>
+        <div class="flyout-mat-chips">
+          <div class="flyout-mat-chip ${mats.body_material==='mdf_18mm_standart'?'active':''}" onclick="setStudioMaterialPreset('body_material', 'mdf_18mm_standart')">
+            <span class="flyout-mat-swatch" style="background:#cbd5e1;"></span> Kaşmir Gri
+          </div>
+          <div class="flyout-mat-chip ${mats.body_material==='mdf_18mm_highgloss'?'active':''}" onclick="setStudioMaterialPreset('body_material', 'mdf_18mm_highgloss')">
+            <span class="flyout-mat-swatch" style="background:#f1f5f9;"></span> Beyaz Meşe
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Kapak Malzemesi & Finish -->
+      <div class="flyout-mat-card">
+        <div class="flyout-mat-title">
+          <span>🚪</span> Kapak Malzemesi & Yüzey Finish
+        </div>
+        <select class="flyout-mat-select" id="flyout-mat-door" onchange="updateStudioMaterial('door_material', this.value)">
+          <option value="mdf_18mm_highgloss" ${mats.door_material === 'mdf_18mm_highgloss' ? 'selected' : ''}>18mm High-Gloss Akrilik Parlak Beyaz</option>
+          <option value="mdf_18mm_lake" ${mats.door_material === 'mdf_18mm_lake' ? 'selected' : ''}>18mm İpek Mat Lake Boya (Özel İmalat)</option>
+          <option value="mdf_18mm_standart" ${mats.door_material === 'mdf_18mm_standart' ? 'selected' : ''}>18mm Mat Antrasit MDFlam</option>
+          <option value="mdf_18mm_wood" ${mats.door_material === 'mdf_18mm_wood' ? 'selected' : ''}>18mm Doğal Meşe Ahşap</option>
+        </select>
+        <div class="flyout-mat-chips">
+          <div class="flyout-mat-chip ${mats.door_material==='mdf_18mm_highgloss'?'active':''}" onclick="setStudioMaterialPreset('door_material', 'mdf_18mm_highgloss')">
+            <span class="flyout-mat-swatch" style="background:#ffffff; border:1px solid #cbd5e1;"></span> Akrilik Beyaz
+          </div>
+          <div class="flyout-mat-chip ${mats.door_material==='mdf_18mm_lake'?'active':''}" onclick="setStudioMaterialPreset('door_material', 'mdf_18mm_lake')">
+            <span class="flyout-mat-swatch" style="background:#64748b;"></span> Mat Lake
+          </div>
+          <div class="flyout-mat-chip ${mats.door_material==='mdf_18mm_standart'?'active':''}" onclick="setStudioMaterialPreset('door_material', 'mdf_18mm_standart')">
+            <span class="flyout-mat-swatch" style="background:#1e293b;"></span> Antrasit
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Tezgah Malzemesi -->
+      <div class="flyout-mat-card">
+        <div class="flyout-mat-title">
+          <span>🔪</span> Tezgah Çözümü
+        </div>
+        <select class="flyout-mat-select" id="flyout-mat-countertop" onchange="updateStudioMaterial('countertop_material', this.value)">
+          <option value="tezgah_cimstone" ${mats.countertop_material === 'tezgah_cimstone' ? 'selected' : ''}>Çimstone Calacatta Kuvars Tezgah</option>
+          <option value="tezgah_granit" ${mats.countertop_material === 'tezgah_granit' ? 'selected' : ''}>Doğal Granit Tezgah (Siyah)</option>
+          <option value="tezgah_porselen" ${mats.countertop_material === 'tezgah_porselen' ? 'selected' : ''}>Ultra Kompakt Porselen Tezgah</option>
+          <option value="tezgah_masif" ${mats.countertop_material === 'tezgah_masif' ? 'selected' : ''}>Masif Meşe Yağlı Ahşap Tezgah</option>
+          <option value="tezgah_laminat" ${mats.countertop_material === 'tezgah_laminat' ? 'selected' : ''}>Postforming Laminat Tezgah</option>
+        </select>
+        <div class="flyout-mat-chips">
+          <div class="flyout-mat-chip ${mats.countertop_material==='tezgah_cimstone'?'active':''}" onclick="setStudioMaterialPreset('countertop_material', 'tezgah_cimstone')">
+            <span class="flyout-mat-swatch" style="background:#f8fafc; border:1px solid #cbd5e1;"></span> Calacatta Kuvars
+          </div>
+          <div class="flyout-mat-chip ${mats.countertop_material==='tezgah_granit'?'active':''}" onclick="setStudioMaterialPreset('countertop_material', 'tezgah_granit')">
+            <span class="flyout-mat-swatch" style="background:#0f172a;"></span> Siyah Granit
+          </div>
+          <div class="flyout-mat-chip ${mats.countertop_material==='tezgah_porselen'?'active':''}" onclick="setStudioMaterialPreset('countertop_material', 'tezgah_porselen')">
+            <span class="flyout-mat-swatch" style="background:#e2e8f0;"></span> Porselen
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Tezgah Arası Seramik & Işık -->
+      <div class="flyout-mat-card" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="flyout-mat-title" style="margin-bottom:2px;"><span>💡</span> Tezgah Arası Işık / Ton</div>
+          <span style="font-size:10px; color:#64748b;">Açık Porselen Seramik ↔ Koyu Taş</span>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="toggleBacksplashTone()" style="font-size:11px; padding:5px 12px; border-radius:999px; background:#f8fafc; font-weight:700;">
+          Tonu Değiştir 🔄
+        </button>
+      </div>
+
+      <!-- 5. Fabrika Güvence Notu -->
+      <div class="flyout-mat-note">
+        🔒 <strong>1. Sınıf Fabrika İmalatı:</strong> AGT E1 Normu MDFlam, Blum / Samet frenli raylar ve Çimstone tezgah. Dinamik fiyat teklifiniz randevuda detaylandırılır.
+      </div>
+
+      <!-- 6. Kaydet & Randevu Al Butonu -->
+      <button class="flyout-mat-cta-btn" onclick="openSubmitQuoteModal()">
+        <span>📅</span> Tasarımı Kaydet & Randevu Al
+      </button>
+    </div>
+  `;
+}
+
+window.updateStudioMaterial = function(key, val) {
+  if (!window.CURRENT_DESIGN.materials) window.CURRENT_DESIGN.materials = {};
+  window.CURRENT_DESIGN.materials[key] = val;
+
+  const altElem = document.getElementById(`mat-${key.replace('_material', '')}`);
+  if (altElem) altElem.value = val;
+
+  if (canvas3D) {
+    canvas3D.render(window.CURRENT_DESIGN.room_config, window.CURRENT_DESIGN.modules, window.CURRENT_DESIGN.layout_type, window.CURRENT_DESIGN.materials);
+  }
+  showToast(`🎨 Malzeme güncellendi.`, 'info');
+};
+
+window.setStudioMaterialPreset = function(key, val) {
+  updateStudioMaterial(key, val);
+  const selectElem = document.getElementById(`flyout-mat-${key.replace('_material', '')}`);
+  if (selectElem) selectElem.value = val;
+  renderFlyoutMaterials();
+};
 
 // STUDIO UNDO / REDO HISTORY CONTROLLER
 window.STUDIO_UNDO_STACK = [];
@@ -1655,6 +2040,18 @@ window.setStudioWallHeight = function(h) {
   if (typeof updateCostSummary === 'function') updateCostSummary();
   const label = heightVal === 720 ? '70 cm' : (heightVal === 800 ? '80 cm' : '90 cm');
   showToast(`📏 Üst dolap yüksekliği ${label} olarak güncellendi (${heightVal >= 900 ? '2 raf / 3 bölme' : '1 raf / 2 bölme'}).`, 'info');
+
+  // Update Flyout Widget Active Button & Badge
+  const badge = document.getElementById('fwh-active-badge');
+  if (badge) badge.textContent = `${Math.round(heightVal / 10)} cm`;
+  document.querySelectorAll('.fwh-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`fwh-btn-${heightVal}`)?.classList.add('active');
+
+  // Update Y height label on all wall module cards in catalog
+  document.querySelectorAll('[id^="dim-txt-wall_"]').forEach(el => {
+    const parts = el.textContent.split('|');
+    el.textContent = `${parts[0] || 'D: 350mm'} | Y: ${heightVal}mm`;
+  });
 };
 
 window.runAutoKitchenGenerator = function() {

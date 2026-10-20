@@ -905,7 +905,8 @@
           <!-- 3. Floating Bottom Notice Toasts -->
           <div id="studio-wizard-notice-banner" class="floating-studio-toast" style="display:none;">
             <span style="font-size:1.2rem;">✨</span>
-            <span><strong>Mutfak Taslak Öneriniz Hazırlandı!</strong> Modülleri tuvalde serbestçe taşıyabilir, silebilir veya sol menüden yenilerini ekleyebilirsiniz.</span>
+            <span><strong>Mutfak Taslak Öneriniz Hazırlandı!</strong> Modülleri tuvalde serbestçe taşıyabilir, boşlukları tek tıkla doldurabilirsiniz.</span>
+            <button class="smart-gap-pill-btn" onclick="autoFillActiveWallGap(window.CURRENT_ACTIVE_WALL, 'base')" style="margin-left:8px;">✨ Boşluğu Doldur</button>
             <button onclick="document.getElementById('studio-wizard-notice-banner').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:1.1rem; cursor:pointer; padding:0 6px; margin-left:auto;">✕</button>
           </div>
 
@@ -944,6 +945,7 @@
                 </div>
                 <button class="fmt-btn" onclick="shiftSelectedModule(-100)" title="100mm Sola Kaydır">◀ Sola</button>
                 <button class="fmt-btn" onclick="shiftSelectedModule(100)" title="100mm Sağa Kaydır">▶ Sağa</button>
+                <button class="fmt-btn" onclick="autoFillActiveWallGap(window.CURRENT_ACTIVE_WALL, 'base')" title="Kalan boşluğu otomatik doldur">✨ Boşluğu Doldur</button>
                 <button class="fmt-btn" onclick="toggleSelectedModuleWall()" title="Diğer Duvara Taşı (Arka ↔ Sol)">🧱 Duvar Değiştir</button>
                 <button class="fmt-btn fmt-btn-danger" onclick="deleteSelectedModule()" title="Modülü Sil">🗑️ Sil</button>
                 <button class="fmt-btn fmt-btn-close" onclick="deselectModule()" title="Seçimi Kapat">✕</button>
