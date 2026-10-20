@@ -47,11 +47,12 @@ const ADEKO_MODULE_GROUPS = {
     {
       groupKey: 'base_drawer',
       category: 'base',
-      title: 'Çekmeceli Alt Dolaplar',
+      title: 'Çekmeceli & Raylı Alt Dolaplar',
       icon: '🗄️',
       open: true,
       items: [
-        { type: 'base_drawer_3', name: '3 Çekmeceli Alt Dolap', category: 'base', w: 600, d: 600, h: 720, drawers: 3, hinges: 0, icon: '🗄️', desc: 'Frenli tandem raylı 3 çekmece' }
+        { type: 'base_drawer_3', name: '3 Çekmeceli Alt Dolap', category: 'base', w: 600, d: 600, h: 720, drawers: 3, hinges: 0, icon: '🗄️', desc: 'Frenli tandem raylı 3 çekmece' },
+        { type: 'base_bottle_pullout', name: 'Raylı Dar Şişelik / Yağdanlık', category: 'base', w: 200, d: 600, h: 720, drawers: 1, hinges: 0, allowed_widths: [150, 200, 250], icon: '🍾', desc: 'Frenli raylı 2 katlı paslanmaz tel şişelik' }
       ]
     },
     {
@@ -174,8 +175,8 @@ const ADEKO_MODULE_GROUPS = {
       icon: '🚪',
       open: true,
       items: [
-        { type: 'tall_oven_pantry', name: 'Ankastre Fırın & Mikrodalga Boy', category: 'tall', w: 600, d: 600, h: 2100, drawers: 2, hinges: 2, icon: '♨️', desc: 'Göz hizası fırın boy ünitesi' },
-        { type: 'tall_pantry_2d', name: '2 Kapaklı Erzak Boy Kileri', category: 'tall', w: 600, d: 600, h: 2100, drawers: 0, hinges: 4, icon: '🚪', desc: '5 raflı tam boy kiler' }
+        { type: 'tall_oven_microwave', name: 'Ankastre Fırın & Mikrodalga Boy Kileri', category: 'tall', w: 600, d: 600, h: 2100, drawers: 2, hinges: 2, allowed_widths: [600], icon: '♨️', desc: 'Göz hizası fırın + mikrodalga ve alt/üst depolama kileri' },
+        { type: 'tall_pantry_2d', name: '2 Kapaklı Erzak Boy Kileri', category: 'tall', w: 600, d: 600, h: 2100, drawers: 0, hinges: 4, allowed_widths: [450, 600], icon: '🚪', desc: '5 raflı tam boy kiler' }
       ]
     },
 
@@ -758,13 +759,14 @@ async function loadCategoryModules(catKey) {
         if (m.type === 'base_standard' || m.type === 'wall_single') m.allowed_widths = [300, 400, 450, 500, 600];
         else if (m.type === 'base_double' || m.type === 'wall_double') m.allowed_widths = [600, 800, 900, 1000];
         else if (m.type === 'base_drawer_3') m.allowed_widths = [400, 450, 600, 800, 900];
+        else if (m.type === 'base_bottle_pullout') m.allowed_widths = [150, 200, 250];
         else if (m.type === 'base_sink' || m.type === 'wall_glass') m.allowed_widths = [600, 800, 900, 1000];
         else if (m.type === 'wall_hood' || m.type === 'wall_hood_chimney') m.allowed_widths = [600, 900];
-        else if (m.type === 'tall_pantry_2d') m.allowed_widths = [450, 600];
+        else if (m.type === 'tall_pantry_2d' || m.type === 'tall_oven_microwave') m.allowed_widths = [450, 600];
         else m.allowed_widths = [m.w || 600];
       }
       if (m.allow_custom_width === undefined) {
-        m.allow_custom_width = !['base_drawer_3', 'base_oven', 'base_dishwasher', 'wall_hood', 'wall_hood_chimney'].includes(m.type);
+        m.allow_custom_width = !['base_drawer_3', 'base_bottle_pullout', 'base_oven', 'base_dishwasher', 'wall_hood', 'wall_hood_chimney', 'tall_oven_microwave'].includes(m.type);
       }
       m.selected_w = m.selected_w || m.w || m.allowed_widths[0];
       m.w = m.selected_w;

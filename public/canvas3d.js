@@ -1147,6 +1147,12 @@ class StudioCanvas3D {
               group.add(hSingle);
             }
 
+          } else if (mod.type === 'base_bottle_pullout') {
+            // Narrow pullout wire basket / bottle rack (15cm / 20cm / 25cm)
+            const handleMesh = this.createHandle3D(Math.min(mw - 40, 80), 10, true);
+            handleMesh.position.set(0, plinthH + bodyH - 70, md + 10);
+            group.add(handleMesh);
+
           } else if (mod.drawers > 0) {
             const dh = bodyH / mod.drawers;
             for (let i = 0; i < mod.drawers; i++) {
@@ -1419,6 +1425,45 @@ class StudioCanvas3D {
         const h2 = this.createHandle3D(8, 120, false);
         h2.position.set(mw / 2 - 25, tallH * 0.4 - 90, md + 10);
         group.add(h2);
+      } else if (mod.type?.includes('oven') || mod.type?.includes('microwave')) {
+        // High-End Built-in Oven & Microwave Appliance Tower
+        // 1. Lower cabinet bottom unit (plinth to 820mm)
+        const bottomSeam = new THREE.Mesh(new THREE.BoxGeometry(mw - 10, 2, 4), this.matCache.plinthAlu);
+        bottomSeam.position.set(0, 820, md + 1);
+        group.add(bottomSeam);
+
+        const hBottom = this.createHandle3D(Math.min(mw * 0.45, 140), 12, true);
+        hBottom.position.set(0, 460, md + 10);
+        group.add(hBottom);
+
+        // 2. Built-in Oven Unit (820 to 1410mm, Height: 590mm)
+        const ovenGeo = new THREE.BoxGeometry(mw - 20, 580, 16);
+        const ovenMesh = new THREE.Mesh(ovenGeo, this.matCache.ovenGlass);
+        ovenMesh.position.set(0, 1110, md + 8);
+        group.add(ovenMesh);
+
+        const ovenHandle = this.createHandle3D(mw - 120, 14, true);
+        ovenHandle.position.set(0, 1360, md + 24);
+        group.add(ovenHandle);
+
+        // 3. Built-in Microwave Unit (1410 to 1790mm, Height: 370mm)
+        const mwGeo = new THREE.BoxGeometry(mw - 20, 360, 16);
+        const mwMesh = new THREE.Mesh(mwGeo, this.matCache.ovenGlass);
+        mwMesh.position.set(0, 1595, md + 8);
+        group.add(mwMesh);
+
+        const mwHandle = this.createHandle3D(mw - 160, 12, true);
+        mwHandle.position.set(0, 1735, md + 22);
+        group.add(mwHandle);
+
+        // 4. Top Lift-up / Storage Cabinet (1790 to 2100mm)
+        const topSeam = new THREE.Mesh(new THREE.BoxGeometry(mw - 10, 2, 4), this.matCache.plinthAlu);
+        topSeam.position.set(0, 1790, md + 1);
+        group.add(topSeam);
+
+        const hTop = this.createHandle3D(Math.min(mw * 0.45, 120), 10, true);
+        hTop.position.set(0, 1840, md + 10);
+        group.add(hTop);
       } else {
         const h = this.createHandle3D(10, 240, false);
         h.position.set(mw / 2 - 25, tallH / 2, md + 10);
