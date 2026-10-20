@@ -791,11 +791,12 @@ body {
   box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
 }
 
-/* Interactive 3D Onboarding Guide Card (Bottom Left) */
+/* Interactive 3D Onboarding Guide Card (Bottom Right) */
 .studio-onboarding-card {
   position: absolute;
   bottom: 24px;
-  left: 24px;
+  right: 24px;
+  left: auto;
   z-index: 35;
   width: 290px;
   background: rgba(255, 255, 255, 0.96);
