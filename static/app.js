@@ -788,624 +788,293 @@ window.handleCustomWidthChange = function(type, valCm) {
   }
 };
 
-// Visual SVG Illustration Generator for 2026 Modular Kitchen Catalog
+// 2026 Architectural Schematic Line Icons (High Contrast, Bold, Instantly Recognizable)
 function getModuleVisualSVG(type, name) {
-  // Shared isometric defs for gradients and shadow filter
-  const defs = `<defs>
-    <linearGradient id="isoTop" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#e8eef4"/>
-    </linearGradient>
-    <linearGradient id="isoFront" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#f0f4f8"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <linearGradient id="isoSide" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#dce4ec"/>
-      <stop offset="100%" stop-color="#cbd5e1"/>
-    </linearGradient>
-    <linearGradient id="isoCounter" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#a0aec0"/>
-      <stop offset="100%" stop-color="#94a3b8"/>
-    </linearGradient>
-    <linearGradient id="isoDark" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1e293b"/>
-      <stop offset="100%" stop-color="#0f172a"/>
-    </linearGradient>
-    <linearGradient id="isoGlass" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.7"/>
-      <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.4"/>
-    </linearGradient>
-    <linearGradient id="isoFridge" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#f1f5f9"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <filter id="isoShadow" x="-10%" y="-10%" width="130%" height="140%">
-      <feDropShadow dx="1.5" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.1"/>
-    </filter>
-    <filter id="isoShadowSm" x="-10%" y="-10%" width="130%" height="140%">
-      <feDropShadow dx="0.8" dy="1" stdDeviation="0.8" flood-color="#000000" flood-opacity="0.08"/>
-    </filter>
-  </defs>`;
+  const line = "#0f172a";
+  const handle = "#0284c7"; // Akıllı mavi kulp vurgusu
+  const counter = "#e2e8f0";
+  const plinth = "#334155";
+  const fill = "#ffffff";
 
   // 1. BASE MODULES
-  if (type === 'base_drawer_3') {
+  if (type === "base_drawer_3") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="14" y="53" width="50" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey (sağ) -->
-        <polygon points="64,13 70,10 70,53 64,56" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey (gövde) -->
-        <rect x="14" y="13" width="50" height="40" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (tezgah) -->
-        <polygon points="12,13 64,13 70,10 18,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Tezgah öne bakan kenar -->
-        <line x1="12" y1="13" x2="64" y2="13" stroke="#8899a6" stroke-width="0.8"/>
-        <!-- Çekmece bölümleri -->
-        <line x1="14" y1="26" x2="64" y2="26" stroke="#b0bec5" stroke-width="0.7"/>
-        <line x1="14" y1="39" x2="64" y2="39" stroke="#b0bec5" stroke-width="0.7"/>
-        <!-- Çekmece olukları (hafif gölge çizgisi) -->
-        <line x1="16" y1="27" x2="62" y2="27" stroke="#cbd5e1" stroke-width="0.3"/>
-        <line x1="16" y1="40" x2="62" y2="40" stroke="#cbd5e1" stroke-width="0.3"/>
-        <!-- Kulplar (yatay) -->
-        <line x1="31" y1="19.5" x2="47" y2="19.5" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="31" y1="32.5" x2="47" y2="32.5" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="31" y1="46" x2="47" y2="46" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <!-- Kulp gölgeleri -->
-        <line x1="31" y1="20.5" x2="47" y2="20.5" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <line x1="31" y1="33.5" x2="47" y2="33.5" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <line x1="31" y1="47" x2="47" y2="47" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-      </g>
+      <!-- Baza -->
+      <rect x="18" y="52" width="44" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <!-- Gövde -->
+      <rect x="15" y="13" width="50" height="39" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Tezgah -->
+      <rect x="13" y="9" width="54" height="4" rx="1" fill="${counter}" stroke="${line}" stroke-width="1.8"/>
+      <!-- Çekmece Çizgileri -->
+      <line x1="15" y1="26" x2="65" y2="26" stroke="${line}" stroke-width="1.8"/>
+      <line x1="15" y1="39" x2="65" y2="39" stroke="${line}" stroke-width="1.8"/>
+      <!-- Kalın Yatay Kulplar -->
+      <line x1="30" y1="19.5" x2="50" y2="19.5" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="30" y1="32.5" x2="50" y2="32.5" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="30" y1="45.5" x2="50" y2="45.5" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'base_bottle_pullout') {
+  if (type === "base_bottle_pullout") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="28" y="53" width="26" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="54,13 60,10 60,53 54,56" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey -->
-        <rect x="26" y="13" width="28" height="40" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (tezgah) -->
-        <polygon points="24" y="13" x="54" y="13" x="60" y="10" x="30" y="10"/>
-        <polygon points="24,13 54,13 60,10 30,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Dikey kulp -->
-        <line x1="30" y1="18" x2="30" y2="34" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="31" y1="18" x2="31" y2="34" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <!-- Şişe ikonları -->
-        <rect x="37" y="19" width="5" height="12" rx="2" fill="#10b981" opacity="0.8"/>
-        <rect x="37" y="16" width="5" height="4" rx="1.5" fill="#10b981" opacity="0.5"/>
-        <rect x="44" y="22" width="5" height="12" rx="2" fill="#f59e0b" opacity="0.8"/>
-        <rect x="44" y="19" width="5" height="4" rx="1.5" fill="#f59e0b" opacity="0.5"/>
-        <rect x="37" y="38" width="5" height="12" rx="2" fill="#ef4444" opacity="0.8"/>
-        <rect x="37" y="35" width="5" height="4" rx="1.5" fill="#ef4444" opacity="0.5"/>
-      </g>
+      <!-- Baza -->
+      <rect x="29" y="52" width="22" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <!-- Gövde -->
+      <rect x="27" y="13" width="26" height="39" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Tezgah -->
+      <rect x="25" y="9" width="30" height="4" rx="1" fill="${counter}" stroke="${line}" stroke-width="1.8"/>
+      <!-- Dikey Kulp -->
+      <line x1="31" y1="20" x2="31" y2="46" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <!-- 2 Şişe Şematik Sembolü -->
+      <rect x="40" y="22" width="6" height="10" rx="1.5" fill="#10b981" stroke="${line}" stroke-width="1.2"/>
+      <rect x="42" y="19" width="2" height="3" fill="#10b981"/>
+      <rect x="40" y="38" width="6" height="10" rx="1.5" fill="#f59e0b" stroke="${line}" stroke-width="1.2"/>
+      <rect x="42" y="35" width="2" height="3" fill="#f59e0b"/>
     </svg>`;
   }
 
-  if (type === 'base_standard') {
+  if (type === "base_standard") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="14" y="53" width="50" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="64,13 70,10 70,53 64,56" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey -->
-        <rect x="14" y="13" width="50" height="40" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (tezgah) -->
-        <polygon points="12,13 64,13 70,10 18,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Kapak çerçeve ince oluk -->
-        <rect x="16" y="15" width="46" height="36" rx="0.5" fill="none" stroke="#cbd5e1" stroke-width="0.4"/>
-        <!-- Dikey kulp -->
-        <line x1="58" y1="26" x2="58" y2="42" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="59" y1="26" x2="59" y2="42" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-      </g>
+      <!-- Baza -->
+      <rect x="18" y="52" width="44" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <!-- Gövde -->
+      <rect x="15" y="13" width="50" height="39" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Tezgah -->
+      <rect x="13" y="9" width="54" height="4" rx="1" fill="${counter}" stroke="${line}" stroke-width="1.8"/>
+      <!-- Sağ Dikey Kulp -->
+      <line x1="57" y1="22" x2="57" y2="44" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'base_double') {
+  if (type === "base_double") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="14" y="53" width="50" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="64,13 70,10 70,53 64,56" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey -->
-        <rect x="14" y="13" width="50" height="40" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (tezgah) -->
-        <polygon points="12,13 64,13 70,10 18,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Orta çizgi (çift kapak) -->
-        <line x1="39" y1="14" x2="39" y2="52" stroke="#b0bec5" stroke-width="0.8"/>
-        <!-- Sol kapak oluk -->
-        <rect x="16" y="15" width="21" height="36" rx="0.5" fill="none" stroke="#cbd5e1" stroke-width="0.3"/>
-        <!-- Sağ kapak oluk -->
-        <rect x="41" y="15" width="21" height="36" rx="0.5" fill="none" stroke="#cbd5e1" stroke-width="0.3"/>
-        <!-- Çift dikey kulp -->
-        <line x1="36" y1="28" x2="36" y2="40" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="42" y1="28" x2="42" y2="40" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <!-- Kulp gölge -->
-        <line x1="37" y1="28" x2="37" y2="40" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <line x1="43" y1="28" x2="43" y2="40" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-      </g>
+      <!-- Baza -->
+      <rect x="18" y="52" width="44" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <!-- Gövde -->
+      <rect x="15" y="13" width="50" height="39" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Tezgah -->
+      <rect x="13" y="9" width="54" height="4" rx="1" fill="${counter}" stroke="${line}" stroke-width="1.8"/>
+      <!-- Orta Kapak Çizgisi -->
+      <line x1="40" y1="13" x2="40" y2="52" stroke="${line}" stroke-width="1.8"/>
+      <!-- Çift Dikey Kulp -->
+      <line x1="37" y1="24" x2="37" y2="42" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="43" y1="24" x2="43" y2="42" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'base_sink') {
+  if (type === "base_sink") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="14" y="53" width="50" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="64,13 70,10 70,53 64,56" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey -->
-        <rect x="14" y="13" width="50" height="40" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (tezgah) - evye havuzlu -->
-        <polygon points="12,13 64,13 70,10 18,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Evye havuzu (tezgah üstünde) -->
-        <rect x="24" y="7" width="28" height="6" rx="2" fill="#94a3b8" stroke="#7a8a9a" stroke-width="0.6"/>
-        <rect x="27" y="8.5" width="10" height="3.5" rx="1" fill="#78909c" opacity="0.7"/>
-        <rect x="39" y="8.5" width="10" height="3.5" rx="1" fill="#78909c" opacity="0.7"/>
-        <!-- Çeşme -->
-        <path d="M38 8 Q38 2 43 2 Q46 2 46 5 L46 7" fill="none" stroke="#475569" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- Su damlası -->
-        <circle cx="46" cy="8.5" r="0.6" fill="#0284c7" opacity="0.6"/>
-        <!-- Orta çizgi (çift kapak altında) -->
-        <line x1="39" y1="14" x2="39" y2="52" stroke="#b0bec5" stroke-width="0.7"/>
-        <!-- Kulplar -->
-        <line x1="36" y1="28" x2="36" y2="40" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="42" y1="28" x2="42" y2="40" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-      </g>
+      <!-- Baza -->
+      <rect x="18" y="52" width="44" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <!-- Gövde -->
+      <rect x="15" y="13" width="50" height="39" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Tezgah -->
+      <rect x="13" y="9" width="54" height="4" rx="1" fill="${counter}" stroke="${line}" stroke-width="1.8"/>
+      <!-- Orta Çizgi & Kulplar -->
+      <line x1="40" y1="13" x2="40" y2="52" stroke="${line}" stroke-width="1.8"/>
+      <line x1="37" y1="26" x2="37" y2="42" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="43" y1="26" x2="43" y2="42" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <!-- Eviye Havuz & Çeşme -->
+      <rect x="24" y="6" width="32" height="4" rx="1.5" fill="#94a3b8" stroke="${line}" stroke-width="1.2"/>
+      <path d="M40 6 Q40 1 45 1 Q48 1 48 3.5 L48 5.5" fill="none" stroke="${handle}" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="48" cy="6" r="1.2" fill="${handle}"/>
     </svg>`;
   }
 
-  if (type === 'base_oven' || type === 'app_oven') {
+  if (type === "base_oven" || type === "app_oven") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="14" y="53" width="50" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="64,12 70,9 70,53 64,56" fill="#1a2332" stroke="#334155" stroke-width="0.4"/>
-        <!-- Ön yüzey (koyu fırın gövdesi) -->
-        <rect x="14" y="12" width="50" height="41" rx="1" fill="url(#isoDark)" stroke="#475569" stroke-width="0.8"/>
-        <!-- Üst panel (düğmeler) -->
-        <rect x="14" y="9" width="50" height="4" fill="#1e293b" stroke="#334155" stroke-width="0.3"/>
-        <polygon points="12,12 64,12 70,9 18,9" fill="#2d3a4a" stroke="#475569" stroke-width="0.4"/>
-        <!-- Kırmızı düğmeler -->
-        <circle cx="24" cy="11" r="1.8" fill="#ef4444"/>
-        <circle cx="30" cy="11" r="1.8" fill="#ef4444"/>
-        <circle cx="48" cy="11" r="1.8" fill="#ef4444"/>
-        <circle cx="54" cy="11" r="1.8" fill="#ef4444"/>
-        <!-- Düğme parlama -->
-        <circle cx="23.5" cy="10.5" r="0.5" fill="#fff" opacity="0.3"/>
-        <circle cx="29.5" cy="10.5" r="0.5" fill="#fff" opacity="0.3"/>
-        <circle cx="47.5" cy="10.5" r="0.5" fill="#fff" opacity="0.3"/>
-        <circle cx="53.5" cy="10.5" r="0.5" fill="#fff" opacity="0.3"/>
-        <!-- Fırın cam kapak -->
-        <rect x="19" y="18" width="40" height="26" rx="2" fill="#1e293b" stroke="#64748b" stroke-width="0.7"/>
-        <rect x="21" y="20" width="36" height="22" rx="1.5" fill="#263040" opacity="0.9"/>
-        <!-- Cam yansıma -->
-        <line x1="23" y1="38" x2="33" y2="22" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity="0.12"/>
-        <line x1="28" y1="40" x2="40" y2="24" stroke="#fff" stroke-width="0.6" stroke-linecap="round" opacity="0.08"/>
-        <!-- Fırın ızgaraları -->
-        <line x1="23" y1="26" x2="55" y2="26" stroke="#94a3b8" stroke-width="0.8" opacity="0.5"/>
-        <line x1="23" y1="31" x2="55" y2="31" stroke="#94a3b8" stroke-width="0.8" opacity="0.5"/>
-        <line x1="23" y1="36" x2="55" y2="36" stroke="#94a3b8" stroke-width="0.6" opacity="0.4"/>
-        <!-- Alt kulp (yatay) -->
-        <line x1="30" y1="48" x2="48" y2="48" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round"/>
-      </g>
+      <!-- Baza -->
+      <rect x="18" y="52" width="44" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <!-- Fırın Gövde Koyu -->
+      <rect x="15" y="13" width="50" height="39" rx="1.5" fill="#0f172a" stroke="${line}" stroke-width="2"/>
+      <!-- Ocak Üst Izgara Çizgisi -->
+      <rect x="13" y="9" width="54" height="4" rx="1" fill="#1e293b" stroke="${line}" stroke-width="1.8"/>
+      <circle cx="28" cy="11" r="1.5" fill="#ef4444"/>
+      <circle cx="52" cy="11" r="1.5" fill="#ef4444"/>
+      <!-- Fırın Kontrol Paneli & LED -->
+      <rect x="18" y="15" width="44" height="7" rx="1" fill="#1e293b"/>
+      <circle cx="24" cy="18.5" r="1.5" fill="#38bdf8"/>
+      <circle cx="56" cy="18.5" r="1.5" fill="#38bdf8"/>
+      <rect x="36" y="17" width="8" height="3" rx="0.5" fill="#ef4444"/>
+      <!-- Fırın Cam Kapak & Izgara -->
+      <rect x="19" y="24" width="42" height="24" rx="1.5" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
+      <line x1="24" y1="28" x2="56" y2="28" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+      <line x1="24" y1="36" x2="56" y2="36" stroke="#475569" stroke-width="1.2"/>
+      <line x1="24" y1="41" x2="56" y2="41" stroke="#475569" stroke-width="1.2"/>
     </svg>`;
   }
 
-  if (type === 'base_dishwasher') {
+  if (type === "base_dishwasher") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="14" y="53" width="50" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="64,13 70,10 70,53 64,56" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey (metalik) -->
-        <rect x="14" y="13" width="50" height="40" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (tezgah) -->
-        <polygon points="12,13 64,13 70,10 18,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Üst kontrol paneli (koyu) -->
-        <rect x="16" y="15" width="46" height="6" fill="#1e293b" rx="1"/>
-        <!-- Yeşil LED -->
-        <circle cx="21" cy="18" r="1.2" fill="#10b981"/>
-        <circle cx="21" cy="18" r="2" fill="#10b981" opacity="0.2"/>
-        <!-- Panel gösterge çizgileri -->
-        <line x1="28" y1="17" x2="34" y2="17" stroke="#64748b" stroke-width="0.6"/>
-        <line x1="28" y1="19" x2="38" y2="19" stroke="#64748b" stroke-width="0.6"/>
-        <!-- Yatay kulp -->
-        <line x1="28" y1="26" x2="50" y2="26" stroke="#475569" stroke-width="2.2" stroke-linecap="round"/>
-        <line x1="28" y1="27" x2="50" y2="27" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <!-- Metalik yüzey efekti -->
-        <line x1="16" y1="35" x2="62" y2="35" stroke="#e2e8f0" stroke-width="0.3" opacity="0.5"/>
-        <line x1="16" y1="45" x2="62" y2="45" stroke="#e2e8f0" stroke-width="0.3" opacity="0.5"/>
-        <!-- Marka plaketi -->
-        <rect x="34" y="40" width="10" height="3" rx="0.5" fill="#e2e8f0" opacity="0.5"/>
-      </g>
+      <!-- Baza -->
+      <rect x="18" y="52" width="44" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <!-- Gövde -->
+      <rect x="15" y="13" width="50" height="39" rx="1.5" fill="#f8fafc" stroke="${line}" stroke-width="2"/>
+      <!-- Tezgah -->
+      <rect x="13" y="9" width="54" height="4" rx="1" fill="${counter}" stroke="${line}" stroke-width="1.8"/>
+      <!-- Üst Kontrol Şeridi -->
+      <rect x="17" y="15" width="46" height="7" rx="1" fill="#1e293b"/>
+      <circle cx="22" cy="18.5" r="1.4" fill="#10b981"/>
+      <circle cx="27" cy="18.5" r="1" fill="#64748b"/>
+      <circle cx="31" cy="18.5" r="1" fill="#64748b"/>
+      <!-- Bulaşık Kapağı & Yatay Kulp -->
+      <line x1="17" y1="24" x2="63" y2="24" stroke="${line}" stroke-width="1.4"/>
+      <line x1="28" y1="29" x2="52" y2="29" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type && type.startsWith('base_corner')) {
+  if (type && type.startsWith("base_corner")) {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik L -->
-        <polygon points="14,52 62,52 62,46 44,46 44,56 14,56" fill="#64748b"/>
-        <!-- L gövde ön yüzey -->
-        <polygon points="14,13 62,13 62,30 44,30 44,52 14,52" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (L-şekil tezgah) -->
-        <polygon points="12,13 62,13 68,10 18,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <polygon points="62,13 62,30 68,27 68,10" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Sağ dikey yan yüzey -->
-        <polygon points="44,30 44,52 50,49 50,27" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Üst L uzantı -->
-        <polygon points="44,30 50,27 68,27 62,30" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.3"/>
-        <!-- 90° etiketi -->
-        <text x="30" y="36" font-size="9" font-weight="bold" fill="#0284c7" font-family="sans-serif">90°</text>
-        <!-- Köşe açı göstergesi -->
-        <path d="M42 32 L42 28 L38 28" fill="none" stroke="#0284c7" stroke-width="0.8" opacity="0.6"/>
-      </g>
+      <polygon points="14,10 66,10 66,30 46,30 46,50 14,50" fill="${fill}" stroke="${line}" stroke-width="2" stroke-linejoin="round"/>
+      <polygon points="16,12 64,12 64,28 44,28 44,48 16,48" fill="${counter}" opacity="0.4"/>
+      <rect x="18" y="50" width="28" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.2"/>
+      <rect x="30" y="24" width="24" height="14" rx="3" fill="#0284c7"/>
+      <text x="42" y="34.5" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">90°</text>
     </svg>`;
   }
 
-  if (type === 'base_open_shelf') {
+  if (type === "base_open_shelf") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="14" y="53" width="50" height="4" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="64,13 70,10 70,53 64,56" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey (açık raf - iç görünüm) -->
-        <rect x="14" y="13" width="50" height="40" rx="1" fill="#edf2f7" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey (tezgah) -->
-        <polygon points="12,13 64,13 70,10 18,10" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Arka duvar (hafif koyu) -->
-        <rect x="15" y="14" width="48" height="38" rx="0.5" fill="#e2e8f0" opacity="0.5"/>
-        <!-- Raf çizgileri -->
-        <line x1="15" y1="27" x2="63" y2="27" stroke="#94a3b8" stroke-width="1.2"/>
-        <line x1="15" y1="40" x2="63" y2="40" stroke="#94a3b8" stroke-width="1.2"/>
-        <!-- Raf gölgeleri -->
-        <line x1="15" y1="28" x2="63" y2="28" stroke="#000" stroke-width="0.4" opacity="0.06"/>
-        <line x1="15" y1="41" x2="63" y2="41" stroke="#000" stroke-width="0.4" opacity="0.06"/>
-        <!-- Raf üstü dekor (küçük detaylar) -->
-        <rect x="20" y="22" width="6" height="5" rx="0.5" fill="#cbd5e1" opacity="0.6"/>
-        <rect x="30" y="20" width="4" height="7" rx="0.5" fill="#cbd5e1" opacity="0.5"/>
-      </g>
+      <rect x="18" y="52" width="44" height="4" fill="${plinth}" stroke="${line}" stroke-width="1.5"/>
+      <rect x="15" y="13" width="50" height="39" rx="1.5" fill="#f8fafc" stroke="${line}" stroke-width="2"/>
+      <rect x="13" y="9" width="54" height="4" rx="1" fill="${counter}" stroke="${line}" stroke-width="1.8"/>
+      <!-- 2 İç Raf Çizgisi -->
+      <line x1="16" y1="26" x2="64" y2="26" stroke="${line}" stroke-width="2"/>
+      <line x1="16" y1="39" x2="64" y2="39" stroke="${line}" stroke-width="2"/>
     </svg>`;
   }
 
   // 2. WALL MODULES
-  if (type === 'wall_single') {
+  if (type === "wall_single") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadowSm)">
-        <!-- Yan yüzey -->
-        <polygon points="64,12 70,9 70,52 64,55" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey -->
-        <rect x="14" y="12" width="50" height="43" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey -->
-        <polygon points="12,12 64,12 70,9 18,9" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Alt yüzey kenarı -->
-        <line x1="14" y1="55" x2="64" y2="55" stroke="#94a3b8" stroke-width="0.5"/>
-        <!-- Kapak oluk -->
-        <rect x="16" y="14" width="46" height="39" rx="0.5" fill="none" stroke="#dce4ec" stroke-width="0.4"/>
-        <!-- Dikey kulp -->
-        <line x1="57" y1="30" x2="57" y2="44" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="58" y1="30" x2="58" y2="44" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-      </g>
+      <rect x="16" y="9" width="48" height="43" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <line x1="56" y1="34" x2="56" y2="46" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'wall_double') {
+  if (type === "wall_double") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadowSm)">
-        <!-- Yan yüzey -->
-        <polygon points="64,12 70,9 70,52 64,55" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey -->
-        <rect x="14" y="12" width="50" height="43" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey -->
-        <polygon points="12,12 64,12 70,9 18,9" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Orta çizgi -->
-        <line x1="39" y1="13" x2="39" y2="54" stroke="#b0bec5" stroke-width="0.8"/>
-        <!-- Sol kapak oluk -->
-        <rect x="16" y="14" width="21" height="39" rx="0.5" fill="none" stroke="#dce4ec" stroke-width="0.3"/>
-        <!-- Sağ kapak oluk -->
-        <rect x="41" y="14" width="21" height="39" rx="0.5" fill="none" stroke="#dce4ec" stroke-width="0.3"/>
-        <!-- Çift kulp -->
-        <line x1="36" y1="30" x2="36" y2="44" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="42" y1="30" x2="42" y2="44" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="37" y1="30" x2="37" y2="44" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <line x1="43" y1="30" x2="43" y2="44" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-      </g>
+      <rect x="15" y="9" width="50" height="43" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <line x1="40" y1="9" x2="40" y2="52" stroke="${line}" stroke-width="1.8"/>
+      <line x1="37" y1="34" x2="37" y2="46" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="43" y1="34" x2="43" y2="46" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'wall_glass') {
+  if (type === "wall_glass") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadowSm)">
-        <!-- Yan yüzey -->
-        <polygon points="64,12 70,9 70,50 64,53" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey (çerçeve) -->
-        <rect x="14" y="12" width="50" height="41" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey -->
-        <polygon points="12,12 64,12 70,9 18,9" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Cam panel -->
-        <rect x="18" y="16" width="42" height="33" rx="1.5" fill="url(#isoGlass)" stroke="#7dd3fc" stroke-width="0.8"/>
-        <!-- Cam yansıma efektleri -->
-        <line x1="22" y1="44" x2="36" y2="20" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
-        <line x1="28" y1="46" x2="44" y2="22" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round" opacity="0.15"/>
-        <!-- İkinci yansıma -->
-        <line x1="46" y1="44" x2="54" y2="26" stroke="#ffffff" stroke-width="0.5" stroke-linecap="round" opacity="0.1"/>
-        <!-- Alt yatay kulp -->
-        <line x1="30" y1="50" x2="48" y2="50" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-        <line x1="30" y1="51" x2="48" y2="51" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <!-- Cam çerçeve raf (ortada) -->
-        <line x1="19" y1="32" x2="59" y2="32" stroke="#7dd3fc" stroke-width="0.5" opacity="0.5"/>
-      </g>
+      <rect x="15" y="9" width="50" height="43" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Cam Çerçeve -->
+      <rect x="20" y="14" width="40" height="33" rx="1" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.6"/>
+      <!-- Cam Yansıma Glinti -->
+      <line x1="25" y1="40" x2="44" y2="20" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
+      <!-- Yatay Kalkar Kulp -->
+      <line x1="28" y1="42" x2="52" y2="42" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'wall_hood') {
+  if (type === "wall_hood") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Üst dolap bölümü - Yan yüzey -->
-        <polygon points="64,10 70,7 70,40 64,43" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Üst dolap ön yüzey -->
-        <rect x="14" y="10" width="50" height="33" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Dolap üst yüzey -->
-        <polygon points="12,10 64,10 70,7 18,7" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Orta çizgi (çift kapak) -->
-        <line x1="39" y1="11" x2="39" y2="42" stroke="#b0bec5" stroke-width="0.7"/>
-        <!-- Davlumbaz gövdesi -->
-        <polygon points="14,43 64,43 68,46 10,46" fill="#cbd5e1" stroke="#94a3b8" stroke-width="0.6"/>
-        <rect x="10" y="46" width="60" height="8" rx="1" fill="#b0bec5" stroke="#8899a6" stroke-width="0.6"/>
-        <!-- Davlumbaz yan -->
-        <polygon points="68,46 74,43 74,54 68,54" fill="#9aa8b8" stroke="#8899a6" stroke-width="0.3"/>
-        <!-- Davlumbaz alt ızgara -->
-        <line x1="16" y1="50" x2="64" y2="50" stroke="#8899a6" stroke-width="1" stroke-dasharray="3,2"/>
-        <line x1="16" y1="52" x2="64" y2="52" stroke="#8899a6" stroke-width="0.6" stroke-dasharray="2,2"/>
-        <!-- Davlumbaz ışığı -->
-        <circle cx="39" cy="48" r="1.5" fill="#fbbf24" opacity="0.6"/>
-      </g>
+      <rect x="15" y="9" width="50" height="34" rx="1.5" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <line x1="40" y1="9" x2="40" y2="43" stroke="${line}" stroke-width="1.8"/>
+      <!-- Aspiratör Izgara Alt Bölüm -->
+      <rect x="15" y="43" width="50" height="9" fill="#1e293b" stroke="${line}" stroke-width="1.8"/>
+      <line x1="22" y1="47.5" x2="58" y2="47.5" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="3,2"/>
     </svg>`;
   }
 
-  if (type === 'wall_hood_chimney') {
+  if (type === "wall_hood_chimney") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Baca (üst kısım) -->
-        <rect x="33" y="4" width="14" height="30" fill="#94a3b8" stroke="#7a8a9a" stroke-width="0.6"/>
-        <!-- Baca yan yüzey -->
-        <polygon points="47,4 53,1 53,31 47,34" fill="#849aaa" stroke="#7a8a9a" stroke-width="0.3"/>
-        <!-- Baca üst -->
-        <polygon points="33,4 47,4 53,1 39,1" fill="#a0b0be" stroke="#7a8a9a" stroke-width="0.3"/>
-        <!-- Piramidal davlumbaz gövdesi -->
-        <polygon points="10,48 68,48 60,38 18,38" fill="#cbd5e1" stroke="#8899a6" stroke-width="0.8"/>
-        <!-- Davlumbaz yan -->
-        <polygon points="68,48 74,45 66,35 60,38" fill="#b0bec5" stroke="#8899a6" stroke-width="0.4"/>
-        <!-- Davlumbaz üst -->
-        <polygon points="18,38 60,38 66,35 24,35" fill="#dce4ec" stroke="#8899a6" stroke-width="0.3"/>
-        <!-- Alt kenar -->
-        <rect x="8" y="48" width="62" height="5" rx="1" fill="#8899a6" stroke="#7a8a9a" stroke-width="0.5"/>
-        <!-- Alt ızgara/filtre -->
-        <line x1="14" y1="50" x2="64" y2="50" stroke="#64748b" stroke-width="0.8" stroke-dasharray="2,1.5"/>
-        <!-- LED ışıklar -->
-        <circle cx="30" cy="50" r="1" fill="#fbbf24" opacity="0.5"/>
-        <circle cx="48" cy="50" r="1" fill="#fbbf24" opacity="0.5"/>
-      </g>
+      <!-- Paslanmaz Çelik Baca -->
+      <rect x="33" y="6" width="14" height="34" fill="#94a3b8" stroke="${line}" stroke-width="1.8"/>
+      <!-- T-Davlumbaz Kanopi -->
+      <polygon points="12,48 68,48 62,40 18,40" fill="#cbd5e1" stroke="${line}" stroke-width="2" stroke-linejoin="round"/>
+      <!-- Alt Izgara Paneli -->
+      <rect x="10" y="48" width="60" height="5" rx="1" fill="#1e293b" stroke="${line}" stroke-width="1.4"/>
+      <circle cx="20" cy="50.5" r="1.2" fill="#38bdf8"/>
     </svg>`;
   }
 
-  if (type && type.startsWith('wall_corner')) {
+  if (type && type.startsWith("wall_corner")) {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadowSm)">
-        <!-- L-şekilli ön yüzey -->
-        <polygon points="14,10 64,10 64,30 44,30 44,50 14,50" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey L -->
-        <polygon points="12,10 64,10 70,7 18,7" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Sağ yan yüzey (üst kısım) -->
-        <polygon points="64,10 70,7 70,27 64,30" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Sağ yan yüzey (alt çıkıntı) -->
-        <polygon points="44,30 50,27 50,47 44,50" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- L üst uzantı -->
-        <polygon points="44,30 50,27 70,27 64,30" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.3"/>
-        <!-- 90° etiketi -->
-        <text x="28" y="34" font-size="9" font-weight="bold" fill="#0284c7" font-family="sans-serif">90°</text>
-        <!-- Köşe açı gösterge -->
-        <path d="M42 32 L42 28 L38 28" fill="none" stroke="#0284c7" stroke-width="0.8" opacity="0.6"/>
-      </g>
+      <polygon points="14,10 66,10 66,32 46,32 46,50 14,50" fill="${fill}" stroke="${line}" stroke-width="2" stroke-linejoin="round"/>
+      <polygon points="16,12 64,12 64,30 44,30 44,48 16,48" fill="#e2e8f0" opacity="0.4"/>
+      <rect x="30" y="24" width="24" height="14" rx="3" fill="#0284c7"/>
+      <text x="42" y="34.5" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle" font-family="sans-serif">90°</text>
     </svg>`;
   }
 
-  if (type === 'wall_open_shelf') {
+  if (type === "wall_open_shelf") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadowSm)">
-        <!-- Yan yüzey -->
-        <polygon points="64,10 70,7 70,54 64,57" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey (açık raf) -->
-        <rect x="14" y="10" width="50" height="47" rx="1" fill="#edf2f7" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey -->
-        <polygon points="12,10 64,10 70,7 18,7" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Arka duvar -->
-        <rect x="15" y="11" width="48" height="45" rx="0.5" fill="#e2e8f0" opacity="0.4"/>
-        <!-- Raf çizgileri -->
-        <line x1="15" y1="24" x2="63" y2="24" stroke="#94a3b8" stroke-width="1.2"/>
-        <line x1="15" y1="38" x2="63" y2="38" stroke="#94a3b8" stroke-width="1.2"/>
-        <line x1="15" y1="50" x2="63" y2="50" stroke="#94a3b8" stroke-width="1"/>
-        <!-- Raf gölgeleri -->
-        <line x1="15" y1="25" x2="63" y2="25" stroke="#000" stroke-width="0.4" opacity="0.05"/>
-        <line x1="15" y1="39" x2="63" y2="39" stroke="#000" stroke-width="0.4" opacity="0.05"/>
-        <!-- Raf dekor objeleri -->
-        <rect x="20" y="27" width="5" height="10" rx="0.5" fill="#cbd5e1" opacity="0.5"/>
-        <rect x="28" y="30" width="4" height="7" rx="0.5" fill="#cbd5e1" opacity="0.4"/>
-        <circle cx="44" cy="33" r="3" fill="#cbd5e1" opacity="0.4"/>
-      </g>
+      <rect x="15" y="9" width="50" height="43" rx="1.5" fill="#f8fafc" stroke="${line}" stroke-width="2"/>
+      <line x1="16" y1="23" x2="64" y2="23" stroke="${line}" stroke-width="2"/>
+      <line x1="16" y1="37" x2="64" y2="37" stroke="${line}" stroke-width="2"/>
     </svg>`;
   }
 
   // 3. TALL MODULES
-  if (type === 'tall_fridge' || type === 'app_fridge') {
+  if (type === "tall_fridge" || type === "app_fridge") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="22" y="55" width="34" height="3" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="56,5 64,2 64,55 56,58" fill="#cbd5e1" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey (buzdolabı gövdesi) -->
-        <rect x="20" y="5" width="36" height="50" rx="2" fill="url(#isoFridge)" stroke="#94a3b8" stroke-width="0.8"/>
-        <!-- Üst yüzey -->
-        <polygon points="18,5 56,5 64,2 26,2" fill="#f1f5f9" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Dondurucu bölüm (üst) -->
-        <rect x="21" y="6" width="34" height="14" fill="#f8fafc" stroke="#b0bec5" stroke-width="0.5"/>
-        <!-- Alt buzdolabı bölüm -->
-        <rect x="21" y="21" width="34" height="33" fill="#f8fafc" stroke="#b0bec5" stroke-width="0.5"/>
-        <!-- Ayırıcı çizgi -->
-        <line x1="21" y1="20" x2="55" y2="20" stroke="#94a3b8" stroke-width="1"/>
-        <!-- Ekran paneli -->
-        <rect x="25" y="25" width="10" height="8" rx="1" fill="#0f172a" stroke="#334155" stroke-width="0.5"/>
-        <!-- Ekran ışığı -->
-        <rect x="26" y="26" width="8" height="4" rx="0.5" fill="#0284c7" opacity="0.4"/>
-        <text x="30" y="29" font-size="3" fill="#7dd3fc" text-anchor="middle" font-family="sans-serif">-18°</text>
-        <!-- Kulp (dondurucu) -->
-        <line x1="52" y1="9" x2="52" y2="17" stroke="#475569" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- Kulp (buzdolabı) -->
-        <line x1="52" y1="24" x2="52" y2="40" stroke="#475569" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- Kulp gölgeleri -->
-        <line x1="53" y1="9" x2="53" y2="17" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <line x1="53" y1="24" x2="53" y2="40" stroke="#000" stroke-width="0.5" stroke-linecap="round" opacity="0.06"/>
-        <!-- Marka plaketi -->
-        <rect x="36" y="36" width="10" height="2.5" rx="0.5" fill="#cbd5e1" opacity="0.6"/>
-      </g>
+      <rect x="23" y="55" width="34" height="3" fill="${plinth}" stroke="${line}" stroke-width="1.2"/>
+      <!-- Buzdolabı Gövde -->
+      <rect x="21" y="5" width="38" height="50" rx="2" fill="#f8fafc" stroke="${line}" stroke-width="2"/>
+      <!-- Dondurucu / Soğutucu Ayrımı -->
+      <line x1="21" y1="22" x2="59" y2="22" stroke="${line}" stroke-width="2"/>
+      <!-- Dijital Su / Buz Pınarı -->
+      <rect x="26" y="26" width="9" height="11" rx="1.5" fill="#1e293b" stroke="${line}" stroke-width="1"/>
+      <circle cx="30.5" cy="29" r="1" fill="#38bdf8"/>
+      <!-- Uzun Dikey Kulplar -->
+      <line x1="53" y1="9" x2="53" y2="19" stroke="${handle}" stroke-width="2.4" stroke-linecap="round"/>
+      <line x1="53" y1="26" x2="53" y2="47" stroke="${handle}" stroke-width="2.4" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'tall_pantry_2d') {
+  if (type === "tall_pantry_2d") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="22" y="55" width="34" height="3" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="56,5 64,2 64,55 56,58" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey -->
-        <rect x="20" y="5" width="36" height="50" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey -->
-        <polygon points="18,5 56,5 64,2 26,2" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Üst kapak bölümü -->
-        <line x1="20" y1="22" x2="56" y2="22" stroke="#b0bec5" stroke-width="0.8"/>
-        <!-- Orta çizgi (çift kapak) -->
-        <line x1="38" y1="6" x2="38" y2="54" stroke="#b0bec5" stroke-width="0.7"/>
-        <!-- Sol kapak olukları -->
-        <rect x="22" y="7" width="14" height="14" rx="0.3" fill="none" stroke="#dce4ec" stroke-width="0.3"/>
-        <rect x="22" y="24" width="14" height="29" rx="0.3" fill="none" stroke="#dce4ec" stroke-width="0.3"/>
-        <!-- Sağ kapak olukları -->
-        <rect x="40" y="7" width="14" height="14" rx="0.3" fill="none" stroke="#dce4ec" stroke-width="0.3"/>
-        <rect x="40" y="24" width="14" height="29" rx="0.3" fill="none" stroke="#dce4ec" stroke-width="0.3"/>
-        <!-- Kulplar (üst) -->
-        <line x1="35" y1="11" x2="35" y2="18" stroke="#475569" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="41" y1="11" x2="41" y2="18" stroke="#475569" stroke-width="1.5" stroke-linecap="round"/>
-        <!-- Kulplar (alt) -->
-        <line x1="35" y1="30" x2="35" y2="44" stroke="#475569" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="41" y1="30" x2="41" y2="44" stroke="#475569" stroke-width="1.5" stroke-linecap="round"/>
-      </g>
+      <rect x="23" y="55" width="34" height="3" fill="${plinth}" stroke="${line}" stroke-width="1.2"/>
+      <!-- Boy Kiler Gövdesi -->
+      <rect x="21" y="5" width="38" height="50" rx="2" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Kapak Ayrım Çizgisi -->
+      <line x1="21" y1="26" x2="59" y2="26" stroke="${line}" stroke-width="1.8"/>
+      <!-- Çift Kulp -->
+      <line x1="53" y1="12" x2="53" y2="22" stroke="${handle}" stroke-width="2.4" stroke-linecap="round"/>
+      <line x1="53" y1="30" x2="53" y2="48" stroke="${handle}" stroke-width="2.4" stroke-linecap="round"/>
     </svg>`;
   }
 
-  if (type === 'tall_oven_microwave') {
+  if (type === "tall_oven_microwave") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Süpürgelik -->
-        <rect x="22" y="55" width="34" height="3" rx="0.5" fill="#64748b"/>
-        <!-- Yan yüzey -->
-        <polygon points="56,5 64,2 64,55 56,58" fill="url(#isoSide)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Ön yüzey (gövde) -->
-        <rect x="20" y="5" width="36" height="50" rx="1" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.6"/>
-        <!-- Üst yüzey -->
-        <polygon points="18,5 56,5 64,2 26,2" fill="url(#isoTop)" stroke="#b0bec5" stroke-width="0.4"/>
-        <!-- Üst dolap bölümü -->
-        <rect x="21" y="6" width="34" height="8" fill="url(#isoFront)" stroke="#b0bec5" stroke-width="0.4"/>
-        <line x1="52" y1="8" x2="52" y2="12" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
-        <!-- Mikrodalga (orta-üst) -->
-        <rect x="22" y="16" width="32" height="11" rx="1" fill="#1e293b" stroke="#475569" stroke-width="0.6"/>
-        <rect x="24" y="17.5" width="22" height="8" rx="0.8" fill="#263040"/>
-        <!-- Mikrodalga cam yansıma -->
-        <line x1="26" y1="24" x2="32" y2="18" stroke="#fff" stroke-width="0.5" opacity="0.15"/>
-        <!-- Mikrodalga kontrol -->
-        <rect x="48" y="18" width="4" height="6" rx="0.5" fill="#334155"/>
-        <circle cx="50" cy="20" r="1" fill="#94a3b8"/>
-        <!-- Fırın (orta-alt) -->
-        <rect x="22" y="29" width="32" height="15" rx="1" fill="#0f172a" stroke="#475569" stroke-width="0.6"/>
-        <rect x="24" y="31" width="28" height="11" rx="0.8" fill="#1a2536"/>
-        <!-- Fırın cam yansıma -->
-        <line x1="26" y1="40" x2="34" y2="32" stroke="#fff" stroke-width="0.6" opacity="0.12"/>
-        <!-- Fırın ızgaralar -->
-        <line x1="26" y1="35" x2="50" y2="35" stroke="#475569" stroke-width="0.5" opacity="0.6"/>
-        <line x1="26" y1="38" x2="50" y2="38" stroke="#475569" stroke-width="0.5" opacity="0.5"/>
-        <!-- Fırın kulp -->
-        <line x1="30" y1="44" x2="46" y2="44" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
-        <!-- Alt dolap bölümü -->
-        <line x1="20" y1="46" x2="56" y2="46" stroke="#b0bec5" stroke-width="0.7"/>
-        <line x1="52" y1="48" x2="52" y2="53" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
-      </g>
+      <rect x="23" y="55" width="34" height="3" fill="${plinth}" stroke="${line}" stroke-width="1.2"/>
+      <!-- Gövde -->
+      <rect x="21" y="5" width="38" height="50" rx="2" fill="${fill}" stroke="${line}" stroke-width="2"/>
+      <!-- Mikrodalga Nişi -->
+      <rect x="24" y="16" width="32" height="12" rx="1" fill="#1e293b" stroke="${line}" stroke-width="1.4"/>
+      <rect x="26" y="18" width="20" height="8" rx="0.5" fill="#0f172a"/>
+      <circle cx="51" cy="22" r="1.5" fill="#38bdf8"/>
+      <!-- Ankastre Fırın Nişi -->
+      <rect x="24" y="30" width="32" height="14" rx="1" fill="#0f172a" stroke="${line}" stroke-width="1.4"/>
+      <line x1="27" y1="33" x2="53" y2="33" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <!-- Alt Kapak Ayrım -->
+      <line x1="21" y1="46" x2="59" y2="46" stroke="${line}" stroke-width="1.8"/>
     </svg>`;
   }
 
   // 4. APPLIANCES
-  if (type === 'app_sink') {
+  if (type === "app_sink") {
     return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-      ${defs}
-      <g filter="url(#isoShadow)">
-        <!-- Tezgah yüzeyi -->
-        <polygon points="10,22 66,22 72,18 16,18" fill="url(#isoCounter)" stroke="#8899a6" stroke-width="0.5"/>
-        <!-- Tezgah ön yüzey -->
-        <rect x="10" y="22" width="56" height="24" rx="1.5" fill="#cbd5e1" stroke="#94a3b8" stroke-width="0.7"/>
-        <!-- Tezgah yan yüzey -->
-        <polygon points="66,22 72,18 72,44 66,46" fill="#b0bec5" stroke="#94a3b8" stroke-width="0.3"/>
-        <!-- Evye havuzu (gömme, tezgah üstünde) -->
-        <rect x="18" y="15" width="28" height="7" rx="2" fill="#78909c" stroke="#607d8b" stroke-width="0.6"/>
-        <!-- Sol havuz -->
-        <rect x="20" y="16.5" width="11" height="4.5" rx="1" fill="#607d8b" opacity="0.7"/>
-        <!-- Sağ havuz -->
-        <rect x="33" y="16.5" width="11" height="4.5" rx="1" fill="#607d8b" opacity="0.7"/>
-        <!-- Su gideri -->
-        <circle cx="25.5" cy="19" r="1" fill="#546e7a"/>
-        <circle cx="38.5" cy="19" r="1" fill="#546e7a"/>
-        <!-- Çeşme gövdesi -->
-        <path d="M50 17 Q50 7 55 7 Q59 7 59 11 L59 15" fill="none" stroke="#475569" stroke-width="2.2" stroke-linecap="round"/>
-        <!-- Çeşme ucu -->
-        <circle cx="59" cy="15.5" r="1" fill="#475569"/>
-        <!-- Su damlası -->
-        <ellipse cx="59" cy="17.5" rx="0.5" ry="0.8" fill="#0284c7" opacity="0.5"/>
-        <!-- Çeşme kolu -->
-        <line x1="48" y1="10" x2="52" y2="10" stroke="#475569" stroke-width="1.5" stroke-linecap="round"/>
-      </g>
+      <!-- Tezgah Evye Havuzu -->
+      <rect x="14" y="18" width="52" height="28" rx="2.5" fill="#cbd5e1" stroke="${line}" stroke-width="2"/>
+      <rect x="18" y="22" width="26" height="20" rx="2" fill="#94a3b8" stroke="${line}" stroke-width="1.4"/>
+      <circle cx="31" cy="32" r="3" fill="${line}"/>
+      <!-- Batarya Eğrisi -->
+      <path d="M48 24 Q48 10 54 10 Q58 10 58 14 L58 17" fill="none" stroke="${handle}" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="58" cy="18" r="1.4" fill="${handle}"/>
     </svg>`;
   }
 
   // Fallback icon
   return `<svg viewBox="0 0 80 60" width="100%" height="100%">
-    <rect x="15" y="12" width="50" height="40" rx="2" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+    <rect x="15" y="12" width="50" height="40" rx="2" fill="#f8fafc" stroke="${line}" stroke-width="2"/>
     <text x="40" y="36" font-size="16" text-anchor="middle" fill="#64748b">📦</text>
   </svg>`;
 }
@@ -1464,7 +1133,7 @@ function renderCatalogModulesDOM(groups, appendOnly = false) {
         </span>
         <span style="display:flex; align-items:center; gap:0.4rem;">
           <span class="acc-badge">${grp.items.length}</span>
-          <span class="acc-arrow">${grp.open ? '▲' : '▼'}</span>
+          <span class="acc-arrow">▼</span>
         </span>
       </button>
       <div class="adeko-accordion-content" id="acc-content-${grp.groupKey}"></div>
@@ -1604,15 +1273,23 @@ function updateCatalogDimensionPills() {
 window.toggleAccordion = function(groupKey) {
   const grp = document.getElementById(`acc-group-${groupKey}`);
   if (!grp) return;
-  const wasOpen = grp.classList.contains('open');
-  if (wasOpen) {
-    grp.classList.remove('open');
-  } else {
-    grp.classList.add('open');
-  }
-  const arrow = grp.querySelector('.acc-arrow');
-  if (arrow) {
-    arrow.textContent = wasOpen ? '▼' : '▲';
+  grp.classList.toggle('open');
+};
+
+window.toggleAllCatalogAccordions = function() {
+  const groups = document.querySelectorAll('.flyout-catalog-container .adeko-accordion-group');
+  if (!groups || groups.length === 0) return;
+  const anyClosed = Array.from(groups).some(g => !g.classList.contains('open'));
+  groups.forEach(g => {
+    if (anyClosed) {
+      g.classList.add('open');
+    } else {
+      g.classList.remove('open');
+    }
+  });
+  const textEl = document.getElementById('toggle-all-acc-text');
+  if (textEl) {
+    textEl.textContent = anyClosed ? 'Tümünü Topla' : 'Tümünü Aç';
   }
 };
 
@@ -2054,9 +1731,23 @@ function renderFlyoutCategory(catKey) {
     );
   }
 
-  const mapped = filtered.map(g => ({ ...g, open: true }));
+  const mapped = filtered.map((g, idx) => ({ ...g, open: idx === 0 }));
 
   container.innerHTML = '';
+
+  // Mini toolbar: Kategori sayısı & Tümünü Aç/Topla
+  if (filtered.length > 1) {
+    const toolbar = document.createElement('div');
+    toolbar.className = 'flyout-accordion-toolbar';
+    toolbar.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:4px 6px 8px 6px; font-size:11px; color:#64748b; border-bottom:1px solid #f1f5f9; margin-bottom:8px;';
+    toolbar.innerHTML = `
+      <span style="font-weight:700; color:#475569;">📁 ${filtered.length} Modül Grubu</span>
+      <button type="button" class="btn-text-link" onclick="toggleAllCatalogAccordions()" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#0284c7; font-weight:700; font-size:10px; cursor:pointer; padding:3px 8px; border-radius:999px;">
+        <span id="toggle-all-acc-text">Tümünü Aç</span> ⇅
+      </button>
+    `;
+    container.appendChild(toolbar);
+  }
 
   // 1. IF WALL: PREPEND UPPER CABINET HEIGHT SELECTOR AT VERY TOP
   if (catKey === 'wall') {
