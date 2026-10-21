@@ -1165,6 +1165,12 @@ function renderCatalogModulesDOM(groups, appendOnly = false) {
       const remSpace = m.category === 'wall' ? cap.wallRemaining : cap.baseRemaining;
       item.innerHTML = renderVisualModuleCardInner(m, remSpace);
 
+      // Card click: If a compatible module is selected on canvas, swap it; otherwise add to canvas
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('.vcard-ctrl-row')) return;
+        handleCatalogAddOrSwap(m.type);
+      });
+
       contentDiv.appendChild(item);
     });
   });
@@ -1191,7 +1197,7 @@ function renderVisualModuleCardInner(m, remSpace) {
       <select class="vcard-width-select" onchange="event.stopPropagation(); selectModuleWidth('${m.type}', parseInt(this.value))" title="Genişlik Değiştir">
         ${widthOptions}
       </select>
-      <button type="button" class="vcard-add-btn" onclick="event.stopPropagation(); addModuleToDesign(getModuleTemplate('${m.type}'))" title="Tuvale Yerleştir">
+      <button type="button" class="vcard-add-btn" onclick="event.stopPropagation(); handleCatalogAddOrSwap('${m.type}')" title="Tuvale Yerleştir veya Seçili Modülle Değiştir">
         + Ekle
       </button>
     </div>
@@ -1291,6 +1297,161 @@ window.toggleAllCatalogAccordions = function() {
   if (textEl) {
     textEl.textContent = anyClosed ? 'Tümünü Topla' : 'Tümünü Aç';
   }
+};
+
+// MODULE SWAP (YERİNDE DEĞİŞTİRME) SİSTEMİ
+window.handleCatalogAddOrSwap = function(type) {
+  const tmpl = getModuleTemplate(type);
+  if (!tmpl) return;
+
+  const selId = canvas3D?.selectedModuleId || canvas2D?.selectedModuleId;
+  if (selId) {
+    const selMod = window.CURRENT_DESIGN.modules.find(m => m.id === selId);
+    if (selMod) {
+      const isBaseComp = (selMod.category === 'base' || selMod.category === 'appliance') && (tmpl.category === 'base' || tmpl.category === 'appliance');
+      const isWallComp = selMod.category === 'wall' && tmpl.category === 'wall';
+      const isTallComp = selMod.category === 'tall' && tmpl.category === 'tall';
+
+      if (isBaseComp || isWallComp || isTallComp) {
+        swapSelectedModule(tmpl);
+        return;
+      }
+    }
+  }
+  addModuleToDesign(tmpl);
+};
+
+window.swapSelectedModule = function(newTemplate) {
+  if (!newTemplate) return;
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlidir. Değişiklik yapılamaz.", "error");
+    return;
+  }
+  const selId = canvas3D?.selectedModuleId || canvas2D?.selectedModuleId;
+  if (!selId) {
+    showToast("⚠️ Değiştirilecek modül seçili değil.", "warning");
+    return;
+  }
+
+  const idx = window.CURRENT_DESIGN.modules.findIndex(m => m.id === selId);
+  if (idx === -1) return;
+
+  saveDesignStateForUndo();
+  const oldMod = window.CURRENT_DESIGN.modules[idx];
+  const oldName = oldMod.name;
+
+  // New module inherits old module's id, wall, position x
+  const newMod = JSON.parse(JSON.stringify(newTemplate));
+  newMod.id = oldMod.id;
+  newMod.wall = oldMod.wall;
+  newMod.x = oldMod.x;
+
+  // Width handling: If newTemplate supports oldMod's width, keep oldMod's width!
+  if (newMod.allowed_widths && newMod.allowed_widths.includes(oldMod.w)) {
+    newMod.w = oldMod.w;
+    newMod.selected_w = oldMod.w;
+  } else if (newMod.allow_custom_width) {
+    newMod.w = oldMod.w;
+    newMod.selected_w = oldMod.w;
+  } else {
+    newMod.w = newMod.selected_w || newMod.w || oldMod.w;
+  }
+
+  // Height and depth handling
+  if (newMod.category === 'wall') {
+    newMod.h = oldMod.h || getActiveStudioWallHeight();
+    newMod.d = oldMod.d || 350;
+    newMod.shelves = (newMod.h >= 900) ? 2 : 1;
+    newMod.shelfCount = newMod.shelves;
+  } else if (newMod.category === 'base' || newMod.category === 'appliance') {
+    newMod.h = oldMod.h || 720;
+    newMod.d = oldMod.d || 600;
+  }
+
+  // Smart handle side
+  if (canvas3D && canvas3D.getSmartHandleSide) {
+    const wallCap = getWallCapacity(newMod.wall);
+    newMod.handleSide = canvas3D.getSmartHandleSide(newMod, wallCap.wallLength);
+  }
+
+  window.CURRENT_DESIGN.modules[idx] = newMod;
+
+  // Re-render scene & UI
+  renderActiveCanvas();
+  updatePlacedModulesUI();
+  showSelectedModuleGizmo(newMod);
+
+  showToast(`🔄 "${oldName}" başarıyla "${newMod.name}" (${Math.round(newMod.w / 10)} cm) ile değiştirildi!`, 'success');
+};
+
+window.openModuleSwapModal = function() {
+  if (window.CURRENT_DESIGN_LOCKED) {
+    showToast("🔒 Tasarımınız kilitlidir. Değişiklik yapılamaz.", "error");
+    return;
+  }
+  const selId = canvas3D?.selectedModuleId || canvas2D?.selectedModuleId;
+  if (!selId) {
+    showToast("⚠️ Lütfen önce değiştirmek istediğiniz modülü seçin.", "warning");
+    return;
+  }
+  const selMod = window.CURRENT_DESIGN.modules.find(m => m.id === selId);
+  if (!selMod) return;
+
+  const modal = document.getElementById('module-swap-modal');
+  const infoEl = document.getElementById('swap-modal-current-info');
+  const gridEl = document.getElementById('swap-modal-candidates-grid');
+  if (!modal || !infoEl || !gridEl) return;
+
+  const wallLabel = selMod.wall === 'left' ? 'Sol Duvar' : 'Arka Duvar';
+  infoEl.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <strong style="color:#0f172a; font-size:13px;">${selMod.name}</strong>
+        <div style="font-size:11px; color:#64748b; margin-top:2px;">Ölçü: ${selMod.w}x${selMod.d || 600} mm | ${wallLabel} (X: ${Math.round(selMod.x)} mm)</div>
+      </div>
+      <span class="badge" style="background:#0284c7; color:#fff; font-weight:700; padding:4px 10px; border-radius:999px; font-size:11px;">Mevcut Modül</span>
+    </div>
+  `;
+
+  // Find all compatible candidates from ADEKO_MODULE_GROUPS
+  const allGroups = ADEKO_MODULE_GROUPS[window.CURRENT_CATEGORY] || ADEKO_MODULE_GROUPS.kitchen;
+  const candidates = [];
+
+  allGroups.forEach(grp => {
+    grp.items.forEach(item => {
+      const isBaseComp = (selMod.category === 'base' || selMod.category === 'appliance') && (item.category === 'base' || item.category === 'appliance');
+      const isWallComp = selMod.category === 'wall' && item.category === 'wall';
+      const isTallComp = selMod.category === 'tall' && item.category === 'tall';
+
+      const currentIsCorner = selMod.type && selMod.type.includes('corner');
+      const itemIsCorner = item.type && item.type.includes('corner');
+
+      if ((isBaseComp || isWallComp || isTallComp) && (currentIsCorner === itemIsCorner) && item.type !== selMod.type) {
+        if (!candidates.find(c => c.type === item.type)) {
+          candidates.push(item);
+        }
+      }
+    });
+  });
+
+  if (candidates.length === 0) {
+    gridEl.innerHTML = `<div style="grid-column:span 2; text-align:center; padding:20px; color:#64748b; font-size:12px;">Bu modül için uyumlu alternatif bulunamadı.</div>`;
+  } else {
+    gridEl.innerHTML = candidates.map(m => {
+      const svg = getModuleVisualSVG(m.type, m.name);
+      return `
+        <div class="swap-candidate-card" onclick="swapSelectedModule(getModuleTemplate('${m.type}')); closeModal('module-swap-modal');" style="background:#ffffff; border:1.5px solid #e2e8f0; border-radius:12px; padding:10px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; transition:all 0.18s ease; text-align:center;" onmouseover="this.style.borderColor='#0284c7'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(2,132,199,0.12)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
+          <div style="width:100%; height:60px; background:#f8fafc; border:1px solid #f1f5f9; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            ${svg}
+          </div>
+          <strong style="font-size:11px; color:#0f172a; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${m.name}</strong>
+          <span style="font-size:10px; color:#0284c7; font-weight:700; background:#e0f2fe; padding:2px 8px; border-radius:999px;">Buna Dönüştür ⚡</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  modal.classList.add('active');
 };
 
 window.filterCatalogModules = function(query) {
