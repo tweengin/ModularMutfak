@@ -3081,5 +3081,200 @@ canvas {
   }
 }
 
+/* ============================================================
+   TOPBAR — RESPONSIVE / ADAPTIVE OVERRIDES
+   ============================================================ */
+
+/* --- Base responsive hardening (all widths) --- */
+.studio-viewport-topbar {
+  gap: 8px;
+}
+.topbar-cluster-left,
+.topbar-cluster-center,
+.topbar-cluster-right {
+  min-width: 0;
+  flex-shrink: 1;
+}
+.topbar-seg-btn,
+.topbar-room-pill,
+.topbar-cta-green,
+.topbar-back-circle-btn,
+.dock-icon-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Camera microdock: in topbar flow, remove absolute positioning */
+.studio-viewport-topbar .floating-camera-microdock {
+  position: static;
+  transform: none;
+}
+
+/* --- 1200px — Cluster'lar hafifçe küçülür --- */
+@media (max-width: 1200px) {
+  .topbar-room-pill {
+    padding: 5px 10px;
+    font-size: 11px;
+    gap: 5px;
+  }
+  /* Room pill'deki boyut yazısı (360 × 260 cm) daha küçük */
+  .topbar-room-pill #topbar-room-info {
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-seg-btn {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+  .topbar-cta-green {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+}
+
+/* --- 1024px — Segmented dock sadece emoji, camera dock küçülür --- */
+@media (max-width: 1024px) {
+  .studio-viewport-topbar {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  /* Segmented butonlarda emoji'den sonraki text'i gizle:
+     Buton içeriği "🧱 Arka Duvar" formatında —
+     max-width ile sadece emoji kadar gösterip text kısmını kırpıyoruz. */
+  .topbar-seg-btn {
+    font-size: 14px;
+    overflow: hidden;
+    max-width: 34px;     /* Sadece emoji sığacak kadar */
+    text-overflow: clip;
+    text-align: center;
+    padding: 5px 8px;
+    line-height: 1;
+  }
+
+  /* Room pill kısalt */
+  .topbar-room-pill #topbar-room-info {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Camera dock butonları küçülsün */
+  .dock-icon-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .studio-viewport-topbar .floating-camera-microdock {
+    padding: 3px 6px;
+    gap: 2px;
+  }
+}
+
+/* --- 768px — Mobil / çok dar ekran — minimal düzen --- */
+@media (max-width: 768px) {
+  .studio-viewport-topbar {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Left cluster: geri butonu + room pill yan yana, segmented alt satıra */
+  .topbar-cluster-left {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  /* Center cluster (camera dock) en alta, tam genişlik */
+  .topbar-cluster-center {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Room pill iyice kısalt */
+  .topbar-room-pill #topbar-room-info {
+    max-width: 80px;
+  }
+  .topbar-room-pill {
+    padding: 4px 8px;
+    font-size: 10px;
+    gap: 4px;
+  }
+
+  /* Geri butonu küçült */
+  .topbar-back-circle-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+
+  /* Yerleşim butonu: sadece icon, text gizle */
+  #btn-toggle-drawer span:last-child {
+    display: none;
+  }
+
+  /* CTA butonu küçült */
+  .topbar-cta-green {
+    font-size: 10px;
+    padding: 5px 10px;
+    gap: 4px;
+  }
+
+  /* Camera dock butonları daha da küçülsün */
+  .dock-icon-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .studio-viewport-topbar .floating-camera-microdock {
+    padding: 2px 4px;
+    gap: 1px;
+    border-radius: 999px;
+  }
+
+  /* Segmented dock'taki text gizlenmeye devam */
+  .topbar-seg-btn {
+    max-width: 30px;
+    padding: 4px 6px;
+    font-size: 13px;
+  }
+}
+
+/* --- 480px — Ultra dar (küçük telefonlar) --- */
+@media (max-width: 480px) {
+  .studio-viewport-topbar {
+    top: 4px;
+    left: 4px;
+    right: 4px;
+  }
+
+  /* Right cluster ikona indirge */
+  .topbar-cluster-right {
+    gap: 4px;
+  }
+  .topbar-cta-green span:last-child {
+    display: none;
+  }
+
+  /* Room pill sadece icon */
+  .topbar-room-pill #topbar-room-info {
+    display: none;
+  }
+
+  /* Camera dock: divider gizle */
+  .dock-divider {
+    display: none;
+  }
+}
+
 
 
